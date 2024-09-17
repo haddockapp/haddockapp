@@ -1,0 +1,5 @@
+{{#each data}}
+{{hostname}} {
+	reverse_proxy * {{ip}}:{{port}}
+}
+{{/each}}

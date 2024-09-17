@@ -1,0 +1,29 @@
+###
+# Builder
+###
+
+FROM node:20 as builder
+
+WORKDIR /build
+
+COPY . .
+
+RUN yarn install
+
+RUN yarn build
+
+###
+# Runner
+###
+
+FROM node:20 as runner
+
+COPY --from=builder ./build /app/
+
+WORKDIR /app
+
+RUN yarn install --production
+
+CMD ["yarn", "start:migrate:prod"]
+
+EXPOSE 3000

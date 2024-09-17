@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String         @id @default(uuid())
+    name          String
+    email         String         @unique
+    authorization Authorization?
+}
+
+model Authorization {
+    id    String @id @default(uuid())
+    type  String
+    value String @unique
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @unique
+
+    sources Source[]
+}
+
+model Source {
+    id   String @id @default(uuid())
+    type String
+
+    authorization   Authorization @relation(fields: [authorizationId], references: [id])
+    authorizationId String
+
+    settings Json
+
+    project Project?
+}
+
+model Project {
+    id       String  @id @default(uuid())
+    path     String? @unique
+    source   Source  @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+    sourceId String  @unique
+    vm       Vm      @relation(fields: [vmId], references: [id], onDelete: Cascade)
+    vmId     String  @unique
+    networkConnections NetworkConnection[]
+}
+
+model Vm {
+    id        String   @id @default(uuid())
+    name      String
+    ip        String?  @unique
+    status    String   @default("stopped")
+    memory    Int
+    disk      Int
+    cpus      Int
+    provider  String
+    createdAt DateTime @default(now())
+
+    project Project?
+}
+
+model NetworkConnection {
+    id        String   @id @default(uuid())
+    domain    String   @unique
+    port      Int
+    createdAt DateTime @default(now())
+
+    project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId String
+}
