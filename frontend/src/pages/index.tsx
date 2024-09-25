@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { constants } from "@/constants";
 import { FC } from "react";
 
 const Home: FC = () => (
@@ -9,7 +10,7 @@ const Home: FC = () => (
     </div>
     <Button
       onClick={() =>
-        (window.location.href = `https://github.com/login/oauth/authorize?client_id=${1}&scope=user%20repo`)
+        (window.location.href = `https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`)
       }
       className="p-4 gap-2"
     >
