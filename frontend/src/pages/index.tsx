@@ -9,6 +9,7 @@ const Home: FC = () => (
       <h1 className="text-4xl text-center">Welcome</h1>
     </div>
     <Button
+      variant="dark"
       onClick={() =>
         (window.location.href = `https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`)
       }

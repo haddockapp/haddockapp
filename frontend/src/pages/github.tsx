@@ -6,12 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 const GithubCallback: FC = () => {
   const navigate = useNavigate();
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     const [, query] = document.location.href.split("?");
-    if (!query) return navigate("/");
+    if (!query) return;
     const code = query.split("=")[1];
     if (code && code.length > 0) {
       dispatch(setToken(code));

@@ -1,4 +1,3 @@
-import Header from "@/components/organisms/Header";
 import { Button } from "@/components/ui/button";
 import { ProjectDto } from "@/types/projects/projects.dto";
 import { VmProvider, VmState } from "@/types/vm/vm";
@@ -34,17 +33,15 @@ const Projects: FC = () => {
       },
     },
   ];
+
   return (
-    <>
-      <Header />
-      <div className="flex flex-column justify-between mx-8">
-        <h1 className="text-3xl font-bold mt-8">Projects</h1>
-        <Button className="mt-8 px-4" size="lg">
-          <Plus size={24} className="mr-2" />
-          Deploy a project
-        </Button>
-      </div>
-    </>
+    <div className="flex flex-column justify-between mx-8">
+      <h1 className="text-3xl font-bold mt-8">Projects</h1>
+      <Button className="mt-8 px-4" size="lg">
+        <Plus size={24} className="mr-2" />
+        Deploy a project
+      </Button>
+    </div>
   );
 };
 
