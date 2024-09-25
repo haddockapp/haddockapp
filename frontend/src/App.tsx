@@ -6,6 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import Home from "./pages";
+import Projects from "./pages/dashboard";
 import GithubCallback from "./pages/github";
 import { useAppSelector } from "./hooks/useStore";
 import { FC } from "react";
@@ -36,11 +37,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="/github" element={<GithubCallback />} />
+         <Route path="/github" element={<GithubCallback />} />
         <Route element={<AuthenticatedGuard />}>
           <Route element={<Layout />}>
-            {/*  <Route path="dashboard" element={<Projects />} />
-            <Route path="project/*">
+            <Route path="dashboard" element={<Projects />} />
+            {/*<Route path="project/*">
               <Route path=":projectId" element={<ServicesPage />} />
             </Route>
             */}
@@ -50,5 +51,4 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;
