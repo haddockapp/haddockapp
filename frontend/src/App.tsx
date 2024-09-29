@@ -11,6 +11,7 @@ import GithubCallback from "./pages/github";
 import { useAppSelector } from "./hooks/useStore";
 import { FC } from "react";
 import Header from "./components/organisms/Header";
+import { Toaster } from "./components/ui/toaster";
 
 const Layout: FC = () => (
   <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
@@ -34,23 +35,24 @@ function App() {
 
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="dashboard" element={<Projects />} />
-        {/* <Route path="/github" element={<GithubCallback />} />
-        <Route path="/github" element={<GithubCallback />} />
-        <Route element={<AuthenticatedGuard />}>
-          <Route element={<Layout />}>
-            {/*  <Route path="/dashboard" element={<Projects />} />
-            <Route path="project/*">
+    <>
+      <Toaster />
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="/github" element={<GithubCallback />} />
+          <Route element={<AuthenticatedGuard />}>
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<Projects />} />
+              {/*<Route path="project/*">
               <Route path=":projectId" element={<ServicesPage />} />
             </Route>
             */}
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 export default App;

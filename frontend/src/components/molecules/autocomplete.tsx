@@ -21,9 +21,10 @@ import {
 import { FC } from "react";
 
 interface AutocompleteProps {
+  onChange?: (...event: unknown[]) => void;
   options: { label: string; value: string }[];
 }
-export const Autocomplete: FC<AutocompleteProps> = ({ options }) => {
+export const Autocomplete: FC<AutocompleteProps> = ({ options, onChange }) => {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -53,7 +54,9 @@ export const Autocomplete: FC<AutocompleteProps> = ({ options }) => {
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    const result = currentValue === value ? "" : currentValue;
+                    setValue(result);
+                    onChange?.(result);
                     setOpen(false);
                   }}
                 >
