@@ -1,5 +1,6 @@
 import { Autocomplete } from "@/components/molecules/autocomplete";
 import ProjectCard from "@/components/organisms/ProjectCard";
+import CreateProjectForm from "@/components/organisms/CreateProjectForm";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,8 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import useDisclosure from "@/hooks/use-disclosure";
 import { ProjectDto } from "@/types/projects/projects.dto";
 import { VmProvider, VmState } from "@/types/vm/vm";
 import { Plus } from "lucide-react";
@@ -71,12 +71,13 @@ const Projects: FC = () => {
       },
     },
   ];
+  const { isOpen, onToggle, onClose } = useDisclosure();
 
   return (
     <>
       <div className="flex flex-column justify-between mx-8">
         <h1 className="text-3xl font-bold mt-8">Projects</h1>
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={onToggle}>
           <DialogTrigger>
             <Button className="mt-8 px-4" size="lg">
               <Plus size={24} className="mr-2" />
@@ -84,33 +85,13 @@ const Projects: FC = () => {
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <div className="flex flex-col justify-between space-y-6">
-              <DialogHeader>
-                <DialogTitle>Create a project</DialogTitle>
-                <DialogDescription>
-                  Fill the form to create a new project.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col justify-between space-y-4">
-                <div className="flex flex-col justify-between space-y-1">
-                  <Label>Repository</Label>
-                  <Autocomplete
-                    options={[{ label: "Github", value: "github" }]}
-                  />
-                </div>
-                <div className="flex flex-col justify-between space-y-1">
-                  <Label>Branch</Label>
-                  <Autocomplete
-                    options={[{ label: "Github", value: "github" }]}
-                  />
-                </div>
-                <div className="flex flex-col justify-between space-y-1">
-                  <Label>Docker compose path</Label>
-                  <Input />
-                </div>
-              </div>
-              <Button>Next</Button>
-            </div>
+            <DialogHeader>
+              <DialogTitle>Create a project</DialogTitle>
+              <DialogDescription>
+                Fill the form to create a new project.
+              </DialogDescription>
+            </DialogHeader>
+            <CreateProjectForm onClose={onClose} />
           </DialogContent>
         </Dialog>
       </div>
