@@ -76,3 +76,11 @@ model NetworkConnection {
     project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
     projectId String
 }
+
+model Domain {
+    id       String   @id @default(uuid())
+    domain   String   @unique
+    challenge String
+    main     Boolean  @default(false)
+    linked   Boolean  @default(false)
+}
