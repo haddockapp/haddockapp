@@ -1,3 +1,5 @@
+import { Autocomplete } from "@/components/molecules/autocomplete";
+import ProjectCard from "@/components/organisms/ProjectCard";
 import CreateProjectForm from "@/components/organisms/CreateProjectForm";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,41 +11,66 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useDisclosure from "@/hooks/use-disclosure";
-// import { ProjectDto } from "@/types/projects/projects.dto";
-// import { VmProvider, VmState } from "@/types/vm/vm";
+import { ProjectDto } from "@/types/projects/projects.dto";
+import { VmProvider, VmState } from "@/types/vm/vm";
 import { Plus } from "lucide-react";
 import { FC } from "react";
 
 const Projects: FC = () => {
-  // const projects: ProjectDto[] = [
-  //   {
-  //     id: "1",
-  //     sourceId: "1",
-  //     vmId: "1",
-  //     vm: {
-  //       id: "1",
-  //       name: "VM 1",
-  //       status: VmState.Running,
-  //       ip: "https://google.com",
-  //       memory: 2048,
-  //       disk: 20,
-  //       cpus: 2,
-  //       provider: VmProvider.Libvirt,
-  //       createdAt: new Date(),
-  //     },
-  //     source: {
-  //       id: "1",
-  //       type: "github",
-  //       authorizationId: "1",
-  //       settings: {
-  //         repository: "test",
-  //         branch: "main",
-  //         organization: "Epitech",
-  //       },
-  //     },
-  //   },
-  // ];
-
+  const projects: ProjectDto[] = [
+    {
+      id: "1",
+      sourceId: "1",
+      vmId: "1",
+      vm: {
+        id: "1",
+        name: "VM 1",
+        status: VmState.Running,
+        ip: "https://google.com",
+        memory: 2048,
+        disk: 20,
+        cpus: 2,
+        provider: VmProvider.Libvirt,
+        createdAt: new Date(),
+      },
+      source: {
+        id: "1",
+        type: "github",
+        authorizationId: "1",
+        settings: {
+          repository: "test",
+          branch: "main",
+          organization: "Epitech",
+        },
+      },
+    },
+    {
+      id: "2",
+      sourceId: "1",
+      vmId: "1",
+      vm: {
+        id: "1",
+        name: "VM 2",
+        status: VmState.Running,
+        ip: "https://google.com",
+        memory: 2048,
+        disk: 20,
+        cpus: 2,
+        provider: VmProvider.Libvirt,
+        createdAt: new Date(),
+      },
+      source: {
+        id: "1",
+        type: "github",
+        authorizationId: "1",
+        settings: {
+          repository: "test",
+          branch: "main",
+          organization: "Epitech",
+        },
+      },
+    },
+  ];
   const { isOpen, onToggle, onClose } = useDisclosure();
 
   return (
@@ -67,6 +94,18 @@ const Projects: FC = () => {
             <CreateProjectForm onClose={onClose} />
           </DialogContent>
         </Dialog>
+      </div>
+      <div className="mx-8 mt-4">
+        {projects.length === 0 && (
+          <div className="flex flex-column justify-center items-center">
+            <p className="text-lg">No projects found</p>
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-4 w-full">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
       </div>
     </>
   );
