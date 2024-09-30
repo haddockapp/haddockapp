@@ -12,6 +12,7 @@ import { useAppSelector } from "./hooks/useStore";
 import { FC } from "react";
 import Header from "./components/organisms/Header";
 import { Toaster } from "./components/ui/toaster";
+import useWebsockets from "./hooks/use-websockets";
 
 const Layout: FC = () => (
   <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
@@ -25,15 +26,12 @@ const Layout: FC = () => (
 const AuthenticatedGuard: FC = () => {
   const { token } = useAppSelector((state) => state.auth);
 
-  if (!token) return <Navigate to="/" />;
-
-  return <Outlet />;
+  if (!token || token === "undefined") return <Navigate to="/" />;
+  else return <Outlet />;
 };
 
 function App() {
-  const authState = useAppSelector((state) => state.auth);
-
-  console.log(authState.token);
+  useWebsockets();
 
   return (
     <>

@@ -1,4 +1,3 @@
-import { Autocomplete } from "@/components/molecules/autocomplete";
 import ProjectCard from "@/components/organisms/ProjectCard";
 import CreateProjectForm from "@/components/organisms/CreateProjectForm";
 import { Button } from "@/components/ui/button";
@@ -78,7 +77,7 @@ const Projects: FC = () => {
       <div className="flex flex-column justify-between mx-8">
         <h1 className="text-3xl font-bold mt-8">Projects</h1>
         <Dialog open={isOpen} onOpenChange={onToggle}>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button className="mt-8 px-4" size="lg">
               <Plus size={24} className="mr-2" />
               Deploy a project

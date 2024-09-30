@@ -3,6 +3,8 @@ import { useAppDispatch } from "@/hooks/useStore";
 import { setToken } from "@/services/authSlice";
 import { FC, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { constants } from "@/constants";
+import axios from "axios";
 
 const GithubCallback: FC = () => {
   const navigate = useNavigate();
@@ -13,8 +15,18 @@ const GithubCallback: FC = () => {
     if (!query) return;
     const code = query.split("=")[1];
     if (code && code.length > 0) {
-      dispatch(setToken(code));
-      navigate("/dashboard");
+      axios
+        .post(`${constants.apiUrl}/auth/github`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          code,
+        })
+        .then(({ data }: { data: { accessToken: string } }) => {
+          dispatch(setToken(data.accessToken));
+          navigate("/dashboard");
+        });
     }
   }, [dispatch, navigate]);
 
