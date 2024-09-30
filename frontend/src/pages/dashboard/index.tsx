@@ -1,4 +1,5 @@
 import { Autocomplete } from "@/components/molecules/autocomplete";
+import ProjectCard from "@/components/organisms/ProjectCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +25,32 @@ const Projects: FC = () => {
       vm: {
         id: "1",
         name: "VM 1",
+        status: VmState.Running,
+        ip: "https://google.com",
+        memory: 2048,
+        disk: 20,
+        cpus: 2,
+        provider: VmProvider.Libvirt,
+        createdAt: new Date(),
+      },
+      source: {
+        id: "1",
+        type: "github",
+        authorizationId: "1",
+        settings: {
+          repository: "test",
+          branch: "main",
+          organization: "Epitech",
+        },
+      },
+    },
+    {
+      id: "2",
+      sourceId: "1",
+      vmId: "1",
+      vm: {
+        id: "1",
+        name: "VM 2",
         status: VmState.Running,
         ip: "https://google.com",
         memory: 2048,
@@ -86,6 +113,18 @@ const Projects: FC = () => {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+      <div className="mx-8 mt-4">
+        {projects.length === 0 && (
+          <div className="flex flex-column justify-center items-center">
+            <p className="text-lg">No projects found</p>
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-4 w-full">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
       </div>
     </>
   );
