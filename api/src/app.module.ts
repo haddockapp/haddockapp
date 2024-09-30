@@ -9,6 +9,7 @@ import { SourceModule } from './source/source.module';
 import { BullModule } from '@nestjs/bull';
 import { WebsocketModule } from './websockets/websocket.module';
 import { CaddyModule } from './caddy/caddy.module';
+import { NetworksModule } from './networks/networks.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { CaddyModule } from './caddy/caddy.module';
     SourceModule,
     DockerModule,
     WebsocketModule,
-    CaddyModule
+    CaddyModule,
+    NetworksModule
   ],
   controllers: [AppController],
   providers: [AppService],

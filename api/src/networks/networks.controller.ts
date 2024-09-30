@@ -8,23 +8,23 @@ import {
   Post,
 } from '@nestjs/common';
 import { NetworkConnection } from '@prisma/client';
-import { CaddyService } from './caddy.service';
+import { NetworksService } from './networks.service';
 import { CreateNetworkConnectionDto } from './dto/CreateNetworkConnectionDto';
 import { UpdateNetworkConnectionDto } from './dto/UpdateNetworkConnectionDto';
-import { CaddyRepository } from './caddy.repository';
+import { NetworksRepository } from './networks.repository';
 
 @Controller('network-connection')
-export class CaddyController {
+export class NetworksController {
   constructor(
-    private caddyService: CaddyService,
-    private caddyRepository: CaddyRepository,
+    private networksService: NetworksService,
+    private networksRepository: NetworksRepository,
   ) {}
 
   @Post()
   async createNetworkConnection(
     @Body() data: CreateNetworkConnectionDto,
   ): Promise<NetworkConnection> {
-    return await this.caddyService.createNetworkConnection(data);
+    return await this.networksService.createNetworkConnection(data);
   }
 
   @Patch(':id')
@@ -33,13 +33,13 @@ export class CaddyController {
     @Body() data: UpdateNetworkConnectionDto,
   ) {
     const network_connection =
-      await this.caddyRepository.findNetworkConnectionById(networkConnectionId);
+      await this.networksRepository.findNetworkConnectionById(networkConnectionId);
 
     if (!network_connection) {
       throw new NotFoundException('Netowrk connection not found.');
     }
 
-    return await this.caddyService.updateNetworkConnection(
+    return await this.networksService.updateNetworkConnection(
       networkConnectionId,
       data,
     );
@@ -47,6 +47,6 @@ export class CaddyController {
 
   @Delete(':id')
   async deleteNetworkConnection(@Param('id') networkConnectionId: string) {
-    await this.caddyService.deleteNetworkConnection(networkConnectionId);
+    await this.networksService.deleteNetworkConnection(networkConnectionId);
   }
 }
