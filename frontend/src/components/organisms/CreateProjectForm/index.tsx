@@ -2,17 +2,23 @@ import { Autocomplete } from "@/components/molecules/autocomplete";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { CreateProjectForm } from "./type";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProjectMutation } from "@/services/backendApi/projects";
 import { Slider } from "@/components/ui/slider";
+import {
+  useGetAllRepositoriesQuery,
+  useGetAllBranchesByRepositoryQuery,
+} from "@/services/backendApi/github";
 
 interface CreateProjectModalProps {
   onClose: () => void;
 }
 const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
+  const { toast } = useToast();
+
   const methods = useForm<CreateProjectForm>({
     defaultValues: {
       branch: "",
@@ -27,9 +33,31 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
 
   const [formStep, setFormStep] = useState<number>(0);
 
-  const { toast } = useToast();
-
   const [createProject] = useCreateProjectMutation();
+  const { data: repositories, isLoading: areRepositoriesLoading } =
+    useGetAllRepositoriesQuery();
+  const { data: branches, isLoading: areBranchesLoading } =
+    useGetAllBranchesByRepositoryQuery(watch("repository"), {
+      skip: !watch("repository"),
+    });
+
+  const repositoriesOptions = useMemo(
+    () =>
+      repositories?.map((repository) => ({
+        label: repository.full_name,
+        value: repository.full_name,
+      })) ?? [],
+    [repositories]
+  );
+
+  const branchesOptions = useMemo(
+    () =>
+      branches?.map((branch) => ({
+        label: branch,
+        value: branch,
+      })) ?? [],
+    [branches]
+  );
 
   const onSubmit: SubmitHandler<CreateProjectForm> = (data) => {
     switch (formStep) {
@@ -79,13 +107,7 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
                 control={control}
                 name="repository"
                 render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    options={[
-                      { label: "Github", value: "github" },
-                      { label: "Twitter", value: "twitter" },
-                    ]}
-                  />
+                  <Autocomplete {...field} options={repositoriesOptions} />
                 )}
               />
             </div>
@@ -95,10 +117,7 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
                 control={control}
                 name="branch"
                 render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    options={[{ label: "Github", value: "github" }]}
-                  />
+                  <Autocomplete {...field} options={branchesOptions} />
                 )}
               />
             </div>
