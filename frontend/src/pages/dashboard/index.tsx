@@ -13,63 +13,14 @@ import useDisclosure from "@/hooks/use-disclosure";
 import { ProjectDto } from "@/types/projects/projects.dto";
 import { VmProvider, VmState } from "@/types/vm/vm";
 import { Plus } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import { useGetProjectsQuery } from "@/services/backendApi/projects";
 
 const Projects: FC = () => {
-  const projects: ProjectDto[] = [
-    {
-      id: "1",
-      sourceId: "1",
-      vmId: "1",
-      vm: {
-        id: "1",
-        name: "VM 1",
-        status: VmState.Running,
-        ip: "https://google.com",
-        memory: 2048,
-        disk: 20,
-        cpus: 2,
-        provider: VmProvider.Libvirt,
-        createdAt: new Date(),
-      },
-      source: {
-        id: "1",
-        type: "github",
-        authorizationId: "1",
-        settings: {
-          repository: "test",
-          branch: "main",
-          organization: "Epitech",
-        },
-      },
-    },
-    {
-      id: "2",
-      sourceId: "1",
-      vmId: "1",
-      vm: {
-        id: "1",
-        name: "VM 2",
-        status: VmState.Running,
-        ip: "https://google.com",
-        memory: 2048,
-        disk: 20,
-        cpus: 2,
-        provider: VmProvider.Libvirt,
-        createdAt: new Date(),
-      },
-      source: {
-        id: "1",
-        type: "github",
-        authorizationId: "1",
-        settings: {
-          repository: "test",
-          branch: "main",
-          organization: "Epitech",
-        },
-      },
-    },
-  ];
+  const { data: projects, isLoading } = useGetProjectsQuery();
+  useEffect(() => {
+    console.log(projects);
+  }, [projects]);
   const { isOpen, onToggle, onClose } = useDisclosure();
 
   return (
@@ -95,13 +46,13 @@ const Projects: FC = () => {
         </Dialog>
       </div>
       <div className="mx-8 mt-4">
-        {projects.length === 0 && (
+        {projects?.length === 0 && (
           <div className="flex flex-column justify-center items-center">
             <p className="text-lg">No projects found</p>
           </div>
         )}
         <div className="grid grid-cols-1 gap-4 w-full">
-          {projects.map((project) => (
+          {projects?.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
