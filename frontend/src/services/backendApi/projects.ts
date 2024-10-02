@@ -46,7 +46,12 @@ const projectsApi = backendApi.injectEndpoints({
         body,
       }),
     }),
+    getProjects: builder.query<ProjectDto[], void>({
+      query: () => ({
+        url: "/project",
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation } = projectsApi;
+export const { useCreateProjectMutation, useGetProjectsQuery } = projectsApi;
