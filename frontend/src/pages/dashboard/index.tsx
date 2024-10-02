@@ -10,11 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useDisclosure from "@/hooks/use-disclosure";
-import { ProjectDto } from "@/types/projects/projects.dto";
-import { VmProvider, VmState } from "@/types/vm/vm";
 import { Plus } from "lucide-react";
 import { FC, useEffect } from "react";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Projects: FC = () => {
   const { data: projects, isLoading } = useGetProjectsQuery();
@@ -52,9 +51,13 @@ const Projects: FC = () => {
           </div>
         )}
         <div className="grid grid-cols-1 gap-4 w-full">
-          {projects?.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {isLoading ? (
+            <Skeleton className="h-32 w-full" />
+          ) : (
+            projects?.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))
+          )}
         </div>
       </div>
     </>
