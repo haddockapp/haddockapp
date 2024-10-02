@@ -15,6 +15,7 @@ import useDisclosure from "@/hooks/use-disclosure";
 import { Plus } from "lucide-react";
 import { FC, useEffect } from "react";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Projects: FC = () => {
   // const projects: ProjectDto[] = [
@@ -81,9 +82,13 @@ const Projects: FC = () => {
           </div>
         )}
         <div className="grid grid-cols-1 gap-4 w-full">
-          {projects?.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {isLoading ? (
+            <Skeleton className="h-32 w-full" />
+          ) : (
+            projects?.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))
+          )}
         </div>
       </div>
     </>
