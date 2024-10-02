@@ -13,9 +13,10 @@ import useDisclosure from "@/hooks/use-disclosure";
 // import { ProjectDto } from "@/types/projects/projects.dto";
 // import { VmProvider, VmState } from "@/types/vm/vm";
 import { Plus } from "lucide-react";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Projects: FC = () => {
   // const projects: ProjectDto[] = [
@@ -47,10 +48,10 @@ const Projects: FC = () => {
   //   },
   // ];
 
+  const navigate = useNavigate();
+  const params = useParams();
+  console.log(params);
   const { data: projects, isLoading } = useGetProjectsQuery();
-  useEffect(() => {
-    console.log(projects);
-  }, [projects]);
   const { isOpen, onToggle, onClose } = useDisclosure();
 
   return (
@@ -86,7 +87,11 @@ const Projects: FC = () => {
             <Skeleton className="h-32 w-full" />
           ) : (
             projects?.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onCLick={() => navigate(`./${project.id}`)}
+              />
             ))
           )}
         </div>

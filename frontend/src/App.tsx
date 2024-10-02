@@ -42,11 +42,8 @@ function App() {
           <Route path="/github" element={<GithubCallback />} />
           <Route element={<AuthenticatedGuard />}>
             <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Projects />} />
-              {/*<Route path="project/*">
-              <Route path=":projectId" element={<ServicesPage />} />
-            </Route>
-            */}
+              <Route path="/dashboard/*" element={<Projects />} />
+              <Route path=":projectId" element={<Projects />} />
             </Route>
           </Route>
         </Routes>
