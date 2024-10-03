@@ -10,6 +10,7 @@ import { BullModule } from '@nestjs/bull';
 import { WebsocketModule } from './websockets/websocket.module';
 import { CaddyModule } from './caddy/caddy.module';
 import { NetworksModule } from './networks/networks.module';
+import { DomainsModule } from './domains/domains.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { NetworksModule } from './networks/networks.module';
     DockerModule,
     WebsocketModule,
     CaddyModule,
-    NetworksModule
+    NetworksModule,
+    DomainsModule
   ],
   controllers: [AppController],
   providers: [AppService],
