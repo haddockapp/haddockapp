@@ -1,5 +1,5 @@
 on:
-    [push, delete, create, pull_request]
+    [push, delete, create]
 jobs:
     push_to_mirror:
         runs-on: ubuntu-latest
