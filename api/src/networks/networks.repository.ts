@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateNetworkConnectionDto } from './dto/CreateNetworkConnectionDto';
 import { NetworkConnection, Prisma } from '@prisma/client';
+import { CreateNetworkConnectionDto } from './dto/CreateNetworkConnectionDto';
 import { UpdateNetworkConnectionDto } from './dto/UpdateNetworkConnectionDto';
 
 @Injectable()
-export class CaddyRepository {
+export class NetworksRepository {
   constructor(private prismaService: PrismaService) {}
 
   async findNetworkConnections(): Promise<NetworkConnection[]> {
