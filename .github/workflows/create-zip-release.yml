@@ -4,10 +4,10 @@ on:
 jobs:
     create_zip_release:
         runs-on: ubuntu-latest
+        if: github.repository_owner == 'haddockapp'
         steps:
             - name: Checkout
               uses: actions/checkout@v3
-              if: github.repository_owner == 'haddockapp'
               with:
                 fetch-depth: 0
 
