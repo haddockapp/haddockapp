@@ -3,6 +3,7 @@ on:
 jobs:
     push_to_mirror:
         runs-on: ubuntu-latest
+        if: github.repository_owner == 'EpitechPromo2026'
         steps:
             - name: Checkout
               uses: actions/checkout@v3
