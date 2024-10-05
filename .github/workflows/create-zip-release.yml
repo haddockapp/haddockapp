@@ -13,7 +13,7 @@ jobs:
 
             - name: Create zip release
               run: |
-                  git archive --format=zip --output=release.zip HEAD
+                  git archive --format=zip --output=release/release.zip HEAD
                   echo "::set-output name=zip_path::release.zip"
 
             - name: Extract branch name
@@ -27,5 +27,5 @@ jobs:
                 server: mar2.network.socialeo.eu
                 username: releases.haddock.ovh_99uowjpqn9e
                 password: ${{ secrets.FTP_PASSWORD }}
-                local-dir: ./release.zip
+                local-dir: ./release
                 server-dir: /httpdocs/${{ steps.extract_branch.outputs.branch }}/
