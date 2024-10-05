@@ -13,8 +13,9 @@ jobs:
 
             - name: Create zip release
               run: |
-                  git archive --format=zip --output=release/release.zip HEAD
-                  echo "::set-output name=zip_path::release.zip"
+                mkdir -p release
+                git archive --format=zip --output=release/release.zip HEAD
+                echo "::set-output name=zip_path::release.zip"
 
             - name: Extract branch name
               shell: bash
