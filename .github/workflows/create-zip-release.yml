@@ -28,5 +28,5 @@ jobs:
                 server: mar2.network.socialeo.eu
                 username: releases.haddock.ovh_99uowjpqn9e
                 password: ${{ secrets.FTP_PASSWORD }}
-                local-dir: ./release
+                local-dir: ./release/
                 server-dir: /httpdocs/${{ steps.extract_branch.outputs.branch }}/
