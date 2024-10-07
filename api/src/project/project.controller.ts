@@ -5,7 +5,6 @@ import {
     Get,
     HttpCode,
     HttpStatus,
-    InternalServerErrorException,
     NotFoundException,
     Param,
     Patch,
@@ -17,7 +16,6 @@ import {UpdateProjectDto} from "./dto/UpdateProject.dto";
 import { CurrentUser } from "src/auth/user.context";
 import { PersistedUserDto } from "src/user/dto/user.dto";
 import { SourceService } from "../source/source.service";
-import * as fs from 'fs';
 import { ComposeService } from "src/compose/compose.service";
 import { DockerService } from "src/docker/docker.service";
 import { GithubSourceSettingsDto } from "src/source/dto/settings.dto";
