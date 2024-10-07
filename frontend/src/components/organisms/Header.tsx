@@ -1,10 +1,22 @@
+import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { FC } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Header: FC = () => {
+  const { projectId } = useParams();
+  const navigate = useNavigate();
+  const { data: projects } = useGetProjectsQuery();
+  const projectName = projects?.find((p) => p.id === projectId)?.vm.name;
   return (
     <div className="flex items-center ml-4 mt-4">
-      <img className="w-16" src="/haddock.png" />
-      <h3 className="text-2xl ml-2">/ dashboard</h3>
+      <img
+        className="w-16 cursor-pointer"
+        src="/haddock.png"
+        onClick={() => navigate("/dashboard")}
+      />
+      <h3 className="text-2xl ml-2">
+        / {projectId ? `projects / ${projectName}` : "dashboard"}
+      </h3>
     </div>
   );
 };

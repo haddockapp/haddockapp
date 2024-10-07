@@ -13,6 +13,7 @@ import { FC } from "react";
 import Header from "./components/organisms/Header";
 import { Toaster } from "./components/ui/toaster";
 import useWebsockets from "./hooks/use-websockets";
+import ProjectDetails from "./pages/project";
 
 const Layout: FC = () => (
   <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
@@ -42,8 +43,10 @@ function App() {
           <Route path="/github" element={<GithubCallback />} />
           <Route element={<AuthenticatedGuard />}>
             <Route element={<Layout />}>
-              <Route path="/dashboard/*" element={<Projects />} />
-              <Route path=":projectId" element={<Projects />} />
+              <Route path="dashboard" element={<Projects />} />
+              <Route path="project/*">
+                <Route path=":projectId" element={<ProjectDetails />} />
+              </Route>
             </Route>
           </Route>
         </Routes>

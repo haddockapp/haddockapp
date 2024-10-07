@@ -30,7 +30,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCLick }) => {
       <CardContent className="p-4">
         <div className="flex justify-between h-24">
           <div className="flex flex-row items-center gap-4 w-2/3">
-            <div className="flex items-center w-64 h-64">{getIcon()}</div>
+            <div className="flex items-center w-64 h-24">{getIcon()}</div>
             <div>
               <p className="text-xl font-bold text-gray-900 line-clamp-1">
                 {project.source.settings.organization} / {project.vm.name}

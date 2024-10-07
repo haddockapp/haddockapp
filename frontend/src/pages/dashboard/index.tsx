@@ -16,7 +16,7 @@ import { Plus } from "lucide-react";
 import { FC } from "react";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Projects: FC = () => {
   // const projects: ProjectDto[] = [
@@ -49,8 +49,6 @@ const Projects: FC = () => {
   // ];
 
   const navigate = useNavigate();
-  const params = useParams();
-  console.log(params);
   const { data: projects, isLoading } = useGetProjectsQuery();
   const { isOpen, onToggle, onClose } = useDisclosure();
 
@@ -90,7 +88,7 @@ const Projects: FC = () => {
               <ProjectCard
                 key={project.id}
                 project={project}
-                onCLick={() => navigate(`./${project.id}`)}
+                onCLick={() => navigate(`/project/${project.id}`)}
               />
             ))
           )}
