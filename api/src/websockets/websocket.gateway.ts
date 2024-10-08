@@ -9,6 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { WebsocketConnectDto } from './dto/connect.dto';
+import { ProjectEventDto } from './dto/project-event.dto';
 
 @WebSocketGateway(3001, {
   cors: {
@@ -35,31 +36,13 @@ export class WSGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('project')
   async handleMetricsSubscribe(
-    @MessageBody()
-    data: {
-      userId: string;
-      projectId: string;
-      service: string;
-      subscribe: boolean;
-      data: any;
-    },
+    @MessageBody() data: ProjectEventDto,
     @ConnectedSocket() client: Socket,
   ) {
     if (data.subscribe) {
-      this.websocketService.protectServiceSubscribe(
-        client,
-        data.userId,
-        data.projectId,
-        data.service,
-        data.data,
-      );
+      this.websocketService.protectServiceSubscribe(client, data);
     } else {
-      this.websocketService.projectServiceUnsubscribe(
-        client,
-        data.userId,
-        data.projectId,
-        data.service,
-      );
+      this.websocketService.projectServiceUnsubscribe(client, data);
     }
   }
 }

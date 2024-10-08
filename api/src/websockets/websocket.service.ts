@@ -4,6 +4,7 @@ import { Handler } from './types/handler';
 import { MetricsHandler } from './handlers/metrics';
 import { Client } from './types/client';
 import { WebsocketEventDto } from './dto/websocket-event.dto';
+import { ProjectEventDto } from './dto/project-event.dto';
 
 class Project {
   metrics: Handler;
@@ -51,47 +52,38 @@ export class WebSocketService {
     return this.clients[userId];
   }
 
-  protectServiceSubscribe(
-    client: Socket,
-    userId: string,
-    projectId: string,
-    service: string,
-    data: any,
-  ) {
-    if (!this.projects[projectId]) {
-      this.projects[projectId] = new Project();
+  protectServiceSubscribe(client: Socket, eventData: ProjectEventDto) {
+    if (!this.projects[eventData.projectId]) {
+      this.projects[eventData.projectId] = new Project();
     }
-
-    const project = this.projects[projectId];
-
-    console.log('project', project);
+    const project = this.projects[eventData.projectId];
 
     if (project) {
-      const handler: Handler = project[service];
+      const handler: Handler = project[eventData.service];
 
       if (handler) {
-        handler.handleSubscribe({ userId, socket: client }, data);
+        handler.handleSubscribe(
+          { userId: eventData.userId, socket: client },
+          eventData.data,
+        );
       }
     }
   }
 
-  projectServiceUnsubscribe(
-    client: Socket,
-    userId: string,
-    projectId: string,
-    service: string,
-  ) {
-    if (!this.projects[projectId]) {
-      this.projects[projectId] = new Project();
+  projectServiceUnsubscribe(client: Socket, eventData: ProjectEventDto) {
+    if (!this.projects[eventData.projectId]) {
+      this.projects[eventData.projectId] = new Project();
     }
-
-    const project = this.projects[projectId];
+    const project = this.projects[eventData.projectId];
 
     if (project) {
-      const handler: Handler = project[service];
+      const handler: Handler = project[eventData.service];
 
       if (handler) {
-        handler.handleUnsubscribe({ userId, socket: client }, {});
+        handler.handleUnsubscribe(
+          { userId: eventData.userId, socket: client },
+          eventData.data,
+        );
       }
     }
   }
