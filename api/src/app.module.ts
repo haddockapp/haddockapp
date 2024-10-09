@@ -11,7 +11,6 @@ import { WebsocketModule } from './websockets/websocket.module';
 import { CaddyModule } from './caddy/caddy.module';
 import { NetworksModule } from './networks/networks.module';
 import { DomainsModule } from './domains/domains.module';
-import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -30,7 +29,6 @@ import { MetricsModule } from './metrics/metrics.module';
     CaddyModule,
     NetworksModule,
     DomainsModule,
-    MetricsModule
   ],
   controllers: [AppController],
   providers: [AppService],

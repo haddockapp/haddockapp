@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Handler } from './types/handler';
-import { MetricsHandler } from './handlers/metrics';
 import { Client } from './types/client';
 import { WebsocketEventDto } from './dto/websocket-event.dto';
 import { ProjectEventDto } from './dto/project-event.dto';
-
-class Project {
-  metrics: Handler;
-
-  constructor() {
-    this.metrics = new MetricsHandler();
-  }
-}
+import { ProjectHandlers } from './types/project-handlers';
+import { ProjectRepository } from 'src/project/project.repository';
+import { PersistedProjectDto } from 'src/project/dto/project.dto';
 
 @Injectable()
 export class WebSocketService {
+  constructor(private readonly projectRepository: ProjectRepository) {}
+
   private clients: { [key: string]: Client } = {};
-  private projects: { [key: string]: Project } = {};
+  private projects: { [key: string]: ProjectHandlers } = {};
 
   addClient(userId: string, client: Socket) {
     this.clients[userId] = {
@@ -52,34 +48,28 @@ export class WebSocketService {
     return this.clients[userId];
   }
 
-  protectServiceSubscribe(client: Socket, eventData: ProjectEventDto) {
+  async protectService(client: Socket, eventData: ProjectEventDto) {
     if (!this.projects[eventData.projectId]) {
-      this.projects[eventData.projectId] = new Project();
+      const project: PersistedProjectDto =
+        await this.projectRepository.findProjectById(eventData.projectId);
+
+      if (!project) {
+        throw new Error('Project not found');
+      }
+
+      this.projects[eventData.projectId] = new ProjectHandlers(project);
     }
     const project = this.projects[eventData.projectId];
 
-    if (project) {
-      const handler: Handler = project[eventData.service];
+    const handler: Handler = project[eventData.service];
 
-      if (handler) {
+    if (handler) {
+      if (eventData.subscribe) {
         handler.handleSubscribe(
           { userId: eventData.userId, socket: client },
           eventData.data,
         );
-      }
-    }
-  }
-
-  projectServiceUnsubscribe(client: Socket, eventData: ProjectEventDto) {
-    if (!this.projects[eventData.projectId]) {
-      this.projects[eventData.projectId] = new Project();
-    }
-    const project = this.projects[eventData.projectId];
-
-    if (project) {
-      const handler: Handler = project[eventData.service];
-
-      if (handler) {
+      } else {
         handler.handleUnsubscribe(
           { userId: eventData.userId, socket: client },
           eventData.data,

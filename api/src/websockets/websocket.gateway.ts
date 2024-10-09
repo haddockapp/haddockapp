@@ -39,10 +39,6 @@ export class WSGateway implements OnGatewayDisconnect {
     @MessageBody() data: ProjectEventDto,
     @ConnectedSocket() client: Socket,
   ) {
-    if (data.subscribe) {
-      this.websocketService.protectServiceSubscribe(client, data);
-    } else {
-      this.websocketService.projectServiceUnsubscribe(client, data);
-    }
+    await this.websocketService.protectService(client, data);
   }
 }
