@@ -59,7 +59,7 @@ echo "Version: $VER"
 echo "Architecture: $ARCH"
 
 # If OS is Ubuntu > 24, print error and exit (for whatever reason, Vagrant is not in HashiCorp' APT repo on Ubuntu > 24)
-if [ "$OS" = "Ubuntu" ] && [ "$VER" > 24 ]; then
+if [ "$OS" = "Ubuntu" ] && [ 1 -eq "$(echo "$VER > 24" | bc)" ]; then
     echo -e "${RED}Error: Ubuntu version is not supported${NC}"
     exit 1
 fi
@@ -98,7 +98,7 @@ fi
 
 # Dependencies (for now): git, nodejs, npm
 # for every package check if it is installed, if not install it
-DEPENDENCIES=("wget" "gpg" "git" "nodejs" "npm")
+DEPENDENCIES=("wget" "gpg" "git" "nodejs" "npm" "unzip")
 
 for i in "${DEPENDENCIES[@]}"; do
     if [ -x "$(command -v $i)" ]; then
@@ -131,10 +131,13 @@ else
     # If yes, install Vagrant
     if [ "$response" = "y" ]; then
         if [ "$PM" = "apt" ]; then
+            # Add HashiCorp's GPG key if it doesn't exist
             if [ ! -f /usr/share/keyrings/hashicorp-archive-keyring.gpg ]; then
                 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
             fi
+            # Add HashiCorp's APT repo
             echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            # Install Vagrant
             sudo apt update && sudo apt install -y vagrant
         elif [ "$PM" = "brew" ]; then
             brew install --cask vagrant
@@ -142,6 +145,14 @@ else
     fi
 fi
 
+# Get latest zip release from https://releases.haddock.ovh/main/release.zip
+curl -L https://releases.haddock.ovh/main/release.zip -o /tmp/haddock.zip
+
+# Unzip it to /opt/haddock
+unzip /tmp/haddock.zip -d /opt/haddock
+
+# Remove the zip file
+rm /tmp/haddock.zip
 
 
 exit 0
