@@ -8,6 +8,12 @@ const ProjectDetails: FC = () => {
   const { data: services } = useGetServicesByProjectIdQuery(projectId ?? "");
   return (
     <div className="mx-8">
+      <h1 className="text-3xl font-bold my-8">Services</h1>
+      {services?.length === 0 && (
+        <div className="flex flex-column justify-center items-center">
+          <p className="text-lg">No services found</p>
+        </div>
+      )}
       {services?.map((service, index) => {
         return (
           <>
