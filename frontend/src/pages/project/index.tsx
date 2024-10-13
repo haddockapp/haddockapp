@@ -1,4 +1,5 @@
 import ServiceCard from "@/components/organisms/ServiceCard";
+import StatusTab from "@/components/organisms/ServicesDrawer/StatusTab";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -64,12 +65,12 @@ const ProjectDetails: FC = () => {
                           <p className="text-gray-600">{service.image}</p>
                         </div>
                       </div>
-                      <div className="w-full flex justify-center">
+                      <div className="w-full flex">
                         <Tabs
-                          defaultValue="account"
-                          className="mt-8 items-center"
+                          defaultValue={TabsValue.Status}
+                          className="mt-8 items-center w-full"
                         >
-                          <TabsList>
+                          <TabsList className="flex justify-center">
                             <TabsTrigger
                               value={TabsValue.Status}
                               className="mx-4"
@@ -121,8 +122,12 @@ const ProjectDetails: FC = () => {
                               </Button>
                             </TabsTrigger>
                           </TabsList>
-                          <TabsContent value="status">
-                            <div className="mt-10 text-center">Status</div>
+                          <TabsContent value="status" className="mt-4">
+                            <StatusTab
+                              status="Started"
+                              image="python/python3.9"
+                              imageLink="https://hub.docker.com/_/python"
+                            />
                           </TabsContent>
                           <TabsContent value="config">
                             <div className="mt-10 text-center">
