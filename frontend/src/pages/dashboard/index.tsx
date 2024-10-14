@@ -88,7 +88,7 @@ const Projects: FC = () => {
               <ProjectCard
                 key={project.id}
                 project={project}
-                onCLick={() => navigate(`/project/${project.id}`)}
+                onClick={() => navigate(`/project/${project.id}`)}
               />
             ))
           )}

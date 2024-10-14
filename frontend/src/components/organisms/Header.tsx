@@ -1,12 +1,15 @@
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Header: FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { data: projects } = useGetProjectsQuery();
-  const projectName = projects?.find((p) => p.id === projectId)?.vm.name;
+  const projectName = useMemo(
+    () => projects?.find((p) => p.id === projectId)?.vm.name,
+    [projects, projectId]
+  );
   return (
     <div className="flex items-center ml-4 mt-4">
       <img

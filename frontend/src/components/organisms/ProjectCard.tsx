@@ -5,7 +5,7 @@ import { FolderDot } from "lucide-react";
 import { FolderGit2 } from "lucide-react";
 
 interface ProjectCardProps {
-  onCLick?: () => void;
+  onClick?: () => void;
   project: ProjectDto;
 }
 
@@ -13,7 +13,7 @@ const capitalizeFirstLetter = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const ProjectCard: FC<ProjectCardProps> = ({ project, onCLick }) => {
+const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
   const getIcon = () => {
     if (project.source.type === "github") {
       return <FolderGit2 size={64} />;
@@ -25,7 +25,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCLick }) => {
   return (
     <Card
       className="w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-      onClick={onCLick}
+      onClick={onClick}
     >
       <CardContent className="p-4">
         <div className="flex justify-between h-24">
