@@ -8,7 +8,7 @@ import { VmProvider } from '../types/vm.enum';
 
 @Injectable()
 export class ProjectRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAllProjects(): Promise<PersistedProjectDto[]> {
     return this.prismaService.project.findMany({

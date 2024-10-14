@@ -10,5 +10,6 @@ import { DockerModule } from "src/docker/docker.module";
     imports: [PrismaModule, SourceModule, ComposeModule, DockerModule],
     controllers: [ProjectController],
     providers: [ProjectRepository],
+    exports: [ProjectRepository]
 })
 export class ProjectModule {}

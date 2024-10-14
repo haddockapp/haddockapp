@@ -14,8 +14,8 @@ export class VmService {
   private readonly template: HandlebarsTemplateDelegate<any>;
 
   constructor(
-    private vmRepository: VmRepository,
-    private websocketService: WebSocketService,
+    private readonly vmRepository: VmRepository,
+    private readonly websocketService: WebSocketService,
   ) {
     this.template = compile(
       readFileSync('./src/vm/template/Vagrantfile.hbs', 'utf-8'),

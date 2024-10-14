@@ -28,7 +28,7 @@ import { DomainsModule } from './domains/domains.module';
     WebsocketModule,
     CaddyModule,
     NetworksModule,
-    DomainsModule
+    DomainsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
