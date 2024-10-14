@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 
 enum TabsValue {
