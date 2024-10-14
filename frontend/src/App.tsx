@@ -13,6 +13,7 @@ import { FC } from "react";
 import Header from "./components/organisms/Header";
 import { Toaster } from "./components/ui/toaster";
 import useWebsockets from "./hooks/use-websockets";
+import { ConfigProvider } from "./providers/config";
 import ProjectDetails from "./pages/project";
 
 const Layout: FC = () => (
@@ -35,7 +36,7 @@ function App() {
   useWebsockets();
 
   return (
-    <>
+    <ConfigProvider>
       <Toaster />
       <BrowserRouter>
         <Routes>
@@ -51,7 +52,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </ConfigProvider>
   );
 }
 export default App;
