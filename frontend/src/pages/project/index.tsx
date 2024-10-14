@@ -24,14 +24,12 @@ const ProjectDetails: FC = () => {
   const { projectId } = useParams();
   const { data: services } = useGetServicesByProjectIdQuery(projectId ?? "");
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Status);
-  useEffect(() => {
-    console.log(selectedTab);
-  }, [selectedTab]);
+  console.log(services);
   return (
     <div className="mx-8">
       <h1 className="text-3xl font-bold my-8">Services</h1>
-      {services?.length === 0 && (
-        <div className="flex flex-column justify-center items-center">
+      {(services?.length === 0 || !services) && (
+        <div className="flex flex-column items-center">
           <p className="text-lg">No services found</p>
         </div>
       )}
