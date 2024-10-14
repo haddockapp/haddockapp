@@ -21,17 +21,17 @@ const StatusTab: FC<StatusTabProps> = ({ status, image, imageLink }) => {
       </div>
       <div className="flex flex-col">
         <p>Image</p>
-        <div className="flex items-center gap-1 ml-3">
+        <div className="flex items-center gap-1 ml-3 mt-2">
           <div className="w-1 h-1 bg-neutral-950 rounded-full" />
           <p>{image}</p>
-          <Button
+          {/* <Button
             variant="link"
             className="text-gray-500"
             onClick={() => window.open(imageLink, "_blank")}
           >
             <SquareArrowOutUpRight size={16} className="mr-1" />
             See it on DockerHub
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>
