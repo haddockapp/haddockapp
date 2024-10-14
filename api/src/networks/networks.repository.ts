@@ -6,7 +6,7 @@ import { UpdateNetworkConnectionDto } from './dto/UpdateNetworkConnectionDto';
 
 @Injectable()
 export class NetworksRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findNetworkConnections(): Promise<NetworkConnection[]> {
     return this.prismaService.networkConnection.findMany();
