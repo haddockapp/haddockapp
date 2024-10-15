@@ -20,8 +20,6 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
     }
     return <FolderDot size={64} />;
   };
-  const description =
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum";
   return (
     <Card
       className="w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100"
@@ -30,16 +28,18 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
       <CardContent className="p-4">
         <div className="flex justify-between h-24">
           <div className="flex flex-row items-center gap-4 w-2/3">
-            <div className="flex items-center w-64 h-24">{getIcon()}</div>
-            <div>
+            <div className="flex items-center">{getIcon()}</div>
+            <div className="flex flex-col justify-start">
               <p className="text-xl font-bold text-gray-900 line-clamp-1">
-                {project.source.settings.organization} / {project.vm.name}
+                {project.name}
               </p>
               <div className="flex flex-row gap-1">
                 <p className="text-gray-600">Last deployment date:</p>
                 <p className="text-gray-800 font-semibold">12/09/2024</p>
               </div>
-              <p className="text-gray-700 line-clamp-2">{description}</p>
+              <p className="text-gray-700 line-clamp-2">
+                {project.description ?? "No description for this project ..."}
+              </p>
             </div>
           </div>
           <div className="self-center flex flex-row items-center gap-2">

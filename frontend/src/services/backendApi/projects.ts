@@ -26,6 +26,8 @@ export enum VmState {
 export interface ProjectDto {
   id: string;
   sourceId: string;
+  name: string;
+  description?: string;
   vmId: string;
   vm: VMInfos;
   source: Source;
