@@ -59,7 +59,7 @@ echo "Version: $VER"
 echo "Architecture: $ARCH"
 
 # If OS is Ubuntu > 24, print error and exit (for whatever reason, Vagrant is not in HashiCorp' APT repo on Ubuntu > 24)
-if [ "$OS" = "Ubuntu" ] && [ 1 -eq "$(echo "$VER > 24" | bc)" ]; then
+if [ "$OS" = "Ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24 ]; then
     echo -e "${RED}Error: Ubuntu version is not supported${NC}"
     exit 1
 fi
@@ -98,7 +98,7 @@ fi
 
 # Dependencies (for now): git, nodejs, npm
 # for every package check if it is installed, if not install it
-DEPENDENCIES=("wget" "gpg" "git" "nodejs" "npm" "unzip")
+DEPENDENCIES=("wget" "gpg" "git" "npm" "unzip" "redis-server")
 
 for i in "${DEPENDENCIES[@]}"; do
     if [ -x "$(command -v $i)" ]; then
@@ -112,11 +112,51 @@ for i in "${DEPENDENCIES[@]}"; do
     fi
 done
 
+# Install postgresql
+if [ -x "$(command -v psql)" ]; then
+    echo -e "${GREEN}PostgreSQL is already installed${NC}"
+else
+    if [ "$PM" = "apt" ]; then
+        apt install -y postgresql
+    elif [ "$PM" = "brew" ]; then
+        brew install postgresql
+    fi
+fi
+
+# Install nvm & node
+if [ -x "$(command -v nvm)" ]; then
+    echo -e "${GREEN}nvm is already installed${NC}"
+else
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+fi
+
+# Check if node version > 20, else install it
+if [ -x "$(command -v node)" ]; then
+    if [ "$(node -v | cut -d 'v' -f 2 | awk -F. '{print ($1 >= 20)}')" -eq 1 ]; then
+        echo -e "${GREEN}Node 20 or higher is already installed${NC}"
+    else
+        nvm install 20
+        nvm use 20
+    fi
+else
+    nvm install 20
+    nvm use 20
+fi
+
+# Install yarn
+if [ -x "$(command -v yarn)" ]; then
+    echo -e "${GREEN}Yarn is already installed${NC}"
+else
+    npm install -g yarn
+fi
+
 # Install pm2
 if [ -x "$(command -v pm2)" ]; then
     echo -e "${GREEN}pm2 is already installed${NC}"
 else
-    npm install pm2 -g
+    yarn global add pm2
 fi
 
 # Check if Vagrant is installed
@@ -145,6 +185,21 @@ else
     fi
 fi
 
+if [ -x "$(command -v caddy)" ]; then
+    echo -e "${GREEN}Caddy is already installed${NC}"
+else
+    if [ "$PM" = "apt" ]; then
+        curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+        curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+        sudo apt update && sudo apt install -y caddy
+    elif [ "$PM" = "brew" ]; then
+        brew install caddy
+    fi
+fi
+
+# Set capabilities for Caddy
+sudo setcap cap_net_bind_service=+ep $(which caddy)
+
 # Get latest zip release from https://releases.haddock.ovh/main/release.zip
 curl -L https://releases.haddock.ovh/main/release.zip -o /tmp/haddock.zip
 
@@ -154,5 +209,61 @@ unzip /tmp/haddock.zip -d /opt/haddock
 # Remove the zip file
 rm /tmp/haddock.zip
 
+#Create empty /opt/haddock/services.caddy
+sudo touch /opt/haddock/services.caddy
+
+#Create empty /opt/haddock/app.caddy
+sudo touch /opt/haddock/app.caddy
+
+# Create /opt/haddock/Caddyfile with basic configuration
+# {
+#     admin off
+# }
+
+# import /var/www/haddock/services.caddy
+# import /var/www/haddock/app.caddy
+echo "{
+    admin off
+}
+
+import /opt/haddock/services.caddy
+import /opt/haddock/app.caddy" | sudo tee /opt/haddock/Caddyfile
+
+
+# Run Caddy
+sudo caddy start --config /opt/haddock/Caddyfile
+
+#if no .env file, create it
+if [ ! -f /opt/haddock/api/.env ]; then
+    # Generate random JWT secret
+    JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(256).toString('base64'));")
+
+    # Set API .env
+    echo "
+    DATABASE_URL=postgresql://haddock:haddock@localhost:5432/haddock
+    REDIS_URL=redis://localhost:6379
+    CADDY_ROOT_DIR=../
+    CADDY_SERVICES_FILE=services.caddy
+    CADDY_APP_FILE=app.caddy
+    JWT_SECRET=$JWT_SECRET
+    " | sudo tee /opt/haddock/api/.env
+fi
+
+# Configure PostgreSQL
+if (sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw haddock); then
+    echo -e "${GREEN}Database haddock already exists${NC}"
+else
+    sudo -u postgres psql -c "CREATE USER haddock WITH PASSWORD 'haddock';"
+    sudo -u postgres psql -c "CREATE DATABASE haddock WITH OWNER haddock;"
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE haddock TO haddock;"
+fi
+
+# Start API
+cd /opt/haddock/api
+
+# Install dependencies, migrate database and start API
+yarn install
+yarn migrate
+pm2 start yarn --name api -- start
 
 exit 0
