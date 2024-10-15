@@ -12,15 +12,10 @@ import ServiceCard from "../ServiceCard";
 import StatusTab from "../ServicesDrawer/StatusTab";
 import { ServiceDto } from "@/services/backendApi/services";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsValue } from "./type";
 
 interface TopologyTabProps {
   services?: ServiceDto[];
-}
-
-enum TabsValue {
-  Status = "status",
-  Config = "config",
-  Networks = "networks",
 }
 
 const TopologyTab: FC<TopologyTabProps> = ({ services }) => {
@@ -114,7 +109,6 @@ const TopologyTab: FC<TopologyTabProps> = ({ services }) => {
                             <StatusTab
                               status="Started"
                               image="python/python3.9"
-                              imageLink="https://hub.docker.com/_/python"
                             />
                           </TabsContent>
                           <TabsContent value="config">
