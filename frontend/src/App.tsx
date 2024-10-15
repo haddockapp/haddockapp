@@ -5,7 +5,7 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import Home from "./pages";
+import Setup from "./pages/setup";
 import Projects from "./pages/dashboard";
 import GithubCallback from "./pages/github";
 import { useAppSelector } from "./hooks/useStore";
@@ -40,10 +40,10 @@ function App() {
       <Toaster />
       <BrowserRouter>
         <Routes>
-          <Route index element={<Home />} />
           <Route path="/github" element={<GithubCallback />} />
-          <Route element={<AuthenticatedGuard />}>
-            <Route element={<Layout />}>
+          <Route element={<Layout />}>
+            <Route index element={<Setup />} />
+            <Route element={<AuthenticatedGuard />}>
               <Route path="dashboard" element={<Projects />} />
               <Route path="project/*">
                 <Route path=":projectId" element={<ProjectDetails />} />

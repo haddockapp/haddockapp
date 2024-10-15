@@ -2,6 +2,11 @@ import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { FC, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+const pathTranslations: Record<string, string> = {
+  ["/"]: "/setup",
+  ["/github"]: "",
+};
+
 const Header: FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -18,7 +23,10 @@ const Header: FC = () => {
         onClick={() => navigate("/dashboard")}
       />
       <h3 className="text-2xl ml-2">
-        / {projectId ? `projects / ${projectName}` : "dashboard"}
+        {projectId
+          ? `/projects/${projectName}`
+          : pathTranslations[window.location.pathname] ??
+            window.location.pathname}
       </h3>
     </div>
   );
