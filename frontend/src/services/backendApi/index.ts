@@ -18,4 +18,5 @@ export const backendApi = createApi({
   reducerPath: "",
   baseQuery,
   endpoints: () => ({}),
+  tagTypes: ["Projects"],
 });

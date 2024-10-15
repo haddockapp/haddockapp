@@ -12,7 +12,7 @@ const Header: FC = () => {
   const navigate = useNavigate();
   const { data: projects } = useGetProjectsQuery();
   const projectName = useMemo(
-    () => projects?.find((p) => p.id === projectId)?.vm.name,
+    () => projects?.find((p) => p.id === projectId)?.name,
     [projects, projectId]
   );
   return (
