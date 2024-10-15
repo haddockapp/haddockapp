@@ -9,12 +9,12 @@ import { CaddyService } from '../caddy/caddy.service';
 export class NetworksService {
 
   constructor(
-    private networksRepository: NetworksRepository,
-    private caddyService: CaddyService
+    private readonly networksRepository: NetworksRepository,
+    private readonly caddyService: CaddyService
   ) {
   }
 
-  private async updateNetworksfile() {
+  async updateNetworksfile() {
     const networkConnections =
       await this.networksRepository.findNetworkConnectionsAndProjectAndVm();
 

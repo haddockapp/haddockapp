@@ -1,4 +1,4 @@
-export default interface ProjectService {
+export default interface ProjectServiceDto {
     name: string;
     image: string;
     ports: string[];

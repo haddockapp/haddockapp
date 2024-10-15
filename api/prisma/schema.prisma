@@ -48,9 +48,9 @@ model Project {
   name               String
   description        String?
   path               String?             @unique
-  source             Source              @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  source             Source              @relation(fields: [sourceId], references: [id])
   sourceId           String              @unique
-  vm                 Vm                  @relation(fields: [vmId], references: [id], onDelete: Cascade)
+  vm                 Vm                  @relation(fields: [vmId], references: [id])
   vmId               String              @unique
   networkConnections NetworkConnection[]
 }

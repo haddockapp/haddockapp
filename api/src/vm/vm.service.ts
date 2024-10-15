@@ -147,4 +147,18 @@ export class VmService {
 
     await this.changeVmStatus(vm.id, VmState.Running);
   }
+
+  async deletePhisicalVm(vmId: string): Promise<void> {
+    const vm = await this.vmRepository.getVmAndProject({ id: vmId });
+
+    if (vm.status === VmState.Starting) {
+      throw new Error('VM is starting');
+    }
+
+    await this.execCommand(`cd ${vm.project.path} && vagrant destroy -f`);
+  }
+
+  async deleteVmDb(vmId: string): Promise<void> {
+    this.vmRepository.deleteVm({ id: vmId });
+  }
 }

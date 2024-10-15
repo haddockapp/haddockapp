@@ -20,15 +20,17 @@ import { ComposeService } from "src/compose/compose.service";
 import { DockerService } from "src/docker/docker.service";
 import { GithubSourceSettingsDto } from "src/source/dto/settings.dto";
 import { getSettings } from "src/source/utils/get-settings";
-import ProjectService from "./dto/ProjectService.dto";
+import ProjectServiceDto from "./dto/ProjectService.dto";
+import { ProjectService } from "./project.service";
 
 @Controller('project')
 export class ProjectController {
     constructor(
-        private projectRepository: ProjectRepository,
-        private sourceService: SourceService,
-        private composeService: ComposeService,
-        private dockerService: DockerService,
+        private readonly projectService: ProjectService,
+        private readonly projectRepository: ProjectRepository,
+        private readonly sourceService: SourceService,
+        private readonly composeService: ComposeService,
+        private readonly dockerService: DockerService,
     ) { }
 
   @Get()
@@ -72,7 +74,7 @@ export class ProjectController {
 
     @Delete(':id')
     async deleteProject(@Param('id') projectId: string) {
-        await this.projectRepository.deleteProject(projectId);
+        await this.projectService.deleteProject(projectId);
     }
 
     @Get(':id/services')
@@ -87,7 +89,7 @@ export class ProjectController {
 
         const services = this.composeService.parseServices(composeContent.toString());
         return await Promise.all(services.map(async (service) => {
-            const result: ProjectService = {
+            const result: ProjectServiceDto = {
                 icon: 'https://i.imgur.com/ZMxf3Iy.png',
                 image: service.image.startsWith('.') ? 'custom' : service.image,
                 name: service.name,
