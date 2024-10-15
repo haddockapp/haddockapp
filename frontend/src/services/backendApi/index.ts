@@ -13,6 +13,11 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+export enum QueryKeys {
+  Projects = "Projects",
+  Domains = "Domains",
+}
+
 export const backendApi = createApi({
   reducerPath: "",
   baseQuery: async (args, api, extraOptions) => {
@@ -21,5 +26,5 @@ export const backendApi = createApi({
     return result;
   },
   endpoints: () => ({}),
-  tagTypes: ["Projects"],
+  tagTypes: [QueryKeys.Projects, QueryKeys.Domains],
 });

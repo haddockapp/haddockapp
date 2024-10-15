@@ -6,6 +6,8 @@ import { FC, useMemo } from "react";
 import Account from "./steps/Account";
 import { Navigate } from "react-router-dom";
 import Domains from "./steps/Domains";
+import Stepdots from "@/components/molecules/stepdots";
+import { useGetAllDomainsQuery } from "@/services/backendApi/domains";
 
 const StepHeader: FC = () => {
   const { setupStep } = useAppSelector((state) => state.auth);
@@ -26,6 +28,7 @@ const StepHeader: FC = () => {
 
   return (
     <div className="space-y-4">
+      <Stepdots step={setupStep} total={3} />
       <div className="select-none justify-center flex items-center space-x-2">
         <h1 className="text-primary">
           <span className="text-3xl">{setupStep + 1}</span>
@@ -42,6 +45,7 @@ const StepHeader: FC = () => {
 const Setup: FC = () => {
   const { isAuth, setupStep } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const { data: domains } = useGetAllDomainsQuery();
 
   const SetupComponent = useMemo<FC>(() => {
     switch (setupStep) {
@@ -56,23 +60,21 @@ const Setup: FC = () => {
 
   const isBlocked = useMemo<boolean>(() => {
     if (setupStep === 0) return !isAuth;
-    if (setupStep === 1) return true;
+    if (setupStep === 1) return !(domains ?? []).some((d) => d.linked);
     return true;
-  }, [isAuth, setupStep]);
+  }, [domains, isAuth, setupStep]);
 
   return (
-    <div className="flex flex-col h-screen justify-between w-3/4 m-auto text-center">
-      <div className="space-y-8">
-        <StepHeader />
-        <SetupComponent />
-        <Button
-          onClick={() => dispatch(setSetupStep(setupStep + 1))}
-          disabled={isBlocked}
-        >
-          <ChevronRight />
-          <span>Next</span>
-        </Button>
-      </div>
+    <div className="justify-between w-3/4 m-auto text-center space-y-8">
+      <StepHeader />
+      <SetupComponent />
+      <Button
+        onClick={() => dispatch(setSetupStep(setupStep + 1))}
+        disabled={isBlocked}
+      >
+        <ChevronRight />
+        <span>Next</span>
+      </Button>
     </div>
   );
 };

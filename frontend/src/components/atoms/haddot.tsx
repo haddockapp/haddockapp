@@ -2,19 +2,23 @@ import { Circle, CircleCheck } from "lucide-react";
 import { FC, useMemo } from "react";
 
 interface HaddotProps {
+  completed?: boolean;
   active?: boolean;
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  size?: number;
 }
-const Haddot: FC<HaddotProps> = ({ active, size = "xs" }) => {
-  const color = useMemo(() => (active ? "primary" : "gray-200"), [active]);
+const Haddot: FC<HaddotProps> = ({ completed, active, size = 20 }) => {
+  const color = useMemo(
+    () => (active || completed ? "primary" : "gray-200"),
+    [active, completed]
+  );
 
   return (
     <span
-      className={`text-${size} bg-${color} rounded-full text-${
-        active ? "white" : color
+      className={`bg-${color} rounded-full text-${
+        active || completed ? "white" : color
       } select-none`}
     >
-      {active ? <CircleCheck /> : <Circle />}
+      {completed ? <CircleCheck size={size} /> : <Circle size={size} />}
     </span>
   );
 };

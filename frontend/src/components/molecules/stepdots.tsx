@@ -8,7 +8,7 @@ interface StepdotsProps {
 const Stepdots: FC<StepdotsProps> = ({ step, total }) => (
   <div className="select-none flex space-x-1 justify-center">
     {Array.from({ length: total }, (_, idx) => idx).map((i) => (
-      <Haddot active={i === step} />
+      <Haddot completed={i < step} active={i === step} />
     ))}
   </div>
 );

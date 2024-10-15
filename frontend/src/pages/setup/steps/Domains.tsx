@@ -47,7 +47,7 @@ const SetupMainDomain: FC<FormComponentProps> = ({ domain }) => {
   const [triggerCreateDomain] = useCreateDomainMutation();
 
   const onSubmit = form.handleSubmit((data) => {
-    triggerCreateDomain({ domain: data.domain, main: true })
+    triggerCreateDomain({ domain: data.domain, main: !!domain?.main })
       .unwrap()
       .then((d) => {
         toast({ title: "Domain created", description: JSON.stringify(d) });
@@ -81,46 +81,29 @@ const SetupMainDomain: FC<FormComponentProps> = ({ domain }) => {
 };
 
 interface SetupDomainStepProps {
-  FormComponent: FC<FormComponentProps>;
+  value: keyof DomainResponseDto;
   title: string;
   subtitle: string;
-  id: string;
 }
 
 const steps: SetupDomainStepProps[] = [
   {
-    FormComponent: SetupMainDomain,
-    title: "Setup main domain",
-    subtitle:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    id: "setup-main-domain",
-  },
-  {
-    FormComponent: ({ domain }) => (
-      <Input disabled value={domain?.primaryBinding} />
-    ),
+    value: "primaryBinding",
     title: "Link primary domain name",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    id: "link-primary-domain",
   },
   {
-    FormComponent: ({ domain }) => (
-      <Input disabled value={domain?.wildcardBinding} />
-    ),
+    value: "wildcardBinding",
     title: "Link wildcard domain name",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    id: "link-wildcard-domain",
   },
   {
-    FormComponent: ({ domain }) => (
-      <Input disabled value={domain?.challengeBinding} />
-    ),
+    value: "challengeBinding",
     title: "Haddock verification challenge",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    id: "haddock-verification-challenge",
   },
 ];
 
@@ -130,19 +113,35 @@ const Domains: FC = () => {
   return (
     <div>
       <Accordion type="multiple">
-        {steps.map((s) => (
-          <AccordionItem value={s.id}>
+        {[...(data ?? []), undefined].map((d) => (
+          <AccordionItem value={d?.id ?? "new"}>
             <AccordionTrigger>
               <div className="flex items-center space-x-4">
-                <Haddot active={data?.[0].linked} size="lg" />
+                <Haddot completed={d?.linked} size={30} />
                 <div className="text-start">
-                  <h1 className="text-xl text-gray-700">{s.title}</h1>
-                  <p className="text-gray-400">{s.subtitle}</p>
+                  <h1 className="text-xl text-gray-700">
+                    Setup {d?.main ? "main" : "secondary"} domain
+                  </h1>
+                  <p className="text-gray-400">{d?.domain}</p>
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-8 pt-1">
-              {<s.FormComponent domain={data?.[0]} />}
+            <AccordionContent className="px-8 pt-1 space-y-6">
+              <SetupMainDomain domain={d} />
+              {steps.map((s) => (
+                <div className="flex space-x-4">
+                  <div className="flex h-fit mx-auto mt-4">
+                    <Haddot completed={d?.linked} />
+                  </div>
+                  <div className="space-y-2 w-full">
+                    <div className="text-start">
+                      <h1 className="text-lg text-gray-700">{s.title}</h1>
+                      <p className="text-gray-400">{s.subtitle}</p>
+                    </div>
+                    <Input value={d?.[s.value] as string} disabled />
+                  </div>
+                </div>
+              ))}
             </AccordionContent>
           </AccordionItem>
         ))}
