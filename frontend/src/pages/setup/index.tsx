@@ -61,7 +61,7 @@ const Setup: FC = () => {
   }, [isAuth, setupStep]);
 
   return (
-    <div className="flex flex-col h-screen justify-between w-1/2 m-auto text-center">
+    <div className="flex flex-col h-screen justify-between w-3/4 m-auto text-center">
       <div className="space-y-8">
         <StepHeader />
         <SetupComponent />

@@ -19,7 +19,11 @@ import { FC } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateDomainMutation } from "@/services/backendApi/domains";
+import {
+  DomainResponseDto,
+  useCreateDomainMutation,
+  useGetAllDomainsQuery,
+} from "@/services/backendApi/domains";
 import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
@@ -28,11 +32,15 @@ const formSchema = z.object({
   }),
 });
 
-const SetupMainDomain: FC = () => {
+interface FormComponentProps {
+  domain?: DomainResponseDto;
+}
+
+const SetupMainDomain: FC<FormComponentProps> = ({ domain }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      domain: "",
+      domain: domain?.domain || "",
     },
   });
 
@@ -73,7 +81,7 @@ const SetupMainDomain: FC = () => {
 };
 
 interface SetupDomainStepProps {
-  FormComponent: FC;
+  FormComponent: FC<FormComponentProps>;
   title: string;
   subtitle: string;
   id: string;
@@ -88,21 +96,27 @@ const steps: SetupDomainStepProps[] = [
     id: "setup-main-domain",
   },
   {
-    FormComponent: () => <></>,
+    FormComponent: ({ domain }) => (
+      <Input disabled value={domain?.primaryBinding} />
+    ),
     title: "Link primary domain name",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     id: "link-primary-domain",
   },
   {
-    FormComponent: () => <></>,
+    FormComponent: ({ domain }) => (
+      <Input disabled value={domain?.wildcardBinding} />
+    ),
     title: "Link wildcard domain name",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     id: "link-wildcard-domain",
   },
   {
-    FormComponent: () => <></>,
+    FormComponent: ({ domain }) => (
+      <Input disabled value={domain?.challengeBinding} />
+    ),
     title: "Haddock verification challenge",
     subtitle:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -111,14 +125,16 @@ const steps: SetupDomainStepProps[] = [
 ];
 
 const Domains: FC = () => {
+  const { data } = useGetAllDomainsQuery();
+
   return (
     <div>
-      <Accordion type="single" collapsible>
+      <Accordion type="multiple">
         {steps.map((s) => (
           <AccordionItem value={s.id}>
             <AccordionTrigger>
               <div className="flex items-center space-x-4">
-                <Haddot size="lg" />
+                <Haddot active={data?.[0].linked} size="lg" />
                 <div className="text-start">
                   <h1 className="text-xl text-gray-700">{s.title}</h1>
                   <p className="text-gray-400">{s.subtitle}</p>
@@ -126,7 +142,7 @@ const Domains: FC = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-8 pt-1">
-              {<s.FormComponent />}
+              {<s.FormComponent domain={data?.[0]} />}
             </AccordionContent>
           </AccordionItem>
         ))}
