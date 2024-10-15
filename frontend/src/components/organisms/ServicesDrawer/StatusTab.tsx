@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { FC } from "react";
-import { SquareArrowOutUpRight } from "lucide-react";
 
 interface StatusTabProps {
   status: string;

@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ProjectDto } from "@/types/projects/projects.dto";
 import { FC } from "react";
 import { FolderDot } from "lucide-react";
 import { FolderGit2 } from "lucide-react";
+import { ProjectDto } from "@/services/backendApi/projects";
 
 interface ProjectCardProps {
   onClick?: () => void;

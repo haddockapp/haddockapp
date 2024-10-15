@@ -19,35 +19,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 
 const Projects: FC = () => {
-  // const projects: ProjectDto[] = [
-  //   {
-  //     id: "1",
-  //     sourceId: "1",
-  //     vmId: "1",
-  //     vm: {
-  //       id: "1",
-  //       name: "VM 1",
-  //       status: VmState.Running,
-  //       ip: "https://google.com",
-  //       memory: 2048,
-  //       disk: 20,
-  //       cpus: 2,
-  //       provider: VmProvider.Libvirt,
-  //       createdAt: new Date(),
-  //     },
-  //     source: {
-  //       id: "1",
-  //       type: "github",
-  //       authorizationId: "1",
-  //       settings: {
-  //         repository: "test",
-  //         branch: "main",
-  //         organization: "Epitech",
-  //       },
-  //     },
-  //   },
-  // ];
-
   const navigate = useNavigate();
   const { data: projects, isLoading } = useGetProjectsQuery();
   const { isOpen, onToggle, onClose } = useDisclosure();
