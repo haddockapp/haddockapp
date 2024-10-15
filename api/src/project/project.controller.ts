@@ -77,7 +77,7 @@ export class ProjectController {
         await this.projectService.deleteProject(projectId);
     }
 
-    @Get(':id/services')
+    @Get(':id/service')
     async getProjectServices(@Param('id') projectId: string) {
         const project = await this.projectRepository.findProjectById(projectId);
         if (!project) {
@@ -93,7 +93,6 @@ export class ProjectController {
                 icon: 'https://i.imgur.com/ZMxf3Iy.png',
                 image: service.image.startsWith('.') ? 'custom' : service.image,
                 name: service.name,
-                ports: service.ports,
             };
 
             const serviceName = service.image.split(':')[0];
@@ -107,16 +106,21 @@ export class ProjectController {
         }));
     }
 
-    @Get(':id/available-ports')
-    async getProjectAvailablePorts(@Param('id') projectId: string) {
+    @Get(':id/service/:name')
+    async getProjectServiceInformations(@Param('id') projectId: string, @Param('name') serviceName: string) {
         const project = await this.projectRepository.findProjectById(projectId);
         if (!project) {
             throw new NotFoundException('Project not found');
         }
 
         const settings = getSettings<GithubSourceSettingsDto>(project?.source.settings);
-        const composeContent = this.composeService.readComposeFile(project.id, settings.composeName);
-        const services = this.composeService.parseServices(composeContent);
-        return services.flatMap((service) => service.ports.map((port) => port.split(':')[0]));
+        const rawCompose = this.composeService.readComposeFile(project.id, settings.composeName);
+        const compose = this.composeService.parseServices(rawCompose);
+
+        const service = compose.find((service) => service.name === serviceName);
+        if (!service) {
+            throw new NotFoundException('Service not found');
+        }
+        return service;
     }
 }
