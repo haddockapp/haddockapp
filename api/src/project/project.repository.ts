@@ -8,7 +8,7 @@ import { VmProvider } from '../types/vm.enum';
 
 @Injectable()
 export class ProjectRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAllProjects(): Promise<PersistedProjectDto[]> {
     return this.prismaService.project.findMany({
@@ -40,9 +40,9 @@ export class ProjectRepository {
   ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
+        name: `${data.repository_organisation}_${data.repository_name}_${data.repository_branch}`,
         vm: {
           create: {
-            name: `${data.repository_organisation}_${data.repository_name}_${data.repository_branch}`,
             memory: data.vm_memory,
             disk: data.vm_disk,
             cpus: data.vm_cpus,
@@ -85,6 +85,8 @@ export class ProjectRepository {
         id: projectId,
       },
       data: {
+        name: data.name,
+        description: data.description,
         vm: {
           update: {
             cpus: data.cpus,

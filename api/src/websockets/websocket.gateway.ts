@@ -9,6 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { WebsocketConnectDto } from './dto/connect.dto';
+import { ProjectEventDto } from './dto/project-event.dto';
 
 @WebSocketGateway(3001, {
   cors: {
@@ -31,5 +32,13 @@ export class WSGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     this.websocketService.addClient(data.userId, client);
+  }
+
+  @SubscribeMessage('project')
+  async handleMetricsSubscribe(
+    @MessageBody() data: ProjectEventDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.websocketService.protectService(client, data);
   }
 }

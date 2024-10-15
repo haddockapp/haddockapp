@@ -4,6 +4,14 @@ import {AllowedValues} from "../validator/AllowedValues.validator";
 export class UpdateProjectDto {
     @IsString()
     @IsOptional()
+    name?: string;
+
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @IsString()
+    @IsOptional()
     repository_branch?: string;
 
     @IsNumber()
