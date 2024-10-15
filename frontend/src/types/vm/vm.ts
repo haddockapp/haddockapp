@@ -11,7 +11,6 @@ export enum VmState {
 
 export type VMInfos = {
   id: string;
-  name: string;
   ip: string;
   status: VmState;
   memory: number;

@@ -11,7 +11,7 @@ const servicesApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
     getServicesByProjectId: builder.query<ServiceDto[], string>({
       query: (projectId) => ({
-        url: `/project/${projectId}/services`,
+        url: `/project/${projectId}/service`,
         method: "GET",
       }),
     }),
