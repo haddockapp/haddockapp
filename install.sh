@@ -40,11 +40,13 @@ fi
 # Get OS
 if [ -f /etc/os-release ]; then
     . /etc/os-release
-    OS=$NAME
+    OS=$ID
     VER=$(echo $VERSION_ID)
+    CODENAME=$(echo $VERSION_CODENAME)
 elif type lsb_release >/dev/null 2>&1; then
     OS=$(lsb_release -si)
     VER=$(lsb_release -sr)
+    CODENAME=$(lsb_release -sc)
 else
     OS=$(uname -s)
     VER=$(echo uname -r)
@@ -59,13 +61,13 @@ echo "Version: $VER"
 echo "Architecture: $ARCH"
 
 # If OS is Ubuntu > 24, print error and exit (for whatever reason, Vagrant is not in HashiCorp' APT repo on Ubuntu > 24)
-if [ "$OS" = "Ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24 ]; then
+if [ "$OS" = "ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24 ]; then
     echo -e "${RED}Error: Ubuntu version is not supported${NC}"
     exit 1
 fi
 
 # Check if OS is compatible. Darwin is OK only for testing purposes
-if [ "$OS" = "Ubuntu" ] || [ "$OS" = "Debian" ] || [ "$OS" = "Darwin" ]; then
+if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ] || [ "$OS" = "Darwin" ]; then
     echo -e "${GREEN}Your OS is compatible with the project"
 else
     echo -e "${RED}Error: Incompatible OS"
@@ -73,7 +75,7 @@ else
 fi
 
 # Set package manager
-if [ "$OS" = "Ubuntu" ] || [ "$OS" = "Debian" ]; then
+if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
     if [ -x "$(command -v apt)" ]; then
         PM="apt"
     else
@@ -176,7 +178,7 @@ else
                 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
             fi
             # Add HashiCorp's APT repo
-            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $CODENAME main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
             # Install Vagrant
             sudo apt update && sudo apt install -y vagrant
         elif [ "$PM" = "brew" ]; then
@@ -209,29 +211,29 @@ unzip /tmp/haddock.zip -d /opt/haddock
 # Remove the zip file
 rm /tmp/haddock.zip
 
-#Create empty /opt/haddock/services.caddy
-sudo touch /opt/haddock/services.caddy
+#Create empty /opt/haddock/api/services.caddy
+sudo touch /opt/haddock/api/services.caddy
 
-#Create empty /opt/haddock/app.caddy
-sudo touch /opt/haddock/app.caddy
+#Create empty /opt/haddock/api/app.caddy
+sudo touch /opt/haddock/api/app.caddy
 
-# Create /opt/haddock/Caddyfile with basic configuration
+# Create /opt/haddock/api/Caddyfile with basic configuration
 # {
 #     admin off
 # }
 
-# import /var/www/haddock/services.caddy
-# import /var/www/haddock/app.caddy
+# import /var/www/haddock/api/services.caddy
+# import /var/www/haddock/api/app.caddy
 echo "{
     admin off
 }
 
-import /opt/haddock/services.caddy
-import /opt/haddock/app.caddy" | sudo tee /opt/haddock/Caddyfile
+import /opt/haddock/api/services.caddy
+import /opt/haddock/api/app.caddy" | sudo tee /opt/haddock/api/Caddyfile
 
 
 # Run Caddy
-sudo caddy start --config /opt/haddock/Caddyfile
+caddy start --config /opt/haddock/api/Caddyfile
 
 #if no .env file, create it
 if [ ! -f /opt/haddock/api/.env ]; then
@@ -246,6 +248,8 @@ if [ ! -f /opt/haddock/api/.env ]; then
     CADDY_SERVICES_FILE=services.caddy
     CADDY_APP_FILE=app.caddy
     JWT_SECRET=$JWT_SECRET
+    GITHUB_CLIENT_ID=***REMOVED***
+    GITHUB_CLIENT_SECRET=***REMOVED***
     " | sudo tee /opt/haddock/api/.env
 fi
 
