@@ -85,9 +85,12 @@ export class ProjectController {
         }
 
         const settings = getSettings<GithubSourceSettingsDto>(project?.source.settings);
-        const composeContent = this.composeService.readComposeFile(project.id, settings.composeName);
+        const rawCompose = this.composeService.readComposeFile(project.id, settings.composeName);
+        if (!rawCompose) {
+            return [];
+        }
 
-        const services = this.composeService.parseServices(composeContent.toString());
+        const services = this.composeService.parseServices(rawCompose.toString());
         return await Promise.all(services.map(async (service) => {
             const result: ProjectServiceDto = {
                 icon: 'https://i.imgur.com/ZMxf3Iy.png',
@@ -115,9 +118,12 @@ export class ProjectController {
 
         const settings = getSettings<GithubSourceSettingsDto>(project?.source.settings);
         const rawCompose = this.composeService.readComposeFile(project.id, settings.composeName);
-        const compose = this.composeService.parseServices(rawCompose);
+        if (!rawCompose) {
+            throw new NotFoundException('Service not found');
+        }
 
-        const service = compose.find((service) => service.name === serviceName);
+        const services = this.composeService.parseServices(rawCompose);
+        const service = services.find((service) => service.name === serviceName);
         if (!service) {
             throw new NotFoundException('Service not found');
         }
