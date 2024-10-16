@@ -1,23 +1,9 @@
-import { backendApi, QueryKeys } from ".";
-
-export interface CreateDomainDto {
-  domain: string;
-
-  main: boolean;
-}
-
-export interface DomainDto {
-  id: string;
-  domain: string;
-  main: boolean;
-
-  primaryBinding: string;
-  wildcardBinding: string;
-  challengeBinding: string;
-}
-
-export type DomainResponseDto = DomainDto & { linked: boolean };
-export type DomainStatusDto = DomainDto & { canBeLinked: boolean };
+import { backendApi, QueryKeys } from "..";
+import {
+  DomainResponseDto,
+  CreateDomainDto,
+  DomainStatusDto,
+} from "./domains.dto";
 
 const domainsApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
