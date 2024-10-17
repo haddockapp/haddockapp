@@ -1,13 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
-import { setSetupStep } from "@/services/authSlice";
-import { ChevronRight } from "lucide-react";
+import { useAppSelector } from "@/hooks/useStore";
 import { FC, useMemo } from "react";
 import Account from "./steps/Account";
 import { Navigate } from "react-router-dom";
 import Domains from "./steps/Domains";
 import Stepdots from "@/components/molecules/stepdots";
-import { useGetAllDomainsQuery } from "@/services/backendApi/domains";
+import Welcome from "./steps/Welcome";
 
 const StepHeader: FC = () => {
   const { setupStep } = useAppSelector((state) => state.auth);
@@ -43,9 +40,7 @@ const StepHeader: FC = () => {
 };
 
 const Setup: FC = () => {
-  const { isAuth, setupStep } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
-  const { data: domains } = useGetAllDomainsQuery();
+  const { setupStep } = useAppSelector((state) => state.auth);
 
   const SetupComponent = useMemo<FC>(() => {
     switch (setupStep) {
@@ -53,28 +48,17 @@ const Setup: FC = () => {
         return Account;
       case 1:
         return Domains;
+      case 2:
+        return Welcome;
       default:
         return () => <Navigate to="/dashboard" />;
     }
   }, [setupStep]);
 
-  const isBlocked = useMemo<boolean>(() => {
-    if (setupStep === 0) return !isAuth;
-    if (setupStep === 1) return !(domains ?? []).some((d) => d.linked);
-    return true;
-  }, [domains, isAuth, setupStep]);
-
   return (
     <div className="justify-between w-3/4 m-auto text-center space-y-8">
       <StepHeader />
       <SetupComponent />
-      <Button
-        onClick={() => dispatch(setSetupStep(setupStep + 1))}
-        disabled={isBlocked}
-      >
-        <ChevronRight />
-        <span>Next</span>
-      </Button>
     </div>
   );
 };
