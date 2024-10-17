@@ -8,7 +8,6 @@ import { logout } from "@/services/authSlice";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
