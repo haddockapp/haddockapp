@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 import { handlebarsHelper } from './handlebars/handlebars.helper';
 
 async function bootstrap() {
@@ -12,6 +13,15 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('HaddockApp API')
+    .setDescription('HaddockApp API official swagger')
+    .setVersion('MVP')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/docs', app, document);
 
   handlebarsHelper();
 
