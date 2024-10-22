@@ -69,7 +69,7 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
           repository_branch: data.branch,
           repository_name: data.repository.split("/")[1],
           repository_organisation: data.repository.split("/")[0],
-          vm_cpus: data.vcpus,
+          vm_cpus: +data.vcpus,
           vm_memory: +data.memory,
           vm_disk: +data.disk,
           compose_name: data.composeName,

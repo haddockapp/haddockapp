@@ -5,7 +5,7 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import Home from "./pages";
+import Setup from "./pages/setup";
 import Projects from "./pages/dashboard";
 import GithubCallback from "./pages/github";
 import { useAppSelector } from "./hooks/useStore";
@@ -15,6 +15,7 @@ import { Toaster } from "./components/ui/toaster";
 import useWebsockets from "./hooks/use-websockets";
 import { ConfigProvider } from "./providers/config";
 import ProjectDetails from "./pages/project";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const Layout: FC = () => (
   <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
@@ -37,21 +38,23 @@ function App() {
 
   return (
     <ConfigProvider>
-      <Toaster />
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="/github" element={<GithubCallback />} />
-          <Route element={<AuthenticatedGuard />}>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/github" element={<GithubCallback />} />
             <Route element={<Layout />}>
-              <Route path="dashboard" element={<Projects />} />
-              <Route path="project/*">
-                <Route path=":projectId" element={<ProjectDetails />} />
+              <Route index element={<Setup />} />
+              <Route element={<AuthenticatedGuard />}>
+                <Route path="dashboard" element={<Projects />} />
+                <Route path="project/*">
+                  <Route path=":projectId" element={<ProjectDetails />} />
+                </Route>
               </Route>
             </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </ConfigProvider>
   );
 }
