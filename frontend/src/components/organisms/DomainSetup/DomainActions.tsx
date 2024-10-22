@@ -37,11 +37,7 @@ const DomainActions: FC<DomainActionsProps> = ({
         <span>Delete domain</span>
       </Button>
     )}
-    <Button
-      onClick={onSave}
-      disabled={!status?.canBeLinked}
-      className="space-x-2"
-    >
+    <Button onClick={onSave} className="space-x-2">
       <Check size="16px" />
       <span>Save</span>
     </Button>

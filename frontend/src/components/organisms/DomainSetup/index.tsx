@@ -12,8 +12,13 @@ import DomainActions from "./DomainActions";
 interface SetupDomainFormProps {
   domain?: DomainResponseDto;
   main?: boolean;
+  onClose: () => void;
 }
-const SetupDomainForm: FC<SetupDomainFormProps> = ({ domain, main }) => {
+const SetupDomainForm: FC<SetupDomainFormProps> = ({
+  domain,
+  main,
+  onClose,
+}) => {
   const { data, refetch, isFetching } = useGetDomainStatusQuery(
     domain?.id ?? "",
     {
@@ -39,7 +44,7 @@ const SetupDomainForm: FC<SetupDomainFormProps> = ({ domain, main }) => {
           isRefreshing={isFetching}
           onRefresh={refetch}
           onDelete={triggerDeleteDomain}
-          onSave={() => {}}
+          onSave={onClose}
           status={data}
         />
       </div>
