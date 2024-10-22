@@ -6,7 +6,6 @@ interface StatusTabProps {
 }
 
 const StatusTab: FC<StatusTabProps> = ({ status, image }) => {
-  console.log(status);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">

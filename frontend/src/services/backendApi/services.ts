@@ -7,6 +7,27 @@ export interface ServiceDto {
   ports: string[];
 }
 
+export interface ServiceUser {
+  uid: string;
+  gid: string;
+}
+
+export interface ServiceDeployment {
+  cpus: number;
+  memory: number;
+}
+
+export interface ServiceInformationDto {
+  name: string;
+  image: string;
+  ports: string[];
+  networks: string[];
+  depends_on: string[];
+  environment: string[];
+  user: ServiceUser | null;
+  deployment: ServiceDeployment | null;
+}
+
 const servicesApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
     getServicesByProjectId: builder.query<ServiceDto[], string>({
@@ -15,7 +36,19 @@ const servicesApi = backendApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getServiceInformations: builder.query<
+      ServiceInformationDto,
+      { projectId: string; serviceName: string }
+    >({
+      query: ({ projectId, serviceName }) => ({
+        url: `/project/${projectId}/service/${serviceName}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetServicesByProjectIdQuery } = servicesApi;
+export const {
+  useGetServicesByProjectIdQuery,
+  useGetServiceInformationsQuery,
+} = servicesApi;
