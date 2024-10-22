@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { constants } from "../constants";
+import { useAppDispatch } from "./useStore";
+import { backendApi } from "@/services/backendApi";
+import { ProjectDto } from "@/services/backendApi/projects";
+import { VmState } from "@/types/vm/vm";
 // import { ProjectDto } from "@/types/projects/projects.dto";
 
 type SocketMessage = {
@@ -13,6 +17,8 @@ type SocketMessage = {
 const socket = io(constants.socketUrl, { autoConnect: false });
 
 const useWebsockets = () => {
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     socket.connect();
 
@@ -21,26 +27,24 @@ const useWebsockets = () => {
     socket.on("message", (msg: SocketMessage) => {
       console.log(msg);
 
-      //   if (msg.event === "status_change") {
-      //     queryClient.setQueryData(
-      //       [QueryTags.PROJECTS],
-      //       (oldData: ProjectDto[]) => {
-      //         const newData = (oldData as ProjectDto[]).map((project) => ({
-      //           ...project,
-      //           vm: {
-      //             ...project.vm,
-      //             status:
-      //               project.id === msg.target
-      //                 ? (msg.data as { status: string }).status
-      //                 : project.vm.status,
-      //           },
-      //         }));
-      //         return newData;
-      //       }
-      //     );
-      //   } else {
-      //     console.log(msg.event);
-      //   }
+      dispatch(
+        backendApi.util.updateQueryData(
+          // @ts-ignore
+          "getProjects",
+          undefined,
+          (draftPosts) => {
+            if (msg.event === "status_change") {
+              const project = (draftPosts as ProjectDto[]).find(
+                (project) => project.id === msg.target
+              );
+              if (project) {
+                project.vm.status = (msg.data as { status: string })
+                  .status as VmState;
+              }
+            }
+          }
+        )
+      );
     });
 
     return () => {
