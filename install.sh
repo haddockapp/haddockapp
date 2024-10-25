@@ -100,7 +100,7 @@ fi
 
 # Dependencies (for now): git, nodejs, npm
 # for every package check if it is installed, if not install it
-DEPENDENCIES=("wget" "gpg" "git" "npm" "unzip" "redis-server")
+DEPENDENCIES=("curl" "wget" "gpg" "git" "npm" "unzip" "redis-server")
 
 for i in "${DEPENDENCIES[@]}"; do
     if [ -x "$(command -v $i)" ]; then
@@ -187,6 +187,10 @@ else
     fi
 fi
 
+# Configuring Vagrant
+vagrant plugin install vagrant-libvirt
+vagrant box add generic/debian12
+
 if [ -x "$(command -v caddy)" ]; then
     echo -e "${GREEN}Caddy is already installed${NC}"
 else
@@ -213,9 +217,11 @@ rm /tmp/haddock.zip
 
 #Create empty /opt/haddock/api/services.caddy
 sudo touch /opt/haddock/api/services.caddy
+sudo echo "" > /opt/haddock/api/services.caddy
 
 #Create empty /opt/haddock/api/app.caddy
 sudo touch /opt/haddock/api/app.caddy
+sudo echo "" > /opt/haddock/api/app.caddy
 
 # Create /opt/haddock/api/Caddyfile with basic configuration
 # {
@@ -224,7 +230,8 @@ sudo touch /opt/haddock/api/app.caddy
 
 # import /var/www/haddock/api/services.caddy
 # import /var/www/haddock/api/app.caddy
-echo "{
+echo "
+{
     admin off
 }
 
