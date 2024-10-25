@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import { io } from "socket.io-client";
-import { constants } from "../constants";
 import { useAppDispatch } from "./useStore";
 import { backendApi } from "@/services/backendApi";
 import { ProjectDto } from "@/services/backendApi/projects";
 import { VmState } from "@/types/vm/vm";
-// import { ProjectDto } from "@/types/projects/projects.dto";
+import socket from "@/services/websockets";
 
 type SocketMessage = {
   event: string;
@@ -14,8 +12,6 @@ type SocketMessage = {
   data: unknown;
 };
 
-const socket = io(constants.socketUrl, { autoConnect: false });
-
 const useWebsockets = () => {
   const dispatch = useAppDispatch();
 
@@ -23,6 +19,19 @@ const useWebsockets = () => {
     socket.connect();
 
     socket.emit("join", { userId: "abcd" });
+
+    socket.on(
+      "metrics",
+      ({
+        cpuUsage,
+        memoryUsage,
+      }: {
+        cpuUsage: number;
+        memoryUsage: number;
+      }) => {
+        console.log("Metrics", cpuUsage, memoryUsage);
+      }
+    );
 
     socket.on("message", (msg: SocketMessage) => {
       console.log(msg);
