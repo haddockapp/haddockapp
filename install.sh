@@ -189,7 +189,7 @@ fi
 
 # Configuring Vagrant
 vagrant plugin install vagrant-libvirt
-vagrant box add generic/debian12
+vagrant box add generic/debian12 --provider=libvirt
 
 if [ -x "$(command -v caddy)" ]; then
     echo -e "${GREEN}Caddy is already installed${NC}"
