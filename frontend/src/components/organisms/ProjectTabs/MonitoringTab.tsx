@@ -11,8 +11,8 @@ interface MetricsSocketType {
 const MonitoringTab: FC = () => {
   const { projectId } = useParams();
 
-  const [cpuUsage, setCpuUsage] = useState<number>(50);
-  const [memoryUsage, setMemoryUsage] = useState<number>(50);
+  const [cpuUsage, setCpuUsage] = useState<number>(0);
+  const [memoryUsage, setMemoryUsage] = useState<number>(0);
 
   useEffect(() => {
     if (!projectId) return;
