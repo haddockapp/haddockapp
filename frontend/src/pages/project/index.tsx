@@ -1,10 +1,10 @@
+import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import TopologyTab from "@/components/organisms/ProjectTabs/TopologyTab";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
-import { handleProjectSubcription } from "@/services/websockets";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 
 enum TabsValue {
@@ -17,29 +17,6 @@ const ProjectDetails: FC = () => {
   const { projectId } = useParams();
   const { data: services } = useGetServicesByProjectIdQuery(projectId ?? "");
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
-
-  useEffect(() => {
-    if (!projectId) return;
-
-    // Subscribe to project
-    handleProjectSubcription({
-      projectId,
-      service: "metrics",
-      subscribe: true,
-      userId: "abcd",
-      data: {},
-    });
-
-    return () => {
-      handleProjectSubcription({
-        projectId,
-        service: "metrics",
-        subscribe: false,
-        userId: "abcd",
-        data: {},
-      });
-    };
-  }, [projectId]);
 
   return (
     <Tabs defaultValue="topology">
@@ -87,7 +64,9 @@ const ProjectDetails: FC = () => {
       <TabsContent value="topology">
         <TopologyTab services={services} />
       </TabsContent>
-      <TabsContent value="monitoring">Monitoring</TabsContent>
+      <TabsContent value="monitoring">
+        <MonitoringTab />
+      </TabsContent>
       <TabsContent value="settings">
         <SettingsTab />
       </TabsContent>

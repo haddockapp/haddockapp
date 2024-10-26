@@ -4,6 +4,7 @@ import { backendApi } from "@/services/backendApi";
 import { ProjectDto } from "@/services/backendApi/projects";
 import { VmState } from "@/types/vm/vm";
 import socket from "@/services/websockets";
+import { toast } from "./use-toast";
 
 type SocketMessage = {
   event: string;
@@ -20,27 +21,16 @@ const useWebsockets = () => {
 
     socket.emit("join", { userId: "abcd" });
 
-    socket.on(
-      "metrics",
-      ({
-        cpuUsage,
-        memoryUsage,
-      }: {
-        cpuUsage: number;
-        memoryUsage: number;
-      }) => {
-        console.log("Metrics", cpuUsage, memoryUsage);
-      }
-    );
-
     socket.on("message", (msg: SocketMessage) => {
-      console.log(msg);
+      toast({
+        title: msg.event,
+        description: msg.data as string,
+      });
 
       dispatch(
         backendApi.util.updateQueryData(
-          // @ts-ignore
-          "getProjects",
-          undefined,
+          "getProjects" as never,
+          undefined as never,
           (draftPosts) => {
             if (msg.event === "status_change") {
               const project = (draftPosts as ProjectDto[]).find(
@@ -60,7 +50,7 @@ const useWebsockets = () => {
       socket.disconnect();
       socket.off("message");
     };
-  }, []);
+  }, [dispatch]);
 };
 
 export default useWebsockets;
