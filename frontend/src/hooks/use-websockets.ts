@@ -23,8 +23,8 @@ const useWebsockets = () => {
 
     socket.on("message", (msg: SocketMessage) => {
       toast({
-        title: msg.event,
-        description: msg.data as string,
+        title: "Websocket message",
+        description: JSON.stringify(msg),
       });
 
       dispatch(
