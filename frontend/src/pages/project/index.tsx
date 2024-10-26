@@ -3,7 +3,8 @@ import TopologyTab from "@/components/organisms/ProjectTabs/TopologyTab";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
-import { FC, useState } from "react";
+import { handleProjectSubcription } from "@/services/websockets";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 enum TabsValue {
@@ -16,6 +17,30 @@ const ProjectDetails: FC = () => {
   const { projectId } = useParams();
   const { data: services } = useGetServicesByProjectIdQuery(projectId ?? "");
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    // Subscribe to project
+    handleProjectSubcription({
+      projectId,
+      service: "metrics",
+      subscribe: true,
+      userId: "abcd",
+      data: {},
+    });
+
+    return () => {
+      handleProjectSubcription({
+        projectId,
+        service: "metrics",
+        subscribe: false,
+        userId: "abcd",
+        data: {},
+      });
+    };
+  }, [projectId]);
+
   return (
     <Tabs defaultValue="topology">
       <TabsList className="absolute sm:top-24 lg:top-10 right-10">
