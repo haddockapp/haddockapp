@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -22,6 +23,8 @@ import { GithubSourceSettingsDto } from "src/source/dto/settings.dto";
 import { getSettings } from "src/source/utils/get-settings";
 import ProjectServiceDto from "./dto/ProjectService.dto";
 import { ProjectService } from "./project.service";
+import { VmState } from "src/types/vm.enum";
+import { VmService } from "src/vm/vm.service";
 
 @Controller('project')
 export class ProjectController {
@@ -31,6 +34,7 @@ export class ProjectController {
         private readonly sourceService: SourceService,
         private readonly composeService: ComposeService,
         private readonly dockerService: DockerService,
+        private readonly vmService: VmService,
     ) { }
 
   @Get()
@@ -60,6 +64,38 @@ export class ProjectController {
     );
     await this.sourceService.deploySource(project.sourceId);
     return project;
+  }
+
+  @Post('/deploy/:id')
+  async deployProject(@Param('id') projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+
+    if (project.vm.status === VmState.Running ||
+        project.vm.status === VmState.Starting) {
+        throw new BadRequestException('Project is already running');
+    }
+
+    console.log("Deploying project");
+    console.log(project.vm.status);
+
+    await this.sourceService.deploySource(project.sourceId);
+  }
+
+  @Post('/rebuild/:id')
+  async rebuildProject(@Param('id') projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+
+    if (project.vm.status === VmState.Running ||
+        project.vm.status === VmState.Starting) {
+        throw new BadRequestException('Project is already running');
+    }
+
+    console.log("rebuild project");
+    console.log(project.vm.status);
+
+    await this.vmService.deletePhisicalVm(project.vmId);
+
+    await this.sourceService.deploySource(project.sourceId);
   }
 
     @Patch(':id')

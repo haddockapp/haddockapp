@@ -8,6 +8,8 @@ import { VmRepository } from './vm.repository';
 import { VmState } from 'src/types/vm.enum';
 import { WebSocketService } from '../websockets/websocket.service';
 import { EventScope, EventType } from '../websockets/dto/websocket-event.dto';
+import { NetworksService } from 'src/networks/networks.service';
+import { ExecutionError } from './error/execution.error';
 
 @Injectable()
 export class VmService {
@@ -16,6 +18,7 @@ export class VmService {
   constructor(
     private readonly vmRepository: VmRepository,
     private readonly websocketService: WebSocketService,
+    private readonly networkService: NetworksService,
   ) {
     this.template = compile(
       readFileSync('./src/vm/template/Vagrantfile.hbs', 'utf-8'),
@@ -41,15 +44,22 @@ export class VmService {
   }
 
   private async execCommand(command: string): Promise<string> {
-    const promise = new Promise<string>((resolve, reject) => {
-      exec(command, (error, stdout) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(stdout);
+    try {
+      const promise = new Promise<string>((resolve, reject) => {
+        exec(command, (error, stdout) => {
+          if (error) {
+            reject(new ExecutionError(`Command failed: ${error.message}`));
+          }
+          resolve(stdout);
+        });
       });
-    });
-    return promise;
+
+      return await promise;
+    } catch (error) {
+      throw new ExecutionError(
+        `Execution of command "${command}" failed: ${error.message}`,
+      );
+    }
   }
 
   private getIpFromOutput(output: string): string {
@@ -96,6 +106,8 @@ export class VmService {
     );
 
     const ip = this.getIpFromOutput(output);
+
+    await this.networkService.updateNetworksfile();
 
     await this.vmRepository.updateVm({
       where: { id: vm.id },
