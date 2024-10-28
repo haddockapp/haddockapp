@@ -9,6 +9,7 @@ import {
   useGetServiceInformationsQuery,
 } from "@/services/backendApi/services";
 import ConfigTab from "./ConfigTab";
+import NetworksTab from "./NetworksTab";
 
 interface ServiceDrawerContentProps {
   service: ServiceDto;
@@ -95,7 +96,11 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               )}
             </TabsContent>
             <TabsContent value="networks">
-              <div className="mt-10 text-center">Networks</div>
+              {serviceInformation ? (
+                <NetworksTab serviceInformations={serviceInformation} />
+              ) : (
+                <div className="mt-10 text-center">No networks found</div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
