@@ -100,7 +100,7 @@ fi
 
 # Dependencies (for now): git, nodejs, npm
 # for every package check if it is installed, if not install it
-DEPENDENCIES=("curl" "wget" "gpg" "git" "npm" "unzip" "redis-server")
+DEPENDENCIES=("curl" "wget" "gpg" "git" "npm" "unzip" "redis-server" "qemu-system libvirt-daemon-system libvirt-dev")
 
 for i in "${DEPENDENCIES[@]}"; do
     if [ -x "$(command -v $i)" ]; then
