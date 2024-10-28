@@ -5,6 +5,7 @@ import { Project } from '@prisma/client';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
 import { VmProvider } from '../types/vm.enum';
+import pirateShips from './pirateShips';
 
 @Injectable()
 export class ProjectRepository {
@@ -34,13 +35,22 @@ export class ProjectRepository {
     });
   }
 
+  private generatePirateShipName(): string {
+    const { prefixes, suffixes } = pirateShips;
+
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
+    return `${prefix} ${suffix}`;
+  }
+
   async createProject(
     data: CreateProjectDto,
     authorizationId: string,
   ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
-        name: `${data.repository_organisation}_${data.repository_name}_${data.repository_branch}`,
+        name: this.generatePirateShipName(),
         vm: {
           create: {
             memory: data.vm_memory,
