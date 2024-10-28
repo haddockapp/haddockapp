@@ -29,8 +29,8 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {serviceInformations.environment.map((env) => (
-                <TableRow>
+              {serviceInformations.environment.map((env, index) => (
+                <TableRow key={index}>
                   <TableCell>{env.split("=")[0]}</TableCell>
                   <TableCell>{env.split("=")[1]}</TableCell>
                 </TableRow>
@@ -51,8 +51,8 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {serviceInformations.depends_on.map((depend) => (
-                <TableRow>
+              {serviceInformations.depends_on.map((depend, index) => (
+                <TableRow key={index}>
                   <TableCell>{depend}</TableCell>
                 </TableRow>
               ))}
