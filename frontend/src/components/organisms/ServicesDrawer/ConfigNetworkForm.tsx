@@ -6,13 +6,19 @@ import { useGetDomainsQuery } from "@/services/domain.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Autocomplete } from "@/components/molecules/autocomplete.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import { useCreateNetworkConnectionMutation } from "@/services/backendApi/networks/networks.service.ts";
+import { Button } from "@/components/ui/button.tsx";
 
 interface ConfigNetworkFormProps {
   serviceInformations: ServiceInformationDto;
+  projectId: string;
+  onClose: () => void;
 }
 
 const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   serviceInformations,
+  projectId,
+  onClose,
 }) => {
   const methods = useForm<ConfigNetworkFormType>({
     defaultValues: {
@@ -20,11 +26,17 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
       domain: "",
       subdomain: "",
     },
+    mode: "onChange",
   });
 
-  const { handleSubmit, reset, register, control, watch } = methods;
+  const {
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+  } = methods;
   const { data: domains } = useGetDomainsQuery();
-  console.log(domains);
+  const [createRedirection] = useCreateNetworkConnectionMutation();
 
   const portOptions = useMemo(
     () =>
@@ -49,30 +61,39 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   const subdomainValue = watch("subdomain");
 
   const onSubmit: SubmitHandler<ConfigNetworkFormType> = (data) => {
+    createRedirection({
+      projectId: projectId,
+      port: parseInt(data.port),
+      domain: `${subdomainValue}.${domainValue}`,
+    });
     console.log(data);
+    onClose();
   };
+
+  const isSubmitDisabled = useMemo(() => {
+    return Boolean(!portValue || !domainValue || errors.subdomain);
+  }, [portValue, domainValue, errors.subdomain]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col justify-between space-y-2 w-1/2">
+      <div className="flex flex-col justify-between space-y-2 w-1/3">
         <Label className="text-md">Port</Label>
         <Controller
           control={control}
           name="port"
-          rules={{ required: true }}
+          rules={{ required: "Port is required" }}
           render={({ field }) => (
             <Autocomplete {...field} options={portOptions} />
           )}
         />
       </div>
-      <div className="flex flex-row w-1/2 gap-2">
+      <div className="flex flex-row w-full gap-1">
         <div className="flex flex-col w-1/3 space-y-2 mt-2">
           <Label className="text-md">Sub domain</Label>
           <Controller
             control={control}
             name="subdomain"
             rules={{
-              required: true,
               pattern: {
                 value: /^(?!-)[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*$/,
                 message: "Sub domain is invalid",
@@ -81,6 +102,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
             render={({ field }) => <Input {...field} disabled={!portValue} />}
           />
         </div>
+        <p className="self-end">.</p>
         <div className="flex flex-col w-2/3 mt-2 space-y-2">
           <Label className="text-md">Domain</Label>
           <Controller
@@ -106,14 +128,20 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
           />
         </div>
       </div>
-      <div className="mt-4">
-        <Label className="text-md">Domain visualizer</Label>
+      {errors.subdomain && (
+        <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
+      )}
+      <div className="my-4">
+        <Label className="text-md">Domain's overview</Label>
         <Input
           className="mt-2"
-          value={`${subdomainValue}.${domainValue}`}
+          value={`${subdomainValue}${subdomainValue ? "." : ""}${domainValue}`}
           disabled
         />
       </div>
+      <Button className="w-full" type="submit" disabled={isSubmitDisabled}>
+        Create
+      </Button>
     </form>
   );
 };

@@ -97,7 +97,10 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
             </TabsContent>
             <TabsContent value="networks">
               {serviceInformation ? (
-                <NetworksTab serviceInformations={serviceInformation} />
+                <NetworksTab
+                  serviceInformations={serviceInformation}
+                  projectId={projectId}
+                />
               ) : (
                 <div className="mt-10 text-center">No networks found</div>
               )}
