@@ -33,12 +33,6 @@ export interface ProjectDto {
   source: Source;
 }
 
-export interface NetworkConnectionDto {
-  projectId: string;
-  port: number;
-  domain: string;
-}
-
 export interface UpdateProjectDto {
   repository_branch?: string;
   vcpu?: number;
