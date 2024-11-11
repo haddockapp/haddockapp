@@ -64,4 +64,12 @@ export class DomainRepository {
       },
     }).then(count => count > 0);
   }
+
+  async getMainDomain(): Promise<Domain | null> {
+    return this.prismaService.domain.findFirst({
+      where: {
+        main: true,
+      },
+    });
+  }
 }
