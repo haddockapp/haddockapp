@@ -1,6 +1,6 @@
 import { Source } from "@/types/source";
 import { VMInfos } from "@/types/vm/vm";
-import { backendApi } from ".";
+import { backendApi, QueryKeys } from ".";
 
 export interface CreateProjectDto {
   repository_organisation: string;
@@ -33,12 +33,6 @@ export interface ProjectDto {
   source: Source;
 }
 
-export interface NetworkConnectionDto {
-  projectId: string;
-  port: number;
-  domain: string;
-}
-
 export interface UpdateProjectDto {
   repository_branch?: string;
   vcpu?: number;
@@ -55,13 +49,13 @@ const projectsApi = backendApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: "Projects", id: "LIST" }],
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
     getProjects: builder.query<ProjectDto[], void>({
       query: () => ({
         url: "/project",
       }),
-      providesTags: [{ type: "Projects", id: "LIST" }],
+      providesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
     updateProject: builder.mutation<
       ProjectDto,
@@ -72,14 +66,14 @@ const projectsApi = backendApi.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: [{ type: "Projects", id: "LIST" }],
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
     deleteProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/${projectId}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Projects", id: "LIST" }],
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
   }),
 });

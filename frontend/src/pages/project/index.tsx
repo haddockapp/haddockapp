@@ -62,7 +62,7 @@ const ProjectDetails: FC = () => {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="topology">
-        <TopologyTab services={services} />
+        <TopologyTab services={services} projectId={projectId ?? ""} />
       </TabsContent>
       <TabsContent value="monitoring">
         <MonitoringTab />
