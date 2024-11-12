@@ -98,7 +98,7 @@ elif [ "$PM" = "brew" ]; then
     brew update && brew upgrade
 fi
 
-# Dependencies (for now): git, nodejs, npm
+# Dependencies
 # for every package check if it is installed, if not install it
 DEPENDENCIES=("curl" "wget" "gpg" "git" "npm" "unzip" "redis-server" "qemu-system libvirt-daemon-system libvirt-dev")
 
@@ -203,8 +203,14 @@ else
     fi
 fi
 
+# Stop Caddy
+sudo systemctl stop caddy
+
 # Set capabilities for Caddy
 sudo setcap cap_net_bind_service=+ep $(which caddy)
+
+# Remove default Caddyfile
+sudo rm /etc/caddy/Caddyfile
 
 # Get latest zip release from https://releases.haddock.ovh/main/release.zip
 curl -L https://releases.haddock.ovh/main/release.zip -o /tmp/haddock.zip
@@ -224,23 +230,45 @@ sudo touch /opt/haddock/api/app.caddy
 sudo echo "" > /opt/haddock/api/app.caddy
 
 # Create /opt/haddock/api/Caddyfile with basic configuration
-# {
-#     admin off
-# }
-
-# import /var/www/haddock/api/services.caddy
-# import /var/www/haddock/api/app.caddy
 echo "
-{
-    admin off
+:80 {
+    root * /opt/haddock/frontend/dist
+    file_server
 }
 
 import /opt/haddock/api/services.caddy
-import /opt/haddock/api/app.caddy" | sudo tee /opt/haddock/api/Caddyfile
+import /opt/haddock/api/app.caddy" | sudo tee /etc/caddy/Caddyfile
 
+IPIfConfigWebsite=$(curl -s ifconfig.me)
+IPInterface=$(ip route get 1 | awk '{print $7}')
+IP=$IPInterface
+printf "We detected these public IP addresses for your server: \n"
+printf "1. $IPIfConfigWebsite\n"
+printf "2. $IPInterface\n"
+printf "3. Custom IP\n"
 
-# Run Caddy
-caddy start --config /opt/haddock/api/Caddyfile
+while true; do
+    read -p "Choose the public IP address of your server: " -n 1 -r choice
+    echo
+    case $choice in
+        1)
+            IP=$IPIfConfigWebsite
+            break
+            ;;
+        2)
+            IP=$IPInterface
+            break
+            ;;
+        3)
+            read -p "Enter the public IP address of your server: " IP
+            # TODO: validate IP
+            break
+            ;;
+        *)
+            echo -e "${RED}Invalid choice, please try again${NC}"
+            ;;
+    esac
+done
 
 #if no .env file, create it
 if [ ! -f /opt/haddock/api/.env ]; then
@@ -255,6 +283,7 @@ if [ ! -f /opt/haddock/api/.env ]; then
     CADDY_SERVICES_FILE=services.caddy
     CADDY_APP_FILE=app.caddy
     JWT_SECRET=$JWT_SECRET
+    SERVER_IP=$IP
     GITHUB_CLIENT_ID=***REMOVED***
     GITHUB_CLIENT_SECRET=***REMOVED***
     " | sudo tee /opt/haddock/api/.env
@@ -276,5 +305,29 @@ cd /opt/haddock/api
 yarn install
 yarn migrate
 pm2 start yarn --name api -- start
+
+#TODO: PM2 save & startup
+
+## FRONTEND
+
+#if no .env file, create it
+if [ ! -f /opt/haddock/frontend/.env ]; then
+    # Set frontend .env, use IP from above
+    echo "
+        VITE_API_URL=http://$IP:3000
+        VITE_SOCKET_URL=http://$IP:3001
+        VITE_GITHUB_CLIENT_ID=***REMOVED***
+    " | sudo tee /opt/haddock/frontend/.env
+fi
+
+# Start frontend
+cd /opt/haddock/frontend
+
+# Install dependencies and start frontend
+yarn install
+yarn build
+
+# Start Caddy
+sudo systemctl start caddy
 
 exit 0
