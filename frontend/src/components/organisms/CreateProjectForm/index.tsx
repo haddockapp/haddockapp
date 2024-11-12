@@ -34,12 +34,13 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
   const [formStep, setFormStep] = useState<number>(0);
 
   const [createProject] = useCreateProjectMutation();
-  const { data: repositories, isLoading: areRepositoriesLoading } =
-    useGetAllRepositoriesQuery();
-  const { data: branches, isLoading: areBranchesLoading } =
-    useGetAllBranchesByRepositoryQuery(watch("repository"), {
+  const { data: repositories } = useGetAllRepositoriesQuery();
+  const { data: branches } = useGetAllBranchesByRepositoryQuery(
+    watch("repository"),
+    {
       skip: !watch("repository"),
-    });
+    }
+  );
 
   const repositoriesOptions = useMemo(
     () =>
