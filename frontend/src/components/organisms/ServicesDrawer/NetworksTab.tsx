@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 
 interface NetworksTabProps {
   serviceInformations: ServiceInformationDto;
@@ -34,6 +35,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
   serviceInformations,
   projectId,
 }) => {
+  const { toast } = useToast();
   const { data: redirections } = useGetNetworksConnectionQuery(projectId);
   const [deleteRedirection] = useDeleteNetworkConnectionMutation();
   const {
@@ -58,6 +60,10 @@ const NetworksTab: FC<NetworksTabProps> = ({
   const handleDeleteRedirection = (id: string) => {
     deleteRedirection(id);
     onDeleteModalClose();
+    toast({
+      title: "Redirection deleted",
+      description: "The redirection has been successfully deleted",
+    });
   };
 
   return (

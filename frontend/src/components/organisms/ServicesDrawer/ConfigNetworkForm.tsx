@@ -8,6 +8,7 @@ import { Autocomplete } from "@/components/molecules/autocomplete.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { useCreateNetworkConnectionMutation } from "@/services/backendApi/networks/networks.service.ts";
 import { Button } from "@/components/ui/button.tsx";
+import { useToast } from "@/hooks/use-toast.ts";
 
 interface ConfigNetworkFormProps {
   serviceInformations: ServiceInformationDto;
@@ -20,6 +21,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   projectId,
   onClose,
 }) => {
+  const { toast } = useToast();
   const methods = useForm<ConfigNetworkFormType>({
     defaultValues: {
       port: "",
@@ -130,7 +132,17 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
           disabled
         />
       </div>
-      <Button className="w-full" type="submit" disabled={isSubmitDisabled}>
+      <Button
+        className="w-full"
+        type="submit"
+        disabled={isSubmitDisabled}
+        onClick={() => {
+          toast({
+            title: "Redirection created",
+            duration: 1000,
+          });
+        }}
+      >
         Create
       </Button>
     </form>
