@@ -19,6 +19,10 @@ echo '
  |_|  |_|\__,_|\__,_|\__,_|\___/ \___|_|\_\                                         
 '
 
+##############################################
+#                Permissions                 #
+##############################################
+
 # Check if root, if not ask to run as root
 if [ "$(id -u)" -ne 0 ]; then
     echo -e "${RED}Error: The script must be run as root${NC}"
@@ -36,6 +40,10 @@ if [ "$(id -u)" -ne 0 ]; then
     fi
     exit 0
 fi
+
+##############################################
+#              OS identification             #
+##############################################
 
 # Get OS
 if [ -f /etc/os-release ]; then
@@ -60,6 +68,10 @@ echo "OS: $OS"
 echo "Version: $VER"
 echo "Architecture: $ARCH"
 
+##############################################
+#                Compatibility               #
+##############################################
+
 # If OS is Ubuntu > 24, print error and exit (for whatever reason, Vagrant is not in HashiCorp' APT repo on Ubuntu > 24)
 if [ "$OS" = "ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24 ]; then
     echo -e "${RED}Error: Ubuntu version is not supported${NC}"
@@ -73,6 +85,10 @@ else
     echo -e "${RED}Error: Incompatible OS"
     exit 1
 fi
+
+##############################################
+#                Dependencies                #
+##############################################
 
 # Set package manager
 if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
@@ -123,6 +139,15 @@ else
     elif [ "$PM" = "brew" ]; then
         brew install postgresql
     fi
+fi
+
+# Configure PostgreSQL
+if (sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw haddock); then
+    echo -e "${GREEN}Database haddock already exists${NC}"
+else
+    sudo -u postgres psql -c "CREATE USER haddock WITH PASSWORD 'haddock';"
+    sudo -u postgres psql -c "CREATE DATABASE haddock WITH OWNER haddock;"
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE haddock TO haddock;"
 fi
 
 # Install nvm & node
@@ -203,6 +228,10 @@ else
     fi
 fi
 
+##############################################
+#                   Caddy                    #
+##############################################
+
 # Stop Caddy
 sudo systemctl stop caddy
 
@@ -212,24 +241,7 @@ sudo setcap cap_net_bind_service=+ep $(which caddy)
 # Remove default Caddyfile
 sudo rm /etc/caddy/Caddyfile
 
-# Get latest zip release from https://releases.haddock.ovh/main/release.zip
-curl -L https://releases.haddock.ovh/main/release.zip -o /tmp/haddock.zip
-
-# Unzip it to /opt/haddock
-unzip /tmp/haddock.zip -d /opt/haddock
-
-# Remove the zip file
-rm /tmp/haddock.zip
-
-#Create empty /opt/haddock/api/services.caddy
-sudo touch /opt/haddock/api/services.caddy
-sudo echo "" > /opt/haddock/api/services.caddy
-
-#Create empty /opt/haddock/api/app.caddy
-sudo touch /opt/haddock/api/app.caddy
-sudo echo "" > /opt/haddock/api/app.caddy
-
-# Create /opt/haddock/api/Caddyfile with basic configuration
+# Create /etc/caddy/Caddyfile with basic configuration
 echo "
 :80 {
     root * /opt/haddock/frontend/dist
@@ -238,6 +250,10 @@ echo "
 
 import /opt/haddock/api/services.caddy
 import /opt/haddock/api/app.caddy" | sudo tee /etc/caddy/Caddyfile
+
+##############################################
+#                  Network                   #
+##############################################
 
 IPIfConfigWebsite=$(curl -s ifconfig.me)
 IPInterface=$(ip route get 1 | awk '{print $7}')
@@ -270,6 +286,31 @@ while true; do
     esac
 done
 
+##############################################
+#                  Haddock                   #
+##############################################
+
+# Get latest zip release from https://releases.haddock.ovh/main/release.zip
+curl -L https://releases.haddock.ovh/main/release.zip -o /tmp/haddock.zip
+
+# Unzip it to /opt/haddock
+unzip /tmp/haddock.zip -d /opt/haddock
+
+# Remove the zip file
+rm /tmp/haddock.zip
+
+##############################################
+#                  Backend                   #
+##############################################
+
+#Create empty /opt/haddock/api/services.caddy
+sudo touch /opt/haddock/api/services.caddy
+sudo echo "" > /opt/haddock/api/services.caddy
+
+#Create empty /opt/haddock/api/app.caddy
+sudo touch /opt/haddock/api/app.caddy
+sudo echo "" > /opt/haddock/api/app.caddy
+
 #if no .env file, create it
 if [ ! -f /opt/haddock/api/.env ]; then
     # Generate random JWT secret
@@ -289,26 +330,21 @@ if [ ! -f /opt/haddock/api/.env ]; then
     " | sudo tee /opt/haddock/api/.env
 fi
 
-# Configure PostgreSQL
-if (sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw haddock); then
-    echo -e "${GREEN}Database haddock already exists${NC}"
-else
-    sudo -u postgres psql -c "CREATE USER haddock WITH PASSWORD 'haddock';"
-    sudo -u postgres psql -c "CREATE DATABASE haddock WITH OWNER haddock;"
-    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE haddock TO haddock;"
-fi
-
 # Start API
 cd /opt/haddock/api
 
 # Install dependencies, migrate database and start API
 yarn install
 yarn migrate
+
 pm2 start yarn --name api -- start
 
-#TODO: PM2 save & startup
+pm2 startup
+pm2 save
 
-## FRONTEND
+##############################################
+#                 Frontend                   #
+##############################################
 
 #if no .env file, create it
 if [ ! -f /opt/haddock/frontend/.env ]; then
@@ -326,6 +362,10 @@ cd /opt/haddock/frontend
 # Install dependencies and start frontend
 yarn install
 yarn build
+
+##############################################
+#                 Starting                   #
+##############################################
 
 # Start Caddy
 sudo systemctl start caddy
