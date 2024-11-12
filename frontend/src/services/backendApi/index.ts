@@ -16,6 +16,7 @@ const baseQuery = fetchBaseQuery({
 export enum QueryKeys {
   Projects = "Projects",
   Domains = "Domains",
+  Redirections = "Redirections",
 }
 
 export const backendApi = createApi({
@@ -26,5 +27,5 @@ export const backendApi = createApi({
     return result;
   },
   endpoints: () => ({}),
-  tagTypes: [QueryKeys.Projects, QueryKeys.Domains],
+  tagTypes: [QueryKeys.Projects, QueryKeys.Domains, QueryKeys.Redirections],
 });

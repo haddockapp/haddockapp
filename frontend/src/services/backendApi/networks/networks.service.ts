@@ -1,4 +1,4 @@
-import { backendApi } from "..";
+import { backendApi, QueryKeys } from "..";
 import {
   CreateNetworkConnectionDto,
   NetworkConnectionDto,
@@ -10,6 +10,7 @@ const networksApi = backendApi.injectEndpoints({
       query: (projectId) => ({
         url: `network-connection/project/${projectId}`,
       }),
+      providesTags: [{ type: QueryKeys.Redirections, id: "LIST" }],
     }),
     createNetworkConnection: builder.mutation<
       NetworkConnectionDto,
@@ -20,12 +21,14 @@ const networksApi = backendApi.injectEndpoints({
         method: "POST",
         body,
       }),
+      invalidatesTags: [{ type: QueryKeys.Redirections, id: "LIST" }],
     }),
     deleteNetworkConnection: builder.mutation<NetworkConnectionDto, string>({
       query: (id) => ({
         url: `network-connection/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: [{ type: QueryKeys.Redirections, id: "LIST" }],
     }),
   }),
 });

@@ -112,16 +112,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
             render={({ field }) => (
               <Autocomplete
                 {...field}
-                options={
-                  domainOptions.length
-                    ? domainOptions
-                    : [
-                        {
-                          label: "custom-domain.fr",
-                          value: "custom-domain.fr",
-                        },
-                      ]
-                }
+                options={domainOptions}
                 disabled={!portValue}
               />
             )}
