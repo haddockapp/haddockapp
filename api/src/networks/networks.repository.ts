@@ -12,6 +12,14 @@ export class NetworksRepository {
     return this.prismaService.networkConnection.findMany();
   }
 
+  async findNetworkConnectionsByProjectId(projectId: string): Promise<NetworkConnection[]> {
+    return this.prismaService.networkConnection.findMany({
+        where: {
+            projectId,
+        },
+    });
+  }
+
   async findNetworkConnectionsAndProjectAndVm(): Promise<
     Prisma.NetworkConnectionGetPayload<{
       include: { project: { include: { vm: true } } };

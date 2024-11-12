@@ -13,7 +13,6 @@ const SettingsTab: FC = () => {
   const project = useGetProjectsQuery().data?.find(
     (project) => project.id === projectId
   );
-  console.log(project);
   const [deleteProject] = useDeleteProjectMutation();
   const handleDeleteProject = () => {
     deleteProject(projectId ?? "");

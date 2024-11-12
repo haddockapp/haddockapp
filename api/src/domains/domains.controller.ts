@@ -11,6 +11,11 @@ export class DomainsController {
     return this.domainsService.create(createDomainDto);
   }
 
+  @Post('apply')
+  apply() {
+    return this.domainsService.apply();
+  }
+
   @Get()
   findAll() {
     return this.domainsService.findAll();

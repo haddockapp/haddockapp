@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { parse } from 'yaml';
 import Service from "./model/Service";
 import * as fs from 'fs';
@@ -36,7 +36,7 @@ export class ComposeService {
 
             res.push({
                 name,
-                image: data.image || data.build,
+                image: data.image || 'Custom Dockerfile',
                 ports: (data.ports || []).map((port) => port.split(':')[0]),
                 networks: data.networks || [],
                 depends_on: data.depends_on || [],
@@ -51,9 +51,15 @@ export class ComposeService {
 
     readComposeFile(projectId: string, composeName: string): string {
         const path = `${__dirname.split('/api')[0]}/workspaces/${projectId}`;
+
+        if (!fs.existsSync(`${path}/${composeName}`)) {
+            return '';
+        }
+
         const composeContent = fs.readFileSync(`${path}/${composeName}`);
+        console.log('composeContent', composeContent);
         if (!composeContent) {
-            throw new NotFoundException('No compose file found.');
+            return '';
         }
 
         return composeContent.toString();

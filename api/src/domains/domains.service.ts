@@ -7,14 +7,19 @@ import { DomainResponseDto } from './dto/domain-response.dto';
 import { BindingService } from './dns/binding.service';
 import { DomainStatusDto } from './dto/domain-status.dto';
 import { DnsService } from './dns/dns.service';
+import { CaddyService } from '../caddy/caddy.service';
+import { FrontendService } from '../frontend/frontend.service';
+import { hostname } from 'os';
 
 @Injectable()
 export class DomainsService {
 
   constructor (
-    private domainRepository: DomainRepository,
-    private bindingService: BindingService,
-    private dnsService: DnsService
+    private readonly domainRepository: DomainRepository,
+    private readonly bindingService: BindingService,
+    private readonly dnsService: DnsService,
+    private readonly frontendService: FrontendService,
+    private readonly caddyService: CaddyService
   ) {}
 
   private generateDomainChallenge() {
@@ -93,5 +98,45 @@ export class DomainsService {
       throw new ForbiddenException('Cannot delete a linked main domain');
     }
     return this.domainRepository.deleteDomain(id);
+  }
+
+  async apply() {
+    const mainDomain = await this.domainRepository.getMainDomain();
+    if (!mainDomain) {
+      throw new ForbiddenException('Cannot apply without a main domain');
+    }
+
+    const status = await this.getDomainStatus(mainDomain.id);
+
+    if (!status.canBeLinked) {
+      throw new ForbiddenException('Cannot apply with the current domain status');
+    }
+
+    const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
+    await this.caddyService.generate({
+      template: 'reverse-proxies.hbs',
+      data:{
+        data: [
+          {
+            hostname: mainDomain.domain,
+            ip: '127.0.0.1',
+            port: +process.env.FRONTEND_PORT
+          },
+          {
+            hostname: `api.${mainDomain.domain}`,
+            ip: '127.0.0.1',
+            port: +process.env.PORT
+          },
+        ]
+      },
+      dest,
+    });
+
+    await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
+    return {
+      mainDomain: mainDomain.domain,
+      frontendUrl: `https://${mainDomain.domain}`,
+      backendUrl: `https://api.${mainDomain.domain}`
+    }
   }
 }

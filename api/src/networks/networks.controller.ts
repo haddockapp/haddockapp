@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   NotFoundException,
   Param,
   Patch,
@@ -19,6 +20,11 @@ export class NetworksController {
     private networksService: NetworksService,
     private networksRepository: NetworksRepository,
   ) {}
+
+  @Get('project/:id')
+  async getAllNetworkConnections(@Param('id') projectId: string) {
+    return await this.networksRepository.findNetworkConnectionsByProjectId(projectId);
+  }
 
   @Post()
   async createNetworkConnection(

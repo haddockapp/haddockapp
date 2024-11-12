@@ -24,9 +24,11 @@ import { ScrollArea } from "../ui/scroll-area";
 interface AutocompleteProps {
   onChange?: (...event: unknown[]) => void;
   options: { label: string; value: string }[];
+  disabled?: boolean;
 }
+
 export const Autocomplete: FC<AutocompleteProps> = forwardRef(
-  ({ options, onChange }) => {
+  ({ options, onChange, disabled = false }) => {
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState("");
 
@@ -37,7 +39,11 @@ export const Autocomplete: FC<AutocompleteProps> = forwardRef(
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="justify-between"
+            className={cn(
+              "justify-between",
+              disabled && "opacity-50 cursor-not-allowed"
+            )}
+            disabled={disabled}
           >
             {value
               ? options.find((option) => option.value === value)?.label
@@ -47,7 +53,7 @@ export const Autocomplete: FC<AutocompleteProps> = forwardRef(
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder="Search option..." />
+            <CommandInput placeholder="Search option..." disabled={disabled} />{" "}
             <CommandList>
               <CommandEmpty>No option found.</CommandEmpty>
               <ScrollArea type="always">
@@ -57,6 +63,7 @@ export const Autocomplete: FC<AutocompleteProps> = forwardRef(
                       key={option.value}
                       value={option.value}
                       onSelect={(currentValue) => {
+                        if (disabled) return;
                         const result =
                           currentValue === value ? "" : currentValue;
                         setValue(result);
