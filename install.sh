@@ -320,13 +320,16 @@ if [ ! -f /opt/haddock/api/.env ]; then
     echo "
     DATABASE_URL=postgresql://haddock:haddock@localhost:5432/haddock
     REDIS_URL=redis://localhost:6379
-    CADDY_ROOT_DIR=../
+    CADDY_ROOT_DIR=./
     CADDY_SERVICES_FILE=services.caddy
     CADDY_APP_FILE=app.caddy
     JWT_SECRET=$JWT_SECRET
     SERVER_IP=$IP
     GITHUB_CLIENT_ID=***REMOVED***
     GITHUB_CLIENT_SECRET=***REMOVED***
+    FRONTEND_CONFIG=/opt/haddock/frontend/public/config.json
+    FRONTEND_PORT=80
+    PORT=3000
     " | sudo tee /opt/haddock/api/.env
 fi
 
