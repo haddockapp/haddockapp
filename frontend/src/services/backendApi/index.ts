@@ -1,13 +1,10 @@
 import { RootState } from "@/app/store";
+import { constants } from "@/constants";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../authSlice";
-import axios from "axios";
-import { Config } from "@/providers/config";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: await axios
-    .get<Config>("/config.json")
-    .then((r) => r.data.backendUrl),
+  baseUrl: constants.apiUrl,
   timeout: 5000,
   prepareHeaders: (headers, { getState }) => {
     const { token } = (getState() as RootState).auth;

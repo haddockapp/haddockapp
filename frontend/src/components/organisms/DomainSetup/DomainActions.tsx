@@ -5,7 +5,6 @@ import { FC } from "react";
 
 interface DomainActionsProps {
   isRefreshing: boolean;
-  isMutating: boolean;
   onRefresh: () => void;
   onDelete: (id: string) => void;
   onSave: () => void;
@@ -13,7 +12,6 @@ interface DomainActionsProps {
 }
 const DomainActions: FC<DomainActionsProps> = ({
   isRefreshing,
-  isMutating,
   onRefresh,
   onDelete,
   onSave,
@@ -31,7 +29,6 @@ const DomainActions: FC<DomainActionsProps> = ({
     </Button>
     {!!onDelete && !!status && (
       <Button
-        disabled={isMutating}
         className="space-x-2"
         variant="destructive"
         onClick={() => onDelete(status.id)}
@@ -40,11 +37,7 @@ const DomainActions: FC<DomainActionsProps> = ({
         <span>Delete domain</span>
       </Button>
     )}
-    <Button
-      disabled={isMutating || !status?.canBeLinked}
-      onClick={onSave}
-      className="space-x-2"
-    >
+    <Button onClick={onSave} className="space-x-2">
       <Check size="16px" />
       <span>Save</span>
     </Button>

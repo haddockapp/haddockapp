@@ -21,7 +21,7 @@ const Account: FC = () => {
           <Button
             variant="dark"
             onClick={() =>
-              (window.location.href = `https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo&redirect_uri=${window.location.protocol}//${window.location.host}/github`)
+              (window.location.href = `https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`)
             }
             className="p-4 gap-2"
           >

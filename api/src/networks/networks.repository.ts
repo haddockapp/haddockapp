@@ -3,7 +3,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { NetworkConnection, Prisma } from '@prisma/client';
 import { CreateNetworkConnectionDto } from './dto/CreateNetworkConnectionDto';
 import { UpdateNetworkConnectionDto } from './dto/UpdateNetworkConnectionDto';
-import { VmState } from 'src/types/vm.enum';
 
 @Injectable()
 export class NetworksRepository {
@@ -52,14 +51,7 @@ export class NetworksRepository {
       where: {
         id: data.projectId,
       },
-      include: {
-        vm: true,
-      },
     });
-
-    if (project.vm.status === VmState.Starting) {
-      throw new Error('VM is starting');
-    }
 
     return this.prismaService.networkConnection.create({
       data: {
