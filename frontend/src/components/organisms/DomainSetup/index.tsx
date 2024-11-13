@@ -2,9 +2,8 @@ import {
   DomainResponseDto,
   useGetDomainStatusQuery,
   useDeleteDomainMutation,
-  useApplyDomainMutation,
 } from "@/services/backendApi/domains";
-import { FC, useCallback } from "react";
+import { FC } from "react";
 import DomainNameForm from "./DomainNameForm";
 import DomainSetupStep from "./DomainSetupStep";
 import steps from "./domainSteps";
@@ -27,18 +26,7 @@ const SetupDomainForm: FC<SetupDomainFormProps> = ({
     }
   );
 
-  const [triggerApplyDommain, { isLoading: isApplying }] =
-    useApplyDomainMutation();
-  const [triggerDeleteDomain, { isLoading: isDeleting }] =
-    useDeleteDomainMutation();
-
-  const handleSave = useCallback(
-    () =>
-      triggerApplyDommain()
-        .unwrap()
-        .then(() => onClose()),
-    [onClose, triggerApplyDommain]
-  );
+  const [triggerDeleteDomain] = useDeleteDomainMutation();
 
   return (
     <div className="px-8 pt-1 space-y-6">
@@ -54,10 +42,9 @@ const SetupDomainForm: FC<SetupDomainFormProps> = ({
       <div className="flex space-x-2">
         <DomainActions
           isRefreshing={isFetching}
-          isMutating={isApplying || isDeleting}
           onRefresh={refetch}
           onDelete={triggerDeleteDomain}
-          onSave={handleSave}
+          onSave={onClose}
           status={data}
         />
       </div>
