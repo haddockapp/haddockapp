@@ -1,7 +1,7 @@
 import { RootState } from "@/app/store";
-import { constants } from "@/constants";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../authSlice";
+import { constants } from "@/constants";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: constants.apiUrl,
