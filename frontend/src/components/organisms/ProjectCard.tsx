@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { FC } from "react";
-import { FolderDot } from "lucide-react";
 import { FolderGit2 } from "lucide-react";
-import { ProjectDto } from "@/services/backendApi/projects";
+import { ProjectDto, VmState } from "@/services/backendApi/projects";
 
 interface ProjectCardProps {
   onClick?: () => void;
@@ -14,11 +13,10 @@ const capitalizeFirstLetter = (str: string) => {
 };
 
 const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
-  const getIcon = () => {
-    if (project.source.type === "github") {
-      return <FolderGit2 size={64} />;
-    }
-    return <FolderDot size={64} />;
+  const getDotColor = () => {
+    if (project.vm.status === VmState.Running) return "bg-green-500";
+    if (project.vm.status === VmState.Starting) return "bg-yellow-500";
+    return "bg-red-500";
   };
   return (
     <Card
@@ -28,7 +26,9 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
       <CardContent className="p-4">
         <div className="flex justify-between h-24">
           <div className="flex flex-row items-center gap-4 w-2/3">
-            <div className="flex items-center">{getIcon()}</div>
+            <div className="flex items-center">
+              <FolderGit2 size={64} />
+            </div>
             <div className="flex flex-col justify-start">
               <p className="text-xl font-bold text-gray-900 line-clamp-1">
                 {project.name}
@@ -46,7 +46,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
             <p className="text-gray-800 font-bold">
               {capitalizeFirstLetter(project.vm.status)}
             </p>
-            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+            <div className={`w-4 h-4 rounded-full ${getDotColor()}`} />
           </div>
         </div>
       </CardContent>
