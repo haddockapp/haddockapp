@@ -245,6 +245,7 @@ sudo rm /etc/caddy/Caddyfile
 echo "
 :80 {
     root * /opt/haddock/frontend/dist
+    try_files {path} /index.html
     file_server
 }
 
