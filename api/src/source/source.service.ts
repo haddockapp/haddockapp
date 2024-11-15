@@ -43,7 +43,6 @@ export class SourceService {
         id: sourceId,
       },
     });
-
-    console.log(res);
+    return res;
   }
 }
