@@ -43,8 +43,8 @@ const GithubCallback: FC = () => {
       <HaddockSpinner />
       <p>
         <span>Loading</span>
-        {Array.from({ length: count }).map(() => (
-          <span> . </span>
+        {Array.from({ length: count }).map((_,idx) => (
+          <span key={idx}> . </span>
         ))}
       </p>
     </div>
