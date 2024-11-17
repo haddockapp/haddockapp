@@ -29,7 +29,14 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
       composeName: "compose.yml",
     },
   });
-  const { handleSubmit, reset, register, control, watch } = methods;
+  const {
+    handleSubmit,
+    reset,
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = methods;
 
   const [formStep, setFormStep] = useState<number>(0);
 
@@ -107,24 +114,41 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
               <Controller
                 control={control}
                 name="repository"
+                rules={{ required: true }}
                 render={({ field }) => (
                   <Autocomplete {...field} options={repositoriesOptions} />
                 )}
               />
+              {errors.repository && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
             <div className="flex flex-col justify-between space-y-1">
               <Label>Branch</Label>
               <Controller
                 control={control}
                 name="branch"
+                rules={{ required: true }}
                 render={({ field }) => (
                   <Autocomplete {...field} options={branchesOptions} />
                 )}
               />
+              {errors.branch && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
             <div className="flex flex-col justify-between space-y-1">
               <Label>Docker compose path</Label>
               <Input {...register("composeName", { required: true })} />
+              {errors.composeName && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -149,9 +173,9 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
               </Label>
               <Slider
                 {...register("memory", { required: true })}
-                min={512}
+                min={1024}
                 max={8192}
-                step={512}
+                step={1024}
               />
             </div>
             <div className="flex flex-col justify-between space-y-1">
