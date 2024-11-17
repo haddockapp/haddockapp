@@ -103,9 +103,24 @@ export class DeployConsumer {
     } catch (e) {
       if (e instanceof DeployError) {
         this.logger.error(`Failed to deploy source: ${e.message}`);
-      }
-      if (e instanceof ExecutionError) {
+      } else if (e instanceof ExecutionError) {
         this.logger.error(`Failed to execute command: ${e.message}`);
+      } else {
+        this.logger.error(`Unexpected error: ${e.message}`);
+      }
+      const vm = await this.prisma.vm.findUnique({
+        where: {
+          id: source.project.vmId,
+        },
+      });
+      if (vm.status === VmState.Starting || vm.status === VmState.Running) {
+        try {
+          await this.vmService.downVm(source.project.vmId);
+        } catch (e) {
+          if (e instanceof ExecutionError) {
+            this.logger.error(`Failed to stop vm: ${e.message}`);
+          }
+        }
       }
       await this.vmService.changeVmStatus(source.project.vmId, VmState.Error);
       return;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { compile } from 'handlebars';
 import { exec } from 'child_process';
@@ -14,6 +14,7 @@ import { ExecutionError } from './error/execution.error';
 @Injectable()
 export class VmService {
   private readonly template: HandlebarsTemplateDelegate<any>;
+  private readonly logger = new Logger(VmService.name);
 
   constructor(
     private readonly vmRepository: VmRepository,
@@ -62,14 +63,14 @@ export class VmService {
     }
   }
 
-  private getIpFromOutput(output: string): string {
+  private getIpFromOutput(output: string): string | undefined {
     const sshAddressRegex = /SSH address: (\S+:\d+)/;
     const match = RegExp(sshAddressRegex).exec(output);
 
     if (match) {
       return match[1].split(':')[0];
     }
-    return '';
+    return undefined;
   }
 
   async setVagrantFile(vmId: string, deployPath: string): Promise<Vm> {
@@ -107,14 +108,20 @@ export class VmService {
 
     const ip = this.getIpFromOutput(output);
 
+    if (ip === undefined) {
+      throw new Error('Failed to get IP address');
+    }
+
+        await this.vmRepository.updateVm({
+          where: { id: vm.id },
+          data: { ip },
+        });
+
     await this.networkService.updateNetworksfile();
 
-    await this.vmRepository.updateVm({
-      where: { id: vm.id },
-      data: { ip },
-    });
-
     await this.changeVmStatus(vm.id, VmState.Running);
+
+    this.logger.log(`VM ${vm.id} is running on IP ${ip}`);
   }
 
   async downVm(vmId: string): Promise<void> {
@@ -124,13 +131,15 @@ export class VmService {
       };
     }> = await this.vmRepository.getVmAndProject({ id: vmId });
 
-    if (vm.status === VmState.Running) {
-      throw new Error('VM is already running');
+    if (vm.status === VmState.Stopped) {
+      throw new Error('VM is already stopped');
     }
 
     await this.execCommand(`cd ${vm.project.path} && vagrant halt`);
 
     await this.changeVmStatus(vm.id, VmState.Stopped);
+
+    this.logger.log(`VM ${vm.id} stopped`);
   }
 
   async restartVm(vmId: string): Promise<void> {
@@ -158,6 +167,8 @@ export class VmService {
     });
 
     await this.changeVmStatus(vm.id, VmState.Running);
+
+    this.logger.log(`VM ${vm.id} restarted`);
   }
 
   async deletePhisicalVm(vmId: string): Promise<void> {
@@ -167,7 +178,11 @@ export class VmService {
       throw new Error('VM is starting');
     }
 
-    await this.execCommand(`cd ${vm.project.path} && vagrant destroy -f`);
+    try {
+        await this.execCommand(`cd ${vm.project.path} && vagrant destroy -f`);
+        this.logger.log(`VM ${vm.id} destroyed`);
+    } catch (e) {
+    }
   }
 
   async deleteVmDb(vmId: string): Promise<void> {

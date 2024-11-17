@@ -6,6 +6,7 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Logger,
     NotFoundException,
     Param,
     Patch,
@@ -25,9 +26,12 @@ import ProjectServiceDto from "./dto/ProjectService.dto";
 import { ProjectService } from "./project.service";
 import { VmState } from "src/types/vm.enum";
 import { VmService } from "src/vm/vm.service";
+import { ExecutionError } from "src/vm/error/execution.error";
 
 @Controller('project')
 export class ProjectController {
+    private readonly logger = new Logger(ProjectController.name);
+
     constructor(
         private readonly projectService: ProjectService,
         private readonly projectRepository: ProjectRepository,
@@ -75,8 +79,7 @@ export class ProjectController {
         throw new BadRequestException('Project is already running');
     }
 
-    console.log("Deploying project");
-    console.log(project.vm.status);
+    this.logger.log(`Deploying project ${project.id}`);
 
     await this.sourceService.deploySource(project.sourceId);
   }
@@ -90,10 +93,16 @@ export class ProjectController {
         throw new BadRequestException('Project is already running');
     }
 
-    console.log("rebuild project");
-    console.log(project.vm.status);
+    this.logger.log(`Rebuilding project ${project.id}`);
 
-    await this.vmService.deletePhisicalVm(project.vmId);
+    try {
+        await this.vmService.deletePhisicalVm(project.vmId);
+    } catch (e) {
+        if (e instanceof ExecutionError) {
+            this.logger.error(`Failed to destroy vm: ${e.message}`);
+        }
+        return;
+    }
 
     await this.sourceService.deploySource(project.sourceId);
   }
