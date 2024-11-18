@@ -1,12 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { VmService } from 'src/vm/vm.service';
 import { ProjectRepository } from './project.repository';
 import { SourceService } from 'src/source/source.service';
 import { exec } from 'child_process';
 import { NetworksService } from 'src/networks/networks.service';
+import { ExecutionError } from 'src/vm/error/execution.error';
+import { VmState } from 'src/types/vm.enum';
 
 @Injectable()
 export class ProjectService {
+  private readonly logger = new Logger(ProjectService.name);
+
   constructor(
     private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
@@ -32,8 +41,14 @@ export class ProjectService {
       throw new NotFoundException('Project not found.');
     }
 
-    await this.vmService.deletePhisicalVm(project.vmId);
-
+    try {
+      await this.vmService.deletePhisicalVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to destroy vm: ${e.message}`);
+      }
+      return;
+    }
     await this.projectRepository.deleteProject(projectId);
 
     await this.vmService.deleteVmDb(project.vmId);
@@ -43,5 +58,46 @@ export class ProjectService {
     await this.networksService.updateNetworksfile();
 
     await this.execCommand(`rm -rf ${project.path}`);
+
+    this.logger.log(`Project ${projectId} deleted`);
+  }
+
+  async deployProject(projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+
+    if (
+      project.vm.status === VmState.Running ||
+      project.vm.status === VmState.Starting
+    ) {
+      throw new BadRequestException('Project is already running');
+    }
+
+    this.logger.log(`Deploying project ${project.id}`);
+
+    await this.sourceService.deploySource(project.sourceId);
+  }
+
+  async rebuildProject(projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+
+    if (
+      project.vm.status === VmState.Running ||
+      project.vm.status === VmState.Starting
+    ) {
+      throw new BadRequestException('Project is already running');
+    }
+
+    this.logger.log(`Rebuilding project ${project.id}`);
+
+    try {
+      await this.vmService.deletePhisicalVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to destroy vm: ${e.message}`);
+      }
+      return;
+    }
+
+    await this.sourceService.deploySource(project.sourceId);
   }
 }
