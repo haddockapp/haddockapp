@@ -72,39 +72,12 @@ export class ProjectController {
 
   @Post('/deploy/:id')
   async deployProject(@Param('id') projectId: string) {
-    const project = await this.projectRepository.findProjectById(projectId);
-
-    if (project.vm.status === VmState.Running ||
-        project.vm.status === VmState.Starting) {
-        throw new BadRequestException('Project is already running');
-    }
-
-    this.logger.log(`Deploying project ${project.id}`);
-
-    await this.sourceService.deploySource(project.sourceId);
+    await this.projectService.deployProject(projectId);
   }
 
   @Post('/rebuild/:id')
   async rebuildProject(@Param('id') projectId: string) {
-    const project = await this.projectRepository.findProjectById(projectId);
-
-    if (project.vm.status === VmState.Running ||
-        project.vm.status === VmState.Starting) {
-        throw new BadRequestException('Project is already running');
-    }
-
-    this.logger.log(`Rebuilding project ${project.id}`);
-
-    try {
-        await this.vmService.deletePhisicalVm(project.vmId);
-    } catch (e) {
-        if (e instanceof ExecutionError) {
-            this.logger.error(`Failed to destroy vm: ${e.message}`);
-        }
-        return;
-    }
-
-    await this.sourceService.deploySource(project.sourceId);
+    await this.projectService.rebuildProject(projectId);
   }
 
     @Patch(':id')
