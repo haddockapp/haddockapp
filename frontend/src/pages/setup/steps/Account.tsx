@@ -1,8 +1,9 @@
+import GithubSignInButton from "@/components/molecules/github-sign-in";
 import { Button } from "@/components/ui/button";
 import { constants } from "@/constants";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { nextSetupStep } from "@/services/authSlice";
-import { Check, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { FC } from "react";
 
 const Account: FC = () => {
@@ -12,26 +13,10 @@ const Account: FC = () => {
   return (
     <>
       <div>
-        {isAuth ? (
-          <Button variant="dark" disabled className="p-4 gap-2">
-            <Check />
-            <span>Signed up</span>
-          </Button>
-        ) : (
-          <Button
-            variant="dark"
-            onClick={() =>
-              (window.location.href = `https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`)
-            }
-            className="p-4 gap-2"
-          >
-            <img
-              className="w-5 bg-white invert rounded-full"
-              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg"
-            />
-            <span className="font-semibold">Signup with Github</span>
-          </Button>
-        )}
+        <GithubSignInButton
+          isSignedIn={isAuth}
+          redirectUrl={`https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`}
+        />
       </div>
       <Button onClick={() => dispatch(nextSetupStep())} disabled={!isAuth}>
         <ChevronRight />
