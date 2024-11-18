@@ -8,12 +8,6 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    onDelete: {
-      action: "deleted",
-      description: "Callback function when project is deleted",
-    },
-  },
   decorators: [
     (Story) => (
       <div className="w-[600px]">
@@ -36,4 +30,4 @@ export const WithCustomAction: Story = {
   args: {
     onDelete: () => alert("Project deleted successfully!"),
   },
-}; 
+};
