@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { parse } from 'yaml';
 import Service from "./model/Service";
 import * as fs from 'fs';
@@ -11,6 +11,10 @@ export class ComposeService {
     parseServices(data: string): Service[] {
         const composeObj: any = parse(data);
         const res: Service[] = [];
+
+        if (!composeObj.services) {
+            return [];
+        }
 
         Object.entries(composeObj.services).forEach(([name, value]) => {
             const data = value as any;
@@ -57,7 +61,6 @@ export class ComposeService {
         }
 
         const composeContent = fs.readFileSync(`${path}/${composeName}`);
-        console.log('composeContent', composeContent);
         if (!composeContent) {
             return '';
         }
