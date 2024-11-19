@@ -7,20 +7,27 @@ import { AuthorizationRepository } from "src/authorization/authorization.reposit
 import { ConnectGithubDto } from "../dto/ConnectGithub.dto";
 import { AuthError } from "../error/AuthError";
 import axios from "axios";
+import { ConfigurationRepository } from "src/configuration/configuration.repository";
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     constructor(
         private githubService: GithubService,
         private userRepository: UserRepository,
-        private authorizationRepository: AuthorizationRepository
+        private authorizationRepository: AuthorizationRepository,
+        private configurationRepository: ConfigurationRepository,
     ) {
         super();
     }
 
     private async connectGithubViaCode(code: string) {
-        const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-        const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+        const config = await this.configurationRepository.getConfigurationNoThrow();
+        if (!config) {
+            throw new InternalServerErrorException('No Github OAuth Application setup');
+        }
+
+        const CLIENT_ID = config.github_client_id;
+        const CLIENT_SECRET = config.github_client_secret;
         const URL = `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}`;
 
         try {
