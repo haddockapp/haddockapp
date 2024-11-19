@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Param, UnauthorizedException } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { User } from '@prisma/client';
 import { AuthorizationRepository } from 'src/authorization/authorization.repository';
