@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 import "../src/index.css";
 import { withRouter } from "storybook-addon-react-router-v6";
-import { initialize, mswDecorator } from 'msw-storybook-addon';
+import { initialize, mswDecorator } from "msw-storybook-addon";
 
 // Initialize MSW
 initialize();
