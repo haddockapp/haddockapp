@@ -12,6 +12,7 @@ import { CaddyModule } from './caddy/caddy.module';
 import { NetworksModule } from './networks/networks.module';
 import { DomainsModule } from './domains/domains.module';
 import { ConfigurationModule } from './configuration/configuration.module';
+import { StartupModule } from './startup/startup.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
     NetworksModule,
     DomainsModule,
     ConfigurationModule,
+    StartupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,7 +11,7 @@ import { GithubSourceSettingsDto } from './dto/settings.dto';
 import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
-import { ExecutionError } from 'src/vm/error/execution.error';
+import { ExecutionError } from 'src/types/error/execution.error';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -77,7 +77,6 @@ export class DeployConsumer {
   @Process('deploy')
   async deploy(job: Job<PersistedSourceDto>) {
     this.logger.log(`Deploying source for project ${job.data.project.id}`);
-    this.vmService.changeVmStatus(job.data.project.vmId, VmState.Starting);
 
     const source = job.data;
 
