@@ -1,12 +1,10 @@
 import {
-    BadRequestException,
     Body,
     Controller,
     Delete,
     Get,
     HttpCode,
     HttpStatus,
-    Logger,
     NotFoundException,
     Param,
     Patch,
@@ -24,13 +22,9 @@ import { GithubSourceSettingsDto } from "src/source/dto/settings.dto";
 import { getSettings } from "src/source/utils/get-settings";
 import ProjectServiceDto from "./dto/ProjectService.dto";
 import { ProjectService } from "./project.service";
-import { VmState } from "src/types/vm.enum";
-import { VmService } from "src/vm/vm.service";
-import { ExecutionError } from "src/vm/error/execution.error";
 
 @Controller('project')
 export class ProjectController {
-    private readonly logger = new Logger(ProjectController.name);
 
     constructor(
         private readonly projectService: ProjectService,
@@ -38,7 +32,6 @@ export class ProjectController {
         private readonly sourceService: SourceService,
         private readonly composeService: ComposeService,
         private readonly dockerService: DockerService,
-        private readonly vmService: VmService,
     ) { }
 
   @Get()

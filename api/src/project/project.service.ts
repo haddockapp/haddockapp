@@ -7,10 +7,10 @@ import {
 import { VmService } from 'src/vm/vm.service';
 import { ProjectRepository } from './project.repository';
 import { SourceService } from 'src/source/source.service';
-import { exec } from 'child_process';
 import { NetworksService } from 'src/networks/networks.service';
-import { ExecutionError } from 'src/vm/error/execution.error';
+import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class ProjectService {
@@ -22,18 +22,6 @@ export class ProjectService {
     private readonly sourceService: SourceService,
     private readonly networksService: NetworksService,
   ) {}
-
-  private async execCommand(command: string): Promise<string> {
-    const promise = new Promise<string>((resolve, reject) => {
-      exec(command, (error, stdout) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(stdout);
-      });
-    });
-    return promise;
-  }
 
   async deleteProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);
@@ -57,7 +45,7 @@ export class ProjectService {
 
     await this.networksService.updateNetworksfile();
 
-    await this.execCommand(`rm -rf ${project.path}`);
+    await execCommand(`rm -rf ${project.path}`);
 
     this.logger.log(`Project ${projectId} deleted`);
   }
