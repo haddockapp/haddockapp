@@ -6,7 +6,7 @@ import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { ProjectRepository } from 'src/project/project.repository';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
-import { execCommand } from 'src/utils/exec.command';
+import { execCommand } from 'src/utils/exec-utils';
 import { VmService } from 'src/vm/vm.service';
 
 @Injectable()

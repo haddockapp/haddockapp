@@ -10,7 +10,7 @@ import { SourceService } from 'src/source/source.service';
 import { NetworksService } from 'src/networks/networks.service';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
-import { execCommand } from 'src/utils/exec.command';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class ProjectService {

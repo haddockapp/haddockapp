@@ -8,7 +8,7 @@ import { VmState } from 'src/types/vm.enum';
 import { WebSocketService } from '../websockets/websocket.service';
 import { EventScope, EventType } from '../websockets/dto/websocket-event.dto';
 import { NetworksService } from 'src/networks/networks.service';
-import { execCommand } from 'src/utils/exec.command';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class VmService {

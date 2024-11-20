@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { compile } from 'handlebars';
 import { CaddyConfig } from './types/caddy-config.type';
-import { execCommand } from 'src/utils/exec.command';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class CaddyService {
