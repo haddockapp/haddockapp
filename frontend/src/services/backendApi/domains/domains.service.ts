@@ -40,13 +40,6 @@ const domainsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Domains],
     }),
-    applyDomain: builder.mutation<void, void>({
-      query: () => ({
-        url: `/domains/apply`,
-        method: "POST",
-      }),
-      invalidatesTags: [QueryKeys.Domains],
-    }),
   }),
 });
 
@@ -56,5 +49,4 @@ export const {
   useGetDomainQuery,
   useGetDomainStatusQuery,
   useDeleteDomainMutation,
-  useApplyDomainMutation,
 } = domainsApi;
