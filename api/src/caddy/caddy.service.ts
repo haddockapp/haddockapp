@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { exec } from 'child_process';
 import { readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { compile } from 'handlebars';
 import { CaddyConfig } from './types/caddy-config.type';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class CaddyService {
   private readonly templates: {
-    [key: string]: HandlebarsTemplateDelegate<any>
+    [key: string]: HandlebarsTemplateDelegate<any>;
   } = {};
 
   private async getTemplate(template: string) {
@@ -28,16 +28,8 @@ export class CaddyService {
   }
 
   private async reloadCaddy() {
-    await new Promise<string>((resolve, reject) => {
-      exec('caddy reload', {
-        cwd: process.env.CADDY_ROOT_DIR,
-      },
-      (error, stdout) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(stdout);
-      });
+    await execCommand('caddy reload', {
+      cwd: process.env.CADDY_ROOT_DIR,
     });
   }
 

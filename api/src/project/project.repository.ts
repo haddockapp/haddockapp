@@ -4,7 +4,7 @@ import { CreateProjectDto } from './dto/CreateProject.dto';
 import { Project } from '@prisma/client';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
-import { VmProvider } from '../types/vm.enum';
+import { VmProvider, VmState } from '../types/vm.enum';
 import pirateShips from './pirateShips';
 
 @Injectable()
