@@ -1,7 +1,7 @@
 import HaddockSpinner from "@/components/atoms/spinner";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setToken } from "@/services/authSlice";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { constants } from "@/constants";
 import axios from "axios";
@@ -30,23 +30,9 @@ const GithubCallback: FC = () => {
     }
   }, [dispatch, navigate]);
 
-  const [count, setCount] = useState<number>(1);
-
-  useEffect(() => {
-    setInterval(() => {
-      setCount((c) => c + 1);
-    }, 500);
-  }, []);
-
   return (
-    <div className="h-screen justify-center items-center flex flex-col">
+    <div className="h-screen items-center justify-center flex flex-col">
       <HaddockSpinner />
-      <p>
-        <span>Loading</span>
-        {Array.from({ length: count }).map(() => (
-          <span> . </span>
-        ))}
-      </p>
     </div>
   );
 };

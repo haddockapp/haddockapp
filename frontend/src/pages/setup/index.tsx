@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import Domains from "./steps/Domains";
 import Stepdots from "@/components/molecules/stepdots";
 import Welcome from "./steps/Welcome";
+import StepTitle from "@/components/atoms/step-title";
 
 const StepHeader: FC = () => {
   const { setupStep } = useAppSelector((state) => state.auth);
@@ -26,14 +27,7 @@ const StepHeader: FC = () => {
   return (
     <div className="space-y-4">
       <Stepdots step={setupStep} total={3} />
-      <div className="select-none justify-center flex items-center space-x-2">
-        <h1 className="text-primary">
-          <span className="text-3xl">{setupStep + 1}</span>
-          <span className="text-2xl">/3</span>
-        </h1>
-        <h1 className="text-xs">●</h1>
-        <h1 className="text-4xl">{title}</h1>
-      </div>
+      <StepTitle step={setupStep + 1} total={3} title={title} />
       <p className="text-gray-500 text-center">{description}</p>
     </div>
   );

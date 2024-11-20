@@ -13,9 +13,9 @@ import { FC } from "react";
 import Header from "./components/organisms/Header";
 import { Toaster } from "./components/ui/toaster";
 import useWebsockets from "./hooks/use-websockets";
-import { ConfigProvider } from "./providers/config";
 import ProjectDetails from "./pages/project";
 import { TooltipProvider } from "./components/ui/tooltip";
+import useConfig from "./hooks/use-config";
 
 const Layout: FC = () => (
   <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
@@ -35,27 +35,26 @@ const AuthenticatedGuard: FC = () => {
 
 function App() {
   useWebsockets();
+  useConfig();
 
   return (
-    <ConfigProvider>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/github" element={<GithubCallback />} />
-            <Route element={<Layout />}>
-              <Route index element={<Setup />} />
-              <Route element={<AuthenticatedGuard />}>
-                <Route path="dashboard" element={<Projects />} />
-                <Route path="project/*">
-                  <Route path=":projectId" element={<ProjectDetails />} />
-                </Route>
+    <TooltipProvider>
+      <Toaster />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/github" element={<GithubCallback />} />
+          <Route element={<Layout />}>
+            <Route index element={<Setup />} />
+            <Route element={<AuthenticatedGuard />}>
+              <Route path="dashboard" element={<Projects />} />
+              <Route path="project/*">
+                <Route path=":projectId" element={<ProjectDetails />} />
               </Route>
             </Route>
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ConfigProvider>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   );
 }
 export default App;

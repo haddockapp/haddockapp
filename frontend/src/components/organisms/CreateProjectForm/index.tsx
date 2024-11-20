@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { FC, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { CreateProjectForm } from "./type";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProjectMutation } from "@/services/backendApi/projects";
 import { Slider } from "@/components/ui/slider";
@@ -13,13 +12,22 @@ import {
   useGetAllBranchesByRepositoryQuery,
 } from "@/services/backendApi/github";
 
-interface CreateProjectModalProps {
+type Form = {
+  repository: string;
+  branch: string;
+  memory: number;
+  disk: number;
+  vcpus: number;
+  composeName: string;
+};
+
+interface CreateProjectFormProps {
   onClose: () => void;
 }
-const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
+const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
 
-  const methods = useForm<CreateProjectForm>({
+  const methods = useForm<Form>({
     defaultValues: {
       branch: "",
       repository: "",
@@ -29,7 +37,14 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
       composeName: "compose.yml",
     },
   });
-  const { handleSubmit, reset, register, control, watch } = methods;
+  const {
+    handleSubmit,
+    reset,
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = methods;
 
   const [formStep, setFormStep] = useState<number>(0);
 
@@ -60,7 +75,7 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
     [branches]
   );
 
-  const onSubmit: SubmitHandler<CreateProjectForm> = (data) => {
+  const onSubmit: SubmitHandler<Form> = (data) => {
     switch (formStep) {
       case 0:
         setFormStep(1);
@@ -107,24 +122,41 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
               <Controller
                 control={control}
                 name="repository"
+                rules={{ required: true }}
                 render={({ field }) => (
                   <Autocomplete {...field} options={repositoriesOptions} />
                 )}
               />
+              {errors.repository && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
             <div className="flex flex-col justify-between space-y-1">
               <Label>Branch</Label>
               <Controller
                 control={control}
                 name="branch"
+                rules={{ required: true }}
                 render={({ field }) => (
                   <Autocomplete {...field} options={branchesOptions} />
                 )}
               />
+              {errors.branch && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
             <div className="flex flex-col justify-between space-y-1">
               <Label>Docker compose path</Label>
               <Input {...register("composeName", { required: true })} />
+              {errors.composeName && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -149,9 +181,9 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
               </Label>
               <Slider
                 {...register("memory", { required: true })}
-                min={512}
+                min={1024}
                 max={8192}
-                step={512}
+                step={1024}
               />
             </div>
             <div className="flex flex-col justify-between space-y-1">
@@ -174,4 +206,4 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
   );
 };
 
-export default CreateProjectModal;
+export default CreateProjectForm;

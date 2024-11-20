@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateDomainDto } from './dto/create-domain.dto';
 import { DomainRepository } from './domains.repository';
 import { Domain } from '@prisma/client';
-import { cpSync } from 'fs';
 import { DomainResponseDto } from './dto/domain-response.dto';
 import { BindingService } from './dns/binding.service';
 import { DomainStatusDto } from './dto/domain-status.dto';
@@ -20,7 +19,7 @@ export class DomainsService {
     private readonly dnsService: DnsService,
     private readonly frontendService: FrontendService,
     private readonly caddyService: CaddyService
-  ) {}
+  ) { }
 
   private generateDomainChallenge() {
     return Array.from({ length: 32 }, () => {
@@ -69,6 +68,37 @@ export class DomainsService {
     return this.domainToResponse(domain);
   }
 
+  private async linkDomain(domain: Domain, canBeLinked: boolean) {
+    await this.domainRepository.linkDomain(domain.id, canBeLinked);
+
+    
+    if (domain.main && canBeLinked) {
+      const serverIp = '127.0.0.1';
+      const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_SERVICES_FILE}`;
+      const data = {
+        data: [
+          {
+            hostname: domain.domain,
+            ip: serverIp,
+            port: 3001,
+          },
+          {
+            hostname: `api.${domain.domain}`,
+            ip: serverIp,
+            port: 3000,
+          }
+        ],
+      };
+
+      await this.caddyService.generate({
+        template: 'reverse-proxies.hbs',
+        data,
+        dest,
+      })
+    }
+  }
+
+
   async getDomainStatus(id: string): Promise<DomainStatusDto> {
     const domain = await this.domainRepository.findDomainById(id);
 
@@ -77,7 +107,8 @@ export class DomainsService {
     const challengeStatus = await this.dnsService.getChallengeStatus(domain);
 
     const canBeLinked = primaryStatus && challengeStatus && (!domain.main || wildcardStatus);
-    await this.domainRepository.linkDomain(id, canBeLinked);
+
+    await this.linkDomain(domain, canBeLinked);
 
     return {
       id: domain.id,

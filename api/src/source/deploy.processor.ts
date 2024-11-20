@@ -10,14 +10,16 @@ import { VmService } from '../vm/vm.service';
 import { GithubSourceSettingsDto } from './dto/settings.dto';
 import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
+import { DeployError } from './errors/deploy.error';
+import { ExecutionError } from 'src/types/error/execution.error';
 
 @Processor('deploys')
 export class DeployConsumer {
   private readonly logger = new Logger(DeployConsumer.name);
 
   constructor(
-    private prisma: PrismaService,
-    private vmService: VmService,
+    private readonly prisma: PrismaService,
+    private readonly vmService: VmService,
   ) {}
 
   @OnQueueFailed()
@@ -40,20 +42,28 @@ export class DeployConsumer {
       `Cloning github repository ${organization}/${repository}#${branch} to ${deployPath}`,
     );
 
-    await git.clone({
-      fs,
-      http,
-      url: `https://github.com/${organization}/${repository}.git`,
-      dir: deployPath,
-      ref: branch,
-      singleBranch: true,
-      onAuth: () => {
-        return {
-          username: 'x-access-token',
-          password: source.authorization.value,
-        };
-      },
-    });
+    await git
+      .clone({
+        fs,
+        http,
+        url: `https://github.com/${organization}/${repository}.git`,
+        dir: deployPath,
+        ref: branch,
+        singleBranch: true,
+        onAuth: () => {
+          return {
+            username: 'x-access-token',
+            password: source.authorization.value,
+          };
+        },
+        onAuthFailure: () => {
+          throw new DeployError('Failed to authenticate with github');
+        },
+      })
+      .catch((err) => {
+        this.logger.error(`Failed to clone repository: ${err.message}`);
+        throw new DeployError('Failed to clone repository');
+      });
     return deployPath;
   }
 
@@ -67,27 +77,52 @@ export class DeployConsumer {
   @Process('deploy')
   async deploy(job: Job<PersistedSourceDto>) {
     this.logger.log(`Deploying source for project ${job.data.project.id}`);
-    this.vmService.changeVmStatus(job.data.project.vmId, VmState.Starting);
 
     const source = job.data;
 
-    const deployPath: string = await this.getDeployPath(source);
+    try {
+      const deployPath: string = await this.getDeployPath(source);
 
-    await this.prisma.project.update({
-      where: {
-        id: source.project.id,
-      },
-      data: {
-        path: deployPath,
-      },
-    });
+      await this.prisma.project.update({
+        where: {
+          id: source.project.id,
+        },
+        data: {
+          path: deployPath,
+        },
+      });
 
-    this.logger.log(`Setting up VM for project ${source.project.id}`);
-    await this.vmService.setVagrantFile(source.project.vmId, deployPath);
+      this.logger.log(`Setting up VM for project ${source.project.id}`);
+      await this.vmService.setVagrantFile(source.project.vmId, deployPath);
 
-    this.logger.log(`Starting VM for project ${source.project.id}`);
-    await this.vmService.upVm(source.project.vmId);
+      this.logger.log(`Starting VM for project ${source.project.id}`);
+      await this.vmService.upVm(source.project.vmId);
 
-    this.logger.log(`Deployed project ${source.project.id}`);
+      this.logger.log(`Deployed project ${source.project.id}`);
+    } catch (e) {
+      if (e instanceof DeployError) {
+        this.logger.error(`Failed to deploy source: ${e.message}`);
+      } else if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to execute command: ${e.message}`);
+      } else {
+        this.logger.error(`Unexpected error: ${e.message}`);
+      }
+      const vm = await this.prisma.vm.findUnique({
+        where: {
+          id: source.project.vmId,
+        },
+      });
+      if (vm.status === VmState.Starting || vm.status === VmState.Running) {
+        try {
+          await this.vmService.downVm(source.project.vmId);
+        } catch (e) {
+          if (e instanceof ExecutionError) {
+            this.logger.error(`Failed to stop vm: ${e.message}`);
+          }
+        }
+      }
+      await this.vmService.changeVmStatus(source.project.vmId, VmState.Error);
+      return;
+    }
   }
 }

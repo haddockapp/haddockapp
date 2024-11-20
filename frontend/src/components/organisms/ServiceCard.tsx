@@ -30,7 +30,7 @@ const ServiceCard: FC<ServiceCardProps> = ({ name, icon, image, onClick }) => {
       <CardContent className="p-4 align-middle">
         <div className="flex flex-column gap-4 justify-between">
           <div className="flex flex-row gap-4">
-            <img className="w-12 h-12" src={icon} />
+            <img className="w-12 h-12" src={icon} alt={name} />
             <div className=" self-center">
               <p className="text-xl font-semibold text-gray-900 line-clamp-1">
                 {name}

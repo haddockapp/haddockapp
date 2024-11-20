@@ -25,6 +25,7 @@ import { ProjectService } from "./project.service";
 
 @Controller('project')
 export class ProjectController {
+
     constructor(
         private readonly projectService: ProjectService,
         private readonly projectRepository: ProjectRepository,
@@ -60,6 +61,16 @@ export class ProjectController {
     );
     await this.sourceService.deploySource(project.sourceId);
     return project;
+  }
+
+  @Post('/deploy/:id')
+  async deployProject(@Param('id') projectId: string) {
+    await this.projectService.deployProject(projectId);
+  }
+
+  @Post('/rebuild/:id')
+  async rebuildProject(@Param('id') projectId: string) {
+    await this.projectService.rebuildProject(projectId);
   }
 
     @Patch(':id')
