@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { FC, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { CreateProjectForm } from "./type";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProjectMutation } from "@/services/backendApi/projects";
 import { Slider } from "@/components/ui/slider";
@@ -13,13 +12,22 @@ import {
   useGetAllBranchesByRepositoryQuery,
 } from "@/services/backendApi/github";
 
-interface CreateProjectModalProps {
+type Form = {
+  repository: string;
+  branch: string;
+  memory: number;
+  disk: number;
+  vcpus: number;
+  composeName: string;
+};
+
+interface CreateProjectFormProps {
   onClose: () => void;
 }
-const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
+const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
 
-  const methods = useForm<CreateProjectForm>({
+  const methods = useForm<Form>({
     defaultValues: {
       branch: "",
       repository: "",
@@ -67,7 +75,7 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
     [branches]
   );
 
-  const onSubmit: SubmitHandler<CreateProjectForm> = (data) => {
+  const onSubmit: SubmitHandler<Form> = (data) => {
     switch (formStep) {
       case 0:
         setFormStep(1);
@@ -198,4 +206,4 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose }) => {
   );
 };
 
-export default CreateProjectModal;
+export default CreateProjectForm;
