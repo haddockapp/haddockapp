@@ -1,26 +1,18 @@
 on:
-    [push, delete, create]
+  [push, delete, create]
 jobs:
-    push_to_mirror:
-        runs-on: ubuntu-latest
-        if: github.repository_owner == 'EpitechPromo2026'
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-              with:
-                fetch-depth: 0
+  push_to_mirror:
+      runs-on: ubuntu-latest
+      if: github.repository_owner == 'haddockapp'
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v3
+            with:
+              fetch-depth: 0
 
-            - name: Push to mirror
-              uses: yesolutions/mirror-action@master
-              with:
-                REMOTE: git@github.com:haddockapp/haddockapp.git
-                # No security risk. The key is only valid to push on the mirror repository & the two repos are private
-                GIT_SSH_PRIVATE_KEY: |
-                    -----BEGIN OPENSSH PRIVATE KEY-----
-                    ***REMOVED***
-                    ***REMOVED***
-                    ***REMOVED***
-                    ***REMOVED***
-                    ***REMOVED***
-                    -----END OPENSSH PRIVATE KEY-----
-                GIT_SSH_NO_VERIFY_HOST: "true"
+          - name: Push to mirror
+            uses: yesolutions/mirror-action@master
+            with:
+              REMOTE: git@github.com:EpitechPromo2026/G-EIP-700-LYN-7-1-eip-thomas.mazaud.git
+              GIT_SSH_PRIVATE_KEY: ${{ secrets.EPITECH_KEY }}
+              GIT_SSH_NO_VERIFY_HOST: "true"
