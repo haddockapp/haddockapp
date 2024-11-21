@@ -8,7 +8,7 @@ import { DomainStatusDto } from './dto/domain-status.dto';
 import { DnsService } from './dns/dns.service';
 import { CaddyService } from '../caddy/caddy.service';
 import { FrontendService } from '../frontend/frontend.service';
-import { hostname } from 'os';
+import { ConfigurationService } from 'src/configuration/configuration.service';
 
 @Injectable()
 export class DomainsService {
@@ -18,7 +18,8 @@ export class DomainsService {
     private readonly bindingService: BindingService,
     private readonly dnsService: DnsService,
     private readonly frontendService: FrontendService,
-    private readonly caddyService: CaddyService
+    private readonly caddyService: CaddyService,
+    private readonly configurationService: ConfigurationService,
   ) { }
 
   private generateDomainChallenge() {
@@ -164,6 +165,7 @@ export class DomainsService {
     });
 
     await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
+    await this.configurationService.modifyAppConfiguration({ configured: true });
     return {
       mainDomain: mainDomain.domain,
       frontendUrl: `https://${mainDomain.domain}`,
