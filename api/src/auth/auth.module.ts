@@ -11,6 +11,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { JwtStrategy } from "./strategy/jwt.strategy";
 import { AuthorizationModule } from "src/authorization/authorization.module";
 import { GithubStrategy } from "./strategy/github.strategy";
+import { ConfigurationModule } from "src/configuration/configuration.module";
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { GithubStrategy } from "./strategy/github.strategy";
         GithubModule,
         UserModule,
         AuthorizationModule,
+        ConfigurationModule,
     ],
     providers: [AuthService,  JwtStrategy, GithubStrategy, { provide: APP_GUARD, useClass: JwtAuthGuard }],
     controllers: [AuthController],
