@@ -11,12 +11,14 @@ export class AuthorizationRepository {
         private readonly mapper: AuthorizationMapper
     ) { }
 
-    async findById(id: string): Promise<AuthorizationObject> {
-        const authorization = await this.prismaService.authorization.findUniqueOrThrow({
+    async findById(id: string): Promise<Authorization> {
+        return this.prismaService.authorization.findUniqueOrThrow({
             where: { id },
         });
+    }
 
-        return this.mapper.toAuthorizationObject(authorization);
+    async findAll(): Promise<Authorization[]> {
+        return this.prismaService.authorization.findMany();
     }
 
     async createAuthorization(authorization: AuthorizationObject): Promise<Authorization | null> {
@@ -25,6 +27,12 @@ export class AuthorizationRepository {
                 type: authorization.type,
                 value: JSON.stringify(authorization.data),
             },
+        });
+    }
+
+    async delete(id: string): Promise<void> {
+        await this.prismaService.authorization.delete({
+            where: { id },
         });
     }
 }
