@@ -1,21 +1,22 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
+import axios from "axios";
 import { Strategy } from "passport-custom";
 import { GithubService } from "src/github/github.service";
 import { UserRepository } from "src/user/user.repository";
-import { AuthorizationRepository } from "src/authorization/authorization.repository";
+import { AuthorizationEnum } from "../../authorization/types/authorization.enum";
 import { ConnectGithubDto } from "../dto/ConnectGithub.dto";
 import { AuthError } from "../error/AuthError";
-import axios from "axios";
 import { ConfigurationService } from "src/configuration/configuration.service";
+import { AuthorizationService } from "../../authorization/authorization.service";
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     constructor(
         private githubService: GithubService,
         private userRepository: UserRepository,
-        private authorizationRepository: AuthorizationRepository,
         private configurationService: ConfigurationService,
+        private authorizationService: AuthorizationService,
     ) {
         super();
     }
@@ -75,8 +76,13 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         let user = await this.userRepository.findByEmail(useremail);
         if (!user) {
             const createdUser = await this.userRepository.createUser(useremail, username);
-            const authorization = await this.authorizationRepository.createAuthorization(accessToken, createdUser.id);
-            user = { ...createdUser, authorization };
+            await this.authorizationService.createAuthorization({
+              type: AuthorizationEnum.OAUTH,
+              data: {
+                token: accessToken,
+              }
+            });
+            user = { ...createdUser };
         }
 
         done(null, user);

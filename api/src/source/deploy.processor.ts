@@ -12,6 +12,7 @@ import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
 import { ExecutionError } from 'src/types/error/execution.error';
+import { AuthorizationService } from '../authorization/authorization.service';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -20,6 +21,7 @@ export class DeployConsumer {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vmService: VmService,
+    private readonly authorizationService: AuthorizationService
   ) {}
 
   @OnQueueFailed()
@@ -50,12 +52,7 @@ export class DeployConsumer {
         dir: deployPath,
         ref: branch,
         singleBranch: true,
-        onAuth: () => {
-          return {
-            username: 'x-access-token',
-            password: source.authorization.value,
-          };
-        },
+        onAuth: () => this.authorizationService.getDeployHeaderForAuthorization(source.authorizationId),
         onAuthFailure: () => {
           throw new DeployError('Failed to authenticate with github');
         },

@@ -4,17 +4,31 @@ import UserInfos from './model/UserInfos';
 import Repository from './model/Repository';
 import Email from './model/Email';
 import Branch from './model/Branch';
+import { AuthorizationService } from '../authorization/authorization.service';
 
 @Injectable()
 export class GithubService {
-  private async execGetRequest(url: string, token: string): Promise<any> {
+
+  constructor(
+    private readonly authorizationService: AuthorizationService
+  ) {}
+
+  private async getWithAuthorization(url: string, authorizationId: string): Promise<any> {
     return await axios.get(`https://api.github.com/${url}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: await this.authorizationService.getHeadersForAuthorization(authorizationId),
+    });
+  }
+
+  private async getWithToken(url: string, token: string): Promise<any> {
+    return await axios.get(`https://api.github.com/${url}`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
     });
   }
 
   async getUserEmails(token: string): Promise<Email[]> {
-    const res = await this.execGetRequest('user/emails', token);
+    const res = await this.getWithToken('user/emails', token);
     return res.data;
   }
 
@@ -24,36 +38,36 @@ export class GithubService {
   }
 
   async getUserInfos(token: string): Promise<UserInfos> {
-    const res = await this.execGetRequest('user', token);
+    const res = await this.getWithToken('user', token);
     return res.data;
   }
 
-  async getUserRepositoriesList(token: string): Promise<Repository[]> {
+  async getUserRepositoriesList(authorizationId: string): Promise<Repository[]> {
     // Max repository per page = 100
-    const res = await this.execGetRequest('user/repos?per_page=100', token);
+    const res = await this.getWithAuthorization('user/repos?per_page=100', authorizationId);
     return res.data;
   }
 
   async getRepositoryBranches(
-    token: string,
+    authorizationId: string,
     organisation: string,
     repositoryName: string,
   ): Promise<Branch[]> {
-    const res = await this.execGetRequest(
+    const res = await this.getWithAuthorization(
       `repos/${organisation}/${repositoryName}/branches`,
-      token,
+      authorizationId,
     );
     return res.data;
   }
 
   async getRepositoryByName(
-    token: string,
+    authorizationId: string,
     organisation: string,
     repositoryName: string,
   ): Promise<Repository> {
-    const res = await this.execGetRequest(
+    const res = await this.getWithAuthorization(
       `/repos/${organisation}/${repositoryName}`,
-      token,
+      authorizationId,
     );
     return res.data;
   }
