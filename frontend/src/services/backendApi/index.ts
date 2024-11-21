@@ -1,10 +1,8 @@
 import { RootState } from "@/app/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../authSlice";
-import { constants } from "@/constants";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: constants.apiUrl,
   timeout: 5000,
   prepareHeaders: (headers, { getState }) => {
     const { token } = (getState() as RootState).auth;
@@ -22,7 +20,12 @@ export enum QueryKeys {
 export const backendApi = createApi({
   reducerPath: "",
   baseQuery: async (args, api, extraOptions) => {
-    const result = await baseQuery(args, api, extraOptions);
+    const baseUrl = (api.getState() as RootState).config.backendUrl;
+    const result = await baseQuery(
+      { ...args, url: `${baseUrl}${args.url}` },
+      api,
+      extraOptions
+    );
     if (result.error?.status === 401) api.dispatch(logout());
     return result;
   },

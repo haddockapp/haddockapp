@@ -1,54 +1,38 @@
 import { Button } from "@/components/ui/button";
-import { DomainStatusDto } from "@/services/backendApi/domains";
+import useDomainActions from "@/hooks/use-domain";
 import { RefreshCw, Trash, Check } from "lucide-react";
 import { FC } from "react";
 
 interface DomainActionsProps {
-  isRefreshing: boolean;
-  isMutating: boolean;
-  onRefresh: () => void;
-  onDelete: (id: string) => void;
+  id?: string;
   onSave: () => void;
-  status?: DomainStatusDto;
 }
-const DomainActions: FC<DomainActionsProps> = ({
-  isRefreshing,
-  isMutating,
-  onRefresh,
-  onDelete,
-  onSave,
-  status,
-}) => (
-  <>
-    <Button
-      disabled={isRefreshing}
-      onClick={onRefresh}
-      className="space-x-2"
-      variant="secondary"
-    >
-      <RefreshCw size="16px" />
-      <span>Refresh</span>
-    </Button>
-    {!!onDelete && !!status && (
+const DomainActions: FC<DomainActionsProps> = ({ id, onSave }) => {
+  const { onDelete, onRefetch, isFetching } = useDomainActions(id);
+
+  return (
+    <>
       <Button
-        disabled={isMutating}
+        disabled={isFetching}
+        onClick={onRefetch}
         className="space-x-2"
-        variant="destructive"
-        onClick={() => onDelete(status.id)}
+        variant="secondary"
       >
-        <Trash size="16px" />
-        <span>Delete domain</span>
+        <RefreshCw size="16px" />
+        <span>Refresh</span>
       </Button>
-    )}
-    <Button
-      disabled={isMutating || !status?.canBeLinked}
-      onClick={onSave}
-      className="space-x-2"
-    >
-      <Check size="16px" />
-      <span>Save</span>
-    </Button>
-  </>
-);
+      {onDelete && (
+        <Button className="space-x-2" variant="destructive" onClick={onDelete}>
+          <Trash size="16px" />
+          <span>Delete domain</span>
+        </Button>
+      )}
+      <Button onClick={onSave} className="space-x-2">
+        <Check size="16px" />
+        <span>Save</span>
+      </Button>
+    </>
+  );
+};
 
 export default DomainActions;

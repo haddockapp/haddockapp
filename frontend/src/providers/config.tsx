@@ -1,3 +1,5 @@
+import { useAppDispatch } from "@/hooks/useStore";
+import { setBackendUrl } from "@/services/configSlice";
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -20,11 +22,14 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const fetchConfig = async () => {
       try {
         const response = await axios.get<Config>("/config.json");
         setConfig(response.data);
+        dispatch(setBackendUrl(response.data.backendUrl));
       } catch (err) {
         setError(err as Error);
         console.error("Failed to load config:", err);
@@ -34,7 +39,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     fetchConfig();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return <div>Loading...</div>;

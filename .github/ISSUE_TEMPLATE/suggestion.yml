@@ -1,0 +1,58 @@
+name: Suggestion
+description: Proposez une idée ou une amélioration pour Haddock.
+title: "[Suggestion]: "
+labels: ["enhancement", "idea"]
+projects: ["haddock-project/1", "haddock-project/enhancements"]
+assignees:
+  - dev-haddock
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de partager vos idées pour rendre Haddock encore meilleur ! Nous lisons attentivement toutes les suggestions.
+  - type: input
+    id: contact
+    attributes:
+      label: Coordonnées
+      description: Comment pouvons-nous vous contacter si nous avons des questions sur votre idée ?
+      placeholder: ex. email@exemple.com
+    validations:
+      required: false
+  - type: textarea
+    id: idea-description
+    attributes:
+      label: Description de votre suggestion
+      description: Expliquez votre idée ou votre amélioration, ainsi que son impact sur Haddock.
+      placeholder: Décrivez votre suggestion ici.
+    validations:
+      required: true
+  - type: checkboxes
+    id: benefits
+    attributes:
+      label: Bénéfices
+      description: Quels sont, selon vous, les avantages de cette suggestion ?
+      options:
+        - label: Amélioration de l'expérience utilisateur
+        - label: Performance accrue
+        - label: Résolution d'un problème existant
+        - label: Autre (précisez dans la description)
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Niveau de priorité
+      description: Quelle priorité donnez-vous à cette suggestion ?
+      options:
+        - Basse
+        - Moyenne
+        - Haute
+      default: 1
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code de Conduite
+      description: En soumettant cette issue, vous acceptez de suivre notre [Code de Conduite](https://example.com).
+      options:
+        - label: J'accepte de respecter le Code de Conduite de ce projet.
+          required: true

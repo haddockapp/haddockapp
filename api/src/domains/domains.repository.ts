@@ -42,7 +42,7 @@ export class DomainRepository {
   }
 
   async findDomainById(id: string): Promise<Domain> {
-    return this.prismaService.domain.findUnique({
+    return this.prismaService.domain.findUniqueOrThrow({
       where: {
         id,
       },
