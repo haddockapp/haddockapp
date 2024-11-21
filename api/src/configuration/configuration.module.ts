@@ -8,6 +8,6 @@ import { ConfigurationController } from "./configuration.controller";
     imports: [PrismaModule],
     controllers: [ConfigurationController],
     providers: [ConfigurationRepository, ConfigurationService],
-    exports: [ConfigurationRepository],
+    exports: [ConfigurationRepository, ConfigurationService],
 })
 export class ConfigurationModule {}

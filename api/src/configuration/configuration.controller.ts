@@ -30,15 +30,6 @@ export class ConfigurationController {
             throw new BadRequestException('Given tokens are not conforms to Github OAuth Application');
         }
 
-        try {
-            const config = await this.configurationRepository.getConfiguration();
-            await this.configurationRepository.updateConfiguration(config.id, dto);
-        } catch (e: any) {
-            if (e.code !== 'P2025') {
-                throw new Error(e);
-            }
-
-            await this.configurationRepository.createConfiguration(dto);
-        }
+        await this.configurationService.modifyAppConfiguration(dto);
     }
 }
