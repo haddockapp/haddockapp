@@ -79,16 +79,18 @@ model NetworkConnection {
 }
 
 model Domain {
-    id       String   @id @default(uuid())
-    domain   String   @unique
-    challenge String
-    main     Boolean  @default(false)
-    linked   Boolean  @default(false)
+  id        String  @id @default(uuid())
+  domain    String  @unique
+  challenge String
+  main      Boolean @default(false)
+  linked    Boolean @default(false)
 }
 
 model AppConfiguration {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    github_client_id String?
-    github_client_secret String?
+  configured Boolean @default(false)
+
+  github_client_id     String?
+  github_client_secret String?
 }
