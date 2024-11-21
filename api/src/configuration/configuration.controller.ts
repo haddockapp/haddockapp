@@ -1,9 +1,9 @@
 import { BadRequestException, Body, Controller, Get, Post } from "@nestjs/common";
 import { ConfigurationRepository } from "./configuration.repository";
-import { Public } from "src/auth/auth.decorator";
 import { SetupGitbubDto } from "./dto/setup-github.dto";
 import { AppConfiguration } from "@prisma/client";
 import { ConfigurationService } from "./configuration.service";
+import { PublicConfig } from "src/auth/auth.decorator";
 
 @Controller('configuration')
 export class ConfigurationController {
@@ -17,7 +17,7 @@ export class ConfigurationController {
         return this.configurationRepository.getConfiguration();
     }
 
-    @Public()
+    @PublicConfig()
     @Post('github')
     async setupGithub(@Body() data: SetupGitbubDto) {
         const dto: Partial<AppConfiguration> = {
