@@ -3,7 +3,7 @@ import { ConfigurationRepository } from "./configuration.repository";
 import { SetupGitbubDto } from "./dto/setup-github.dto";
 import { AppConfiguration } from "@prisma/client";
 import { ConfigurationService } from "./configuration.service";
-import { PublicConfig } from "src/auth/auth.decorator";
+import { Public, PublicConfig } from "src/auth/auth.decorator";
 
 @Controller('configuration')
 export class ConfigurationController {
@@ -20,16 +20,11 @@ export class ConfigurationController {
     @PublicConfig()
     @Post('github')
     async setupGithub(@Body() data: SetupGitbubDto) {
-        const dto: Partial<AppConfiguration> = {
-            github_client_id: data.client_id,
-            github_client_secret: data.client_secret,
-        };
-
-        const isDataConform = await this.configurationService.checkGithubTokensConformity(dto.github_client_id, dto.github_client_id);
-        if (!isDataConform) {
+        const dataConform = await this.configurationService.checkGithubTokensConformity(data.client_id, data.client_secret);
+        if (!dataConform) {
             throw new BadRequestException('Given tokens are not conforms to Github OAuth Application');
         }
 
-        await this.configurationService.modifyAppConfiguration(dto);
+        await this.configurationService.modifyGithubConfiguration(data.client_id, data.client_secret);
     }
 }
