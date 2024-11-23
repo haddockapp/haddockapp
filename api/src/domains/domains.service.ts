@@ -9,6 +9,7 @@ import { DnsService } from './dns/dns.service';
 import { CaddyService } from '../caddy/caddy.service';
 import { FrontendService } from '../frontend/frontend.service';
 import { ConfigurationService } from 'src/configuration/configuration.service';
+import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
 
 @Injectable()
 export class DomainsService {
@@ -165,7 +166,7 @@ export class DomainsService {
     });
 
     await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
-    await this.configurationService.modifyAppConfiguration({ configured: true });
+    await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
     return {
       mainDomain: mainDomain.domain,
       frontendUrl: `https://${mainDomain.domain}`,

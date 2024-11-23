@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_CONFIG_KEY, IS_PUBLIC_KEY } from '../auth.decorator';
 import { ConfigurationRepository } from 'src/configuration/configuration.repository';
+import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -25,8 +26,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
         if (!isPublicConfig) return false;
 
-        const config = await this.configurationRepository.getConfigurationNoThrow();
-        return config && config.configured;
+        const config = await this.configurationRepository.getConfigurationByKey(CONFIGURED_KEY);
+        return config && config.value === true;
     }
 
     public async canActivate(context: ExecutionContext) {

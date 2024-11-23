@@ -1,31 +1,50 @@
 import { Injectable } from "@nestjs/common";
-import { AppConfiguration } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class ConfigurationRepository {
     constructor(private readonly prismaService: PrismaService) {}
 
-    async createConfiguration(data: Partial<Omit<AppConfiguration, 'id'>>) {
+    async createConfiguration(key: string, value: Prisma.JsonValue) {
         return this.prismaService.appConfiguration.create({
-            data,
+            data: {
+                key,
+                value,
+            },
         });
     }
 
     async getConfiguration() {
-        return this.prismaService.appConfiguration.findFirstOrThrow();
+        return this.prismaService.appConfiguration.findMany();
     }
 
-    async getConfigurationNoThrow() {
-        return this.prismaService.appConfiguration.findFirst();
+    async getConfigurationByKey(key: string) {
+        return this.prismaService.appConfiguration.findFirst({
+            where: {
+                key,
+            },
+        });
     }
 
-    async updateConfiguration(configId: string, data: Partial<Omit<AppConfiguration, 'id'>>) {
+    async getConfigurationByKeys(keys: string[]) {
+        return this.prismaService.appConfiguration.findMany({
+            where: {
+                key: {
+                    in: keys,
+                },
+            },
+        });
+    }
+
+    async updateConfiguration(key: string, value: Prisma.JsonValue) {
         return this.prismaService.appConfiguration.update({
             where: {
-                id: configId,
+                key,
             },
-            data,
+            data: {
+                value,
+            },
         });
     }
 }
