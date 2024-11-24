@@ -4,8 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class VmRepository {
-    constructor(private prismaService: PrismaService) { }
-
+    constructor(private readonly prismaService: PrismaService) { }
 
     async getVm(
         vmWhereUniqueInput: Prisma.VmWhereUniqueInput,

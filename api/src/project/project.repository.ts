@@ -4,11 +4,12 @@ import { CreateProjectDto } from './dto/CreateProject.dto';
 import { Project } from '@prisma/client';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
-import { VmProvider } from '../types/vm.enum';
+import { VmProvider, VmState } from '../types/vm.enum';
+import pirateShips from './pirateShips';
 
 @Injectable()
 export class ProjectRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAllProjects(): Promise<PersistedProjectDto[]> {
     return this.prismaService.project.findMany({
@@ -34,15 +35,24 @@ export class ProjectRepository {
     });
   }
 
+  private generatePirateShipName(): string {
+    const { prefixes, suffixes } = pirateShips;
+
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
+    return `${prefix} ${suffix}`;
+  }
+
   async createProject(
     data: CreateProjectDto,
     authorizationId: string,
   ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
+        name: this.generatePirateShipName(),
         vm: {
           create: {
-            name: `${data.repository_organisation}_${data.repository_name}_${data.repository_branch}`,
             memory: data.vm_memory,
             disk: data.vm_disk,
             cpus: data.vm_cpus,
@@ -85,6 +95,8 @@ export class ProjectRepository {
         id: projectId,
       },
       data: {
+        name: data.name,
+        description: data.description,
         vm: {
           update: {
             cpus: data.cpus,

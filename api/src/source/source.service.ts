@@ -7,35 +7,41 @@ import { Queue } from 'bull';
 
 @Injectable()
 export class SourceService {
+  constructor(
+    @InjectQueue('deploys') private readonly deployQueue: Queue,
+    private readonly sourceFactory: SourceFactory,
+    private readonly prismaService: PrismaService,
+  ) {}
 
-    constructor(
-        @InjectQueue('deploys') private deployQueue: Queue,
-        private sourceFactory: SourceFactory,
-        private prismaService: PrismaService,
+  async registerSource(createSourceDto: CreateSourceDto) {
+    const source = this.sourceFactory.createSource(createSourceDto);
+    return this.prismaService.source.create({
+      data: source,
+    });
+  }
 
-    ) { }
-
-    async registerSource(createSourceDto: CreateSourceDto) {
-        const source = this.sourceFactory.createSource(createSourceDto);
-        return this.prismaService.source.create({
-            data: source
-        });
+  async deploySource(sourceId: string) {
+    const source = await this.prismaService.source.findUnique({
+      where: {
+        id: sourceId,
+      },
+      include: {
+        authorization: true,
+        project: true,
+      },
+    });
+    if (!source) {
+      throw new NotFoundException('Source not found');
     }
 
-    async deploySource(sourceId: string) {
-        const source = await this.prismaService.source.findUnique({
-            where: {
-                id: sourceId
-            },
-            include: {
-                authorization: true,
-                project: true
-            }
-        });
-        if (!source) {
-            throw new NotFoundException('Source not found');
-        }
+    await this.deployQueue.add('deploy', source);
+  }
 
-        await this.deployQueue.add('deploy', source);
-    }
+  async deleteSource(sourceId: string) {
+    await this.prismaService.source.delete({
+      where: {
+        id: sourceId,
+      },
+    });
+  }
 }

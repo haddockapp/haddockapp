@@ -1,78 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNetworkConnectionDto } from './dto/CreateNetworkConnectionDto';
-import { NetworkConnection } from '@prisma/client';
-import { compile } from 'handlebars';
 import { readFileSync } from 'fs';
-import { CaddyRepository } from './caddy.repository';
-import { UpdateNetworkConnectionDto } from './dto/UpdateNetworkConnectionDto';
 import { writeFile } from 'fs/promises';
-import { exec } from 'child_process';
+import { compile } from 'handlebars';
+import { CaddyConfig } from './types/caddy-config.type';
+import { execCommand } from 'src/utils/exec-utils';
 
 @Injectable()
 export class CaddyService {
-  private readonly template: HandlebarsTemplateDelegate<any>;
+  private readonly templates: {
+    [key: string]: HandlebarsTemplateDelegate<any>;
+  } = {};
 
-  constructor(private caddyRepository: CaddyRepository) {
-    this.template = compile(
-      readFileSync('./src/caddy/template/Caddyfile.hbs', 'utf-8'),
-    );
+  private async getTemplate(template: string) {
+    if (!this.templates[template]) {
+      this.templates[template] = compile(
+        readFileSync(`./src/caddy/template/${template}`).toString(),
+      );
+    }
+
+    return this.templates[template];
   }
 
-  private async updateCaddyfile() {
-    const network_connections =
-      await this.caddyRepository.findNetworkConnectionsAndProjectAndVm();
-
-    const caddyfile = this.template({
-      data: network_connections.map((network_connection) => ({
-        hostname: network_connection.domain,
-        ip: network_connection.project.vm.ip,
-        port: network_connection.port,
-      })),
-    });
-
-    await writeFile('./src/caddy/Caddyfile', caddyfile, {
+  private async saveCaddyfile(content: string, dest: string) {
+    await writeFile(dest, content, {
       encoding: 'utf-8',
     });
+  }
 
-    await new Promise<string>((resolve, reject) => {
-      exec('cd ./src/caddy && caddy reload', (error, stdout) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(stdout);
-      });
+  private async reloadCaddy() {
+    await execCommand('caddy reload', {
+      cwd: process.env.CADDY_ROOT_DIR,
     });
   }
 
-  async createNetworkConnection(
-    data: CreateNetworkConnectionDto,
-  ): Promise<NetworkConnection> {
-    const network_connection =
-      await this.caddyRepository.createNetworkConnection(data);
+  async generate(config: CaddyConfig) {
+    const template = await this.getTemplate(config.template);
+    const content = template(config.data);
 
-    await this.updateCaddyfile();
-
-    return network_connection;
-  }
-
-  async updateNetworkConnection(
-    networkConnectionId: string,
-    data: UpdateNetworkConnectionDto,
-  ): Promise<NetworkConnection> {
-    const network_connection =
-      await this.caddyRepository.updateNetworkConnection(
-        networkConnectionId,
-        data,
-      );
-
-    await this.updateCaddyfile();
-
-    return network_connection;
-  }
-
-  async deleteNetworkConnection(networkConnectionId: string) {
-    await this.caddyRepository.deleteNetworkConnection(networkConnectionId);
-
-    await this.updateCaddyfile();
+    await this.saveCaddyfile(content, config.dest);
+    await this.reloadCaddy();
   }
 }

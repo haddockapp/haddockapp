@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { VmService } from './vm.service';
-import { VmController } from './vm.controller';
 import { VmRepository } from './vm.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { WebsocketModule } from '../websockets/websocket.module';
+import { NetworksModule } from 'src/networks/networks.module';
 
 @Module({
-    imports: [PrismaModule, WebsocketModule],
+    imports: [PrismaModule, WebsocketModule, NetworksModule],
     providers: [VmService, VmRepository],
-    controllers: [VmController],
     exports: [VmService],
 })
 export class VmModule { }

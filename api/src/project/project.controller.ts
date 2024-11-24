@@ -5,7 +5,6 @@ import {
     Get,
     HttpCode,
     HttpStatus,
-    InternalServerErrorException,
     NotFoundException,
     Param,
     Patch,
@@ -17,20 +16,22 @@ import {UpdateProjectDto} from "./dto/UpdateProject.dto";
 import { CurrentUser } from "src/auth/user.context";
 import { PersistedUserDto } from "src/user/dto/user.dto";
 import { SourceService } from "../source/source.service";
-import * as fs from 'fs';
 import { ComposeService } from "src/compose/compose.service";
 import { DockerService } from "src/docker/docker.service";
 import { GithubSourceSettingsDto } from "src/source/dto/settings.dto";
 import { getSettings } from "src/source/utils/get-settings";
-import ProjectService from "./dto/ProjectService.dto";
+import ProjectServiceDto from "./dto/ProjectService.dto";
+import { ProjectService } from "./project.service";
 
 @Controller('project')
 export class ProjectController {
+
     constructor(
-        private projectRepository: ProjectRepository,
-        private sourceService: SourceService,
-        private composeService: ComposeService,
-        private dockerService: DockerService,
+        private readonly projectService: ProjectService,
+        private readonly projectRepository: ProjectRepository,
+        private readonly sourceService: SourceService,
+        private readonly composeService: ComposeService,
+        private readonly dockerService: DockerService,
     ) { }
 
   @Get()
@@ -62,6 +63,16 @@ export class ProjectController {
     return project;
   }
 
+  @Post('/deploy/:id')
+  async deployProject(@Param('id') projectId: string) {
+    await this.projectService.deployProject(projectId);
+  }
+
+  @Post('/rebuild/:id')
+  async rebuildProject(@Param('id') projectId: string) {
+    await this.projectService.rebuildProject(projectId);
+  }
+
     @Patch(':id')
     async updateProject(@Param('id') projectId: string, @Body() data: UpdateProjectDto) {
         const project = await this.projectRepository.findProjectById(projectId);
@@ -74,10 +85,10 @@ export class ProjectController {
 
     @Delete(':id')
     async deleteProject(@Param('id') projectId: string) {
-        await this.projectRepository.deleteProject(projectId);
+        await this.projectService.deleteProject(projectId);
     }
 
-    @Get(':id/services')
+    @Get(':id/service')
     async getProjectServices(@Param('id') projectId: string) {
         const project = await this.projectRepository.findProjectById(projectId);
         if (!project) {
@@ -85,15 +96,17 @@ export class ProjectController {
         }
 
         const settings = getSettings<GithubSourceSettingsDto>(project?.source.settings);
-        const composeContent = this.composeService.readComposeFile(project.id, settings.composeName);
+        const rawCompose = this.composeService.readComposeFile(project.id, settings.composeName);
+        if (!rawCompose) {
+            return [];
+        }
 
-        const services = this.composeService.parseServices(composeContent.toString());
+        const services = this.composeService.parseServices(rawCompose.toString());
         return await Promise.all(services.map(async (service) => {
-            const result: ProjectService = {
+            const result: ProjectServiceDto = {
                 icon: 'https://i.imgur.com/ZMxf3Iy.png',
                 image: service.image.startsWith('.') ? 'custom' : service.image,
                 name: service.name,
-                ports: service.ports,
             };
 
             const serviceName = service.image.split(':')[0];
@@ -107,16 +120,24 @@ export class ProjectController {
         }));
     }
 
-    @Get(':id/available-ports')
-    async getProjectAvailablePorts(@Param('id') projectId: string) {
+    @Get(':id/service/:name')
+    async getProjectServiceInformations(@Param('id') projectId: string, @Param('name') serviceName: string) {
         const project = await this.projectRepository.findProjectById(projectId);
         if (!project) {
             throw new NotFoundException('Project not found');
         }
 
         const settings = getSettings<GithubSourceSettingsDto>(project?.source.settings);
-        const composeContent = this.composeService.readComposeFile(project.id, settings.composeName);
-        const services = this.composeService.parseServices(composeContent);
-        return services.flatMap((service) => service.ports.map((port) => port.split(':')[0]));
+        const rawCompose = this.composeService.readComposeFile(project.id, settings.composeName);
+        if (!rawCompose) {
+            throw new NotFoundException('Service not found');
+        }
+
+        const services = this.composeService.parseServices(rawCompose);
+        const service = services.find((service) => service.name === serviceName);
+        if (!service) {
+            throw new NotFoundException('Service not found');
+        }
+        return service;
     }
 }

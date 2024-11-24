@@ -5,3 +5,5 @@ workspaces
 migrations
 
 launch.sh
+
+!/Caddyfile
