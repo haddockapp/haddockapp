@@ -2,13 +2,13 @@ import {
     Injectable
 } from '@nestjs/common';
 import { Authorization } from '@prisma/client';
-import { AuthorizationObject } from './types/authorization-object';
+import { AuthorizationDTO } from './dto/authorization.dto';
 import { AuthorizationEnum } from './types/authorization.enum';
-import { AuthorizationResponse } from './types/authorization.response';
+import { AuthorizationResponse } from './dto/authorization.response';
 
 @Injectable()
 export class AuthorizationMapper {
-    public toAuthorizationObject(authorization: Authorization): AuthorizationObject {
+    public toAuthorizationObject(authorization: Authorization): AuthorizationDTO {
         return {
             type: authorization.type as AuthorizationEnum,
             data: JSON.parse(authorization.value as string),

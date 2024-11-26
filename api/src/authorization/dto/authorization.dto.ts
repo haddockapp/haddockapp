@@ -1,6 +1,6 @@
-import { AuthorizationEnum } from "./authorization.enum";
+import { AuthorizationEnum } from "../types/authorization.enum";
 
-export type AuthorizationObject = {
+export type AuthorizationDTO = {
     type: AuthorizationEnum.OAUTH;
     data: {
         token: string

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { AuthorizationRepository } from './authorization.repository';
 import { AuthorizationEnum } from './types/authorization.enum';
-import { AuthorizationObject } from './types/authorization-object';
+import { AuthorizationDTO } from './dto/authorization.dto';
 import { AuthorizationMapper } from './authorization.mapper';
 
 @Injectable()
@@ -50,7 +50,7 @@ export class AuthorizationService {
     }
   }
 
-  public async createAuthorization(authorization: AuthorizationObject) {
+  public async createAuthorization(authorization: AuthorizationDTO) {
     return this.repository.createAuthorization(authorization);
   }
 }

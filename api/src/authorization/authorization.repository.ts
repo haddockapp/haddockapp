@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Authorization } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { AuthorizationObject } from "./types/authorization-object";
+import { AuthorizationDTO } from "./dto/authorization.dto";
 import { AuthorizationMapper } from "./authorization.mapper";
 
 @Injectable()
@@ -21,7 +21,7 @@ export class AuthorizationRepository {
         return this.prismaService.authorization.findMany();
     }
 
-    async createAuthorization(authorization: AuthorizationObject): Promise<Authorization | null> {
+    async createAuthorization(authorization: AuthorizationDTO): Promise<Authorization | null> {
         return this.prismaService.authorization.create({
             data: {
                 type: authorization.type,

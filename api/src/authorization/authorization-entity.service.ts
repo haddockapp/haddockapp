@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { AuthorizationRepository } from './authorization.repository';
 import { AuthorizationEnum } from './types/authorization.enum';
-import { AuthorizationObject } from './types/authorization-object';
-import { AuthorizationResponse } from './types/authorization.response';
+import { AuthorizationDTO } from './dto/authorization.dto';
+import { AuthorizationResponse } from './dto/authorization.response';
 import { AuthorizationMapper } from './authorization.mapper';
 
 @Injectable()
