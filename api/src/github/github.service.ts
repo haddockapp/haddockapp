@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { AuthError } from '../auth/error/AuthError';
 import { AuthorizationService } from '../authorization/authorization.service';
@@ -6,12 +6,15 @@ import Branch from './model/Branch';
 import Email from './model/Email';
 import Repository from './model/Repository';
 import UserInfos from './model/UserInfos';
+import { ConfigurationService } from '../configuration/configuration.service';
 
 @Injectable()
 export class GithubService {
 
   constructor(
-    private readonly authorizationService: AuthorizationService
+    private readonly authorizationService: AuthorizationService,
+    private readonly configurationService: ConfigurationService,
+
   ) { }
 
   private async getWithAuthorization(url: string, authorizationId: string): Promise<any> {
@@ -29,8 +32,13 @@ export class GithubService {
   }
 
   public async exchangeCode(code: string) {
-    const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-    const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+    const config = await this.configurationService.getGithubConfiguration();
+    if (!config) {
+      throw new InternalServerErrorException('No Github OAuth Application setup yet');
+    }
+
+    const CLIENT_ID = config.client_id;
+    const CLIENT_SECRET = config.client_secret;
     const URL = `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}`;
 
     const { data } = await axios.post(
