@@ -18,8 +18,6 @@ export class GithubController {
       );
     }
 
-    console.log(authorization);
-
     return await this.githubService.getUserRepositoriesList(
       authorization,
     );

@@ -8,7 +8,6 @@ import { AuthorizationMapper } from "./authorization.mapper";
 export class AuthorizationRepository {
     constructor(
         private readonly prismaService: PrismaService,
-        private readonly mapper: AuthorizationMapper
     ) { }
 
     async findById(id: string): Promise<Authorization> {
@@ -25,7 +24,7 @@ export class AuthorizationRepository {
         return this.prismaService.authorization.create({
             data: {
                 type: authorization.type,
-                value: JSON.stringify(authorization.data),
+                value: authorization.data,
             },
         });
     }

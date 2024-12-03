@@ -1,17 +1,65 @@
 import {
-  Injectable
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException
 } from '@nestjs/common';
+import { AuthError } from '../auth/error/AuthError';
+import { GithubService } from '../github/github.service';
 import { AuthorizationMapper } from './authorization.mapper';
 import { AuthorizationRepository } from './authorization.repository';
+import { AuthorizationService } from './authorization.service';
+import { AuthorizationDTO } from './dto/authorization.dto';
 import { AuthorizationResponse } from './dto/authorization.response';
-import { CreateAuthorizationDTO } from './dto/request/create-authorization.dto';
+import { CreateAuthorizationDTO, DeployKeyData, OAuthData, PersonalAccessTokenData } from './dto/request/create-authorization.dto';
+import { AuthorizationEnum } from './types/authorization.enum';
 
 @Injectable()
 export class AuthorizationEntityService {
   constructor(
     private readonly repository: AuthorizationRepository,
-    private readonly mapper: AuthorizationMapper
+    private readonly mapper: AuthorizationMapper,
+    private readonly githubService: GithubService,
+    private readonly service: AuthorizationService,
   ) { }
+
+  private async getOAuthToken(code: string): Promise<string> {
+    try {
+      return await this.githubService.exchangeCode(code);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException('An error occurred.');
+      }
+    }
+  }
+
+
+  private async requestToAuthorizationObject(authorization: CreateAuthorizationDTO): Promise<AuthorizationDTO> {
+    switch (authorization.type) {
+      case AuthorizationEnum.OAUTH:
+        return {
+          type: AuthorizationEnum.OAUTH,
+          data: {
+            token: await this.getOAuthToken((authorization.data as OAuthData).code),
+          },
+        };
+      case AuthorizationEnum.PERSONAL_ACCESS_TOKEN:
+        return {
+          type: AuthorizationEnum.PERSONAL_ACCESS_TOKEN,
+          data: {
+            token: (authorization.data as PersonalAccessTokenData).token,
+          },
+        };
+      case AuthorizationEnum.DEPLOY_KEY:
+        return {
+          type: AuthorizationEnum.DEPLOY_KEY,
+          data: {
+            key: (authorization.data as DeployKeyData).key,
+          },
+        };
+    }
+  }
 
   public async findAll(): Promise<AuthorizationResponse[]> {
     const authorizations = await this.repository.findAll();
@@ -28,6 +76,7 @@ export class AuthorizationEntityService {
   }
 
   public async create(body: CreateAuthorizationDTO) {
-    return body;
+    const authorization = await this.requestToAuthorizationObject(body);
+    return this.service.createAuthorization(authorization);
   }
 }
