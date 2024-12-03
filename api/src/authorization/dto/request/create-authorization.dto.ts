@@ -2,24 +2,24 @@ import { IsEnum, IsNotEmpty, IsString, ValidateNested} from "class-validator";
 import { AuthorizationEnum } from "../../types/authorization.enum";
 import { Type } from "class-transformer";
 
-class PersonalAccessTokenData {
+export class PersonalAccessTokenData {
     @IsString()
     token: string;
 }
 
-class OAuthData {
+export class OAuthData {
     @IsString()
-    token: string;
+    code: string;
 }
 
-class DeployKeyData {
+export class DeployKeyData {
     @IsString()
     key: string;
 }
 
 export class CreateAuthorizationDTO {
     @IsEnum(AuthorizationEnum)
-    type: string;
+    type: AuthorizationEnum;
 
     @ValidateNested()
     @IsNotEmpty()

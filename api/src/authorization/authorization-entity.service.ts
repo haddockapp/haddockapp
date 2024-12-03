@@ -1,13 +1,10 @@
 import {
-  BadRequestException,
-  Injectable,
-  NotImplementedException
+  Injectable
 } from '@nestjs/common';
-import { AuthorizationRepository } from './authorization.repository';
-import { AuthorizationEnum } from './types/authorization.enum';
-import { AuthorizationDTO } from './dto/authorization.dto';
-import { AuthorizationResponse } from './dto/authorization.response';
 import { AuthorizationMapper } from './authorization.mapper';
+import { AuthorizationRepository } from './authorization.repository';
+import { AuthorizationResponse } from './dto/authorization.response';
+import { CreateAuthorizationDTO } from './dto/request/create-authorization.dto';
 
 @Injectable()
 export class AuthorizationEntityService {
@@ -28,5 +25,9 @@ export class AuthorizationEntityService {
 
   public async delete(id: string): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  public async create(body: CreateAuthorizationDTO) {
+    return body;
   }
 }

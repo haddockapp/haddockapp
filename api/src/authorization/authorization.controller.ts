@@ -8,11 +8,13 @@ import {
 } from '@nestjs/common';
 import { AuthorizationEntityService } from './authorization-entity.service';
 import { CreateAuthorizationDTO } from './dto/request/create-authorization.dto';
+import { AuthorizationValidator } from './authorization.validator';
 
 @Controller('authorization')
 export class AuthorizationController {
   constructor(
     private readonly service: AuthorizationEntityService,
+    private readonly validator: AuthorizationValidator,
   ) {}
 
   @Get()
@@ -38,6 +40,7 @@ export class AuthorizationController {
   async create(
     @Body() body: CreateAuthorizationDTO
   ) {
-    return body;
+    await this.validator.validate(body);
+    return this.service.create(body);
   }
 }
