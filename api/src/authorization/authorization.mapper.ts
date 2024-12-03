@@ -12,7 +12,7 @@ export class AuthorizationMapper {
     public toAuthorizationObject(authorization: Authorization): AuthorizationDTO {
         return {
             type: authorization.type as AuthorizationEnum,
-            data: JSON.parse(authorization.value as string),
+            data: authorization.value as any,
         };
     }
 

@@ -32,16 +32,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         const URL = `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}`;
 
         try {
-          const { data } = await axios.post(
-            URL,
-            {},
-            { headers: { Accept: 'application/json' } },
-          );
-          if (data.error) {
-            throw new AuthError(data.error);
-          }
-
-          return data.access_token as string;
+          return await this.githubService.exchangeCode(code);
         } catch (e) {
           console.error(e);
 

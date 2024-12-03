@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import UserInfos from './model/UserInfos';
-import Repository from './model/Repository';
-import Email from './model/Email';
-import Branch from './model/Branch';
+import { AuthError } from '../auth/error/AuthError';
 import { AuthorizationService } from '../authorization/authorization.service';
+import Branch from './model/Branch';
+import Email from './model/Email';
+import Repository from './model/Repository';
+import UserInfos from './model/UserInfos';
 
 @Injectable()
 export class GithubService {
 
   constructor(
     private readonly authorizationService: AuthorizationService
-  ) {}
+  ) { }
 
   private async getWithAuthorization(url: string, authorizationId: string): Promise<any> {
     return await axios.get(`https://api.github.com/${url}`, {
@@ -27,6 +28,23 @@ export class GithubService {
     });
   }
 
+  public async exchangeCode(code: string) {
+    const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+    const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+    const URL = `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}`;
+
+    const { data } = await axios.post(
+      URL,
+      {},
+      { headers: { Accept: 'application/json' } },
+    );
+    if (data.error) {
+      throw new AuthError(data.error);
+    }
+
+    return data.access_token as string;
+
+  }
   async getUserEmails(token: string): Promise<Email[]> {
     const res = await this.getWithToken('user/emails', token);
     return res.data;
