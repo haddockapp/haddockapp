@@ -7,9 +7,10 @@ import { DnsService } from './dns/dns.service';
 import { DomainsController } from './domains.controller';
 import { DomainRepository } from './domains.repository';
 import { DomainsService } from './domains.service';
+import { ConfigurationModule } from 'src/configuration/configuration.module';
 
 @Module({
-  imports: [PrismaModule, FrontendModule, CaddyModule],
+  imports: [PrismaModule, FrontendModule, CaddyModule, ConfigurationModule],
   controllers: [DomainsController],
   providers: [
     DomainsService,

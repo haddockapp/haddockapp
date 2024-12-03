@@ -38,7 +38,7 @@ export class SourceService {
   }
 
   async deleteSource(sourceId: string) {
-    await this.prismaService.source.delete({
+    return this.prismaService.source.delete({
       where: {
         id: sourceId,
       },

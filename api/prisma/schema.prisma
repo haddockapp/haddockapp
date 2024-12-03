@@ -79,9 +79,14 @@ model NetworkConnection {
 }
 
 model Domain {
-    id       String   @id @default(uuid())
-    domain   String   @unique
-    challenge String
-    main     Boolean  @default(false)
-    linked   Boolean  @default(false)
+  id        String  @id @default(uuid())
+  domain    String  @unique
+  challenge String
+  main      Boolean @default(false)
+  linked    Boolean @default(false)
+}
+
+model AppConfiguration {
+  key   String @unique
+  value Json
 }
