@@ -5,6 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { DeployConsumer } from './deploy.processor';
 import { SourceFactory } from './source.factory';
 import { SourceService } from './source.service';
+import { AuthorizationModule } from '../authorization/authorization.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { SourceService } from './source.service';
         BullModule.registerQueue({
             name: 'deploys',
         }),
+        AuthorizationModule
     ],
     providers: [
         SourceService,

@@ -1,44 +1,34 @@
-import { Controller, Get, Param, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Param, Query, UnauthorizedException } from '@nestjs/common';
 import { GithubService } from './github.service';
-import { User } from '@prisma/client';
-import { AuthorizationRepository } from 'src/authorization/authorization.repository';
-import { CurrentUser } from 'src/auth/user.context';
 import Repository from './model/Repository';
 
 @Controller('github')
 export class GithubController {
   constructor(
     private githubService: GithubService,
-    private authorizationRepository: AuthorizationRepository,
-  ) {}
+  ) { }
 
   @Get('/repository')
-  async getUserRepositories(@CurrentUser() user: User): Promise<Repository[]> {
-    const authorization = await this.authorizationRepository.findByUserId(
-      user.id,
-    );
+  async getUserRepositories(
+    @Query('authorization') authorization?: string,
+  ): Promise<Repository[]> {
     if (!authorization) {
       throw new UnauthorizedException(
         'A Github connection is required to perform this action.',
       );
     }
 
-    console.log(authorization);
-
     return await this.githubService.getUserRepositoriesList(
-      authorization.value,
+      authorization,
     );
   }
 
   @Get('/repository/:orga/:name')
   async getRepositoryByName(
-    @CurrentUser() user: User,
     @Param('orga') organisation: string,
     @Param('name') repositoryName: string,
+    @Query('authorization') authorization?: string,
   ) {
-    const authorization = await this.authorizationRepository.findByUserId(
-      user.id,
-    );
     if (!authorization) {
       throw new UnauthorizedException(
         'A Github connection is required to perform this actions.',
@@ -46,7 +36,7 @@ export class GithubController {
     }
 
     return await this.githubService.getRepositoryByName(
-      authorization.value,
+      authorization,
       organisation,
       repositoryName,
     );
@@ -54,13 +44,11 @@ export class GithubController {
 
   @Get('/repository/:orga/:name/branches')
   async getUserRepositoryBranches(
-    @CurrentUser() user: User,
     @Param('orga') organisation: string,
     @Param('name') repositoryName: string,
+    @Query('authorization') authorization?: string,
   ) {
-    const authorization = await this.authorizationRepository.findByUserId(
-      user.id,
-    );
+
     if (!authorization) {
       throw new UnauthorizedException(
         'A Github connection is required to perform this actions.',
@@ -68,7 +56,7 @@ export class GithubController {
     }
 
     const branches = await this.githubService.getRepositoryBranches(
-      authorization.value,
+      authorization,
       organisation,
       repositoryName,
     );

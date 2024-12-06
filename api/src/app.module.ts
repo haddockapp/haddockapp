@@ -13,9 +13,11 @@ import { NetworksModule } from './networks/networks.module';
 import { DomainsModule } from './domains/domains.module';
 import { StartupModule } from './startup/startup.module';
 import { ConfigurationModule } from './configuration/configuration.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     BullModule.forRoot({
       redis: {
         host: 'localhost',
