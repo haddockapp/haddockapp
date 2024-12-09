@@ -7,6 +7,7 @@ import { AuthorizationRepository } from './authorization.repository';
 import { AuthorizationEnum } from './types/authorization.enum';
 import { AuthorizationDTO } from './dto/authorization.dto';
 import { AuthorizationMapper } from './authorization.mapper';
+import axios from 'axios';
 
 @Injectable()
 export class AuthorizationService {
@@ -52,5 +53,32 @@ export class AuthorizationService {
 
   public async createAuthorization(authorization: AuthorizationDTO) {
     return this.repository.createAuthorization(authorization);
+  }
+
+  private async readSource(authorizationId: string, organization: string, repo: string) {
+    const authorizationHeaders = await this.getHeadersForAuthorization(authorizationId);
+
+    try {
+      await axios.get(`https://api.github.com/repos/${organization}/${repo}`, {
+        headers: authorizationHeaders,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async canReadSource(authorizationId: string, organization: string, repo: string) {
+    const authorization = await this.repository.findById(authorizationId);
+    const object = this.mapper.toAuthorizationObject(authorization);
+
+    switch (object.type) {
+      case AuthorizationEnum.OAUTH:
+        return this.readSource(authorizationId, organization, repo);
+      case AuthorizationEnum.PERSONAL_ACCESS_TOKEN:
+        return this.readSource(authorizationId, organization, repo);
+      case AuthorizationEnum.DEPLOY_KEY:
+        return true;
+    }
   }
 }
