@@ -27,7 +27,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
   });
   return (
     <div className="bg-zinc-50 rounded-[16px] w-[310px] grow mt-2 mr-2 mb-2 p-5 flex flex-col">
-      <DrawerTitle className="font-medium mb-2 text-zinc-900">
+      <DrawerTitle>
         <div className="flex flex-row gap-2">
           <img className="w-12 h-12" src={service.icon} />
           <div className="flex flex-col">
