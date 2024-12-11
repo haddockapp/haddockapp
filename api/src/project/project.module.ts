@@ -8,6 +8,7 @@ import { DockerModule } from 'src/docker/docker.module';
 import { ProjectService } from './project.service';
 import { VmModule } from 'src/vm/vm.module';
 import { NetworksModule } from 'src/networks/networks.module';
+import { AuthorizationModule } from '../authorization/authorization.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { NetworksModule } from 'src/networks/networks.module';
     DockerModule,
     forwardRef(() => VmModule),
     NetworksModule,
+    AuthorizationModule
   ],
   controllers: [ProjectController],
   providers: [ProjectService, ProjectRepository],
