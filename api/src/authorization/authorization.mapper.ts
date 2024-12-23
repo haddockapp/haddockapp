@@ -3,9 +3,8 @@ import {
 } from '@nestjs/common';
 import { Authorization } from '@prisma/client';
 import { AuthorizationDTO } from './dto/authorization.dto';
-import { AuthorizationEnum } from './types/authorization.enum';
 import { AuthorizationResponse } from './dto/authorization.response';
-import { CreateAuthorizationDTO } from './dto/request/create-authorization.dto';
+import { AuthorizationEnum } from './types/authorization.enum';
 
 @Injectable()
 export class AuthorizationMapper {

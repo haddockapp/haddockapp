@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateProjectDto } from './dto/CreateProject.dto';
 import { Project } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { VmProvider } from '../types/vm.enum';
+import { CreateProjectDto } from './dto/CreateProject.dto';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
-import { VmProvider, VmState } from '../types/vm.enum';
 import pirateShips from './pirateShips';
 
 @Injectable()
@@ -46,7 +46,6 @@ export class ProjectRepository {
 
   async createProject(
     data: CreateProjectDto,
-    authorizationId: string,
   ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
@@ -69,7 +68,7 @@ export class ProjectRepository {
               composeName: data.compose_name,
             },
             authorization: {
-              connect: { id: authorizationId },
+              connect: { id: data.authorization_id },
             },
           },
         },
