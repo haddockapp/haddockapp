@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Card, CardContent } from "../ui/card";
-import { VmState } from "@/services/backendApi/projects";
+import { VmState } from "@/types/vm/vm";
 
 interface ServiceCardProps {
   name: string;

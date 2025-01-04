@@ -4,11 +4,8 @@ import { Provider } from "react-redux";
 import { store } from "@/app/store";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { http, HttpResponse } from "msw";
-import {
-  ProjectDto,
-  VmProvider,
-  VmState,
-} from "@/services/backendApi/projects";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
+import { VmState, VmProvider } from "@/types/vm/vm";
 
 const meta = {
   title: "Organisms/SettingsTab",

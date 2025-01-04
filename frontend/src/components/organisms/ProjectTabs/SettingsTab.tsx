@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   useDeleteProjectMutation,
   useGetProjectsQuery,
-} from "@/services/backendApi/projects";
+} from "@/services/backendApi/projects/projects.service";
 import DeleteProjectDialog from "./DeleteProjectDialog";
 import EditProjectDialog from "./EditProjectDialog";
 

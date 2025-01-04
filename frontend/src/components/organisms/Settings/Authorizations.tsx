@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { FC, useCallback } from "react";
 import SimpleDialog from "@/components/organisms/SimpleDialog";
 import {
   AuthorizationEnum,
   useCreateAuthorizationMutation,
+  useDeleteAuthorizationMutation,
+  useGetAllAuthorizationsQuery,
 } from "@/services/backendApi/authorizations";
 import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -23,6 +25,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import useDisclosure from "@/hooks/use-disclosure";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const DEPLOY_KEY_PLACEHOLDER = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAK...jLV05UD
@@ -49,21 +61,30 @@ const formSchema = z.object({
     AuthorizationEnum.OAUTH,
     AuthorizationEnum.PERSONAL_ACCESS_TOKEN,
   ]),
-  token: z.string().regex(/^github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}$/, {
-    message: "Invalid token format",
-  }),
+  token: z
+    .string()
+    .regex(/^ghp_[a-zA-Z0-9]{36}$/, {
+      message: "Invalid token format",
+    })
+    .optional(),
   code: z
     .string()
-    .regex(/^gho_[a-zA-Z0-9]{36}$/, { message: "Invalid OAuth code format" }),
+    .regex(/^gho_[a-zA-Z0-9]{36}$/, { message: "Invalid OAuth code format" })
+    .optional(),
   key: z
     .string()
     .regex(
-      /^-----BEGIN(?: (?:RSA|OPENSSH|ED25519))? PRIVATE KEY-----\s*(\S[\s\S]*?)\s*-----END(?: (?:RSA|OPENSSH|ED25519))? PRIVATE KEY-----\n$/,
+      /^-----BEGIN(?: (?:RSA|OPENSSH|ED25519))? PRIVATE KEY-----([^-!]+)-----END(?: (?:RSA|OPENSSH|ED25519))? PRIVATE KEY-----/,
       { message: "Invalid key format" }
-    ),
+    )
+    .optional(),
 });
 
-const CreateNewAuthorization: FC = () => {
+type CreateNewAuthorizationProps = { onClose: () => void };
+
+const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
+  onClose,
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -72,7 +93,6 @@ const CreateNewAuthorization: FC = () => {
 
   const handleCreateAuthorization = useCallback(
     (data: z.infer<typeof formSchema>) => {
-      console.log(data);
       const createDeployKey = (key: string) =>
         triggerCreateAuthorization({
           type: AuthorizationEnum.DEPLOY_KEY,
@@ -102,6 +122,7 @@ const CreateNewAuthorization: FC = () => {
             duration: 1000,
             variant: "default",
           });
+          onClose();
         })
         .catch(() => {
           toast({
@@ -111,7 +132,7 @@ const CreateNewAuthorization: FC = () => {
           });
         });
     },
-    [triggerCreateAuthorization]
+    [onClose, triggerCreateAuthorization]
   );
 
   const onSubmit = form.handleSubmit(handleCreateAuthorization);
@@ -172,7 +193,7 @@ const CreateNewAuthorization: FC = () => {
                   <Textarea
                     {...field}
                     placeholder={DEPLOY_KEY_PLACEHOLDER}
-                    className="h-20"
+                    className="min-h-20"
                   />
                 </FormControl>
                 <FormDescription className="pt-2">
@@ -255,16 +276,26 @@ const CreateNewAuthorization: FC = () => {
             )}
           />
         )}
-        <Button type="submit" className="w-fit">
-          Confirm
-        </Button>
+        <Button type="submit">Confirm</Button>
       </form>
     </Form>
   );
 };
 
 const Authorizations: FC = () => {
-  //   const { data: authorizations, isLoading } = useGetAllAuthorizationsQuery();
+  const { data: authorizations, isLoading } = useGetAllAuthorizationsQuery();
+  const [triggerDeleteAuthorization, { isLoading: isDeleting }] =
+    useDeleteAuthorizationMutation();
+
+  const handleDeleteAuthorization = useCallback(
+    (id: string) =>
+      triggerDeleteAuthorization(id)
+        .unwrap()
+        .catch(() => toast({ title: "Authorization could not be deleted" })),
+    [triggerDeleteAuthorization]
+  );
+
+  const disclosureMethods = useDisclosure();
 
   return (
     <div className="flex flex-col space-y-4">
@@ -274,13 +305,56 @@ const Authorizations: FC = () => {
         luctus vel, placerat nec metus. Proin nibh ligula, porta eu libero
         ultricies, vulputate sodales augue.
       </p>
+      {(authorizations?.length ?? 0) === 0 ? null : isLoading ? (
+        <Skeleton className="h-20" />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type</TableHead>
+              <TableHead>Token</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {authorizations?.map((a) => (
+              <TableRow key={a.id}>
+                <TableCell>
+                  <p>{a.type.toUpperCase()}</p>
+                </TableCell>
+                <TableCell>
+                  <p>*******************</p>
+                </TableCell>
+                <TableCell
+                  className={`group justify-items-center ${
+                    isDeleting ? "cursor-not-allowed" : "cursor-pointer"
+                  }`}
+                  onClick={() => handleDeleteAuthorization(a.id)}
+                >
+                  <Trash
+                    className={
+                      isDeleting
+                        ? "text-gray-500"
+                        : "text-destructive group-hover:fill-destructive/30"
+                    }
+                    size="18px"
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
       <SimpleDialog
+        {...disclosureMethods}
         title="Add a new Authorization"
         description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     Suspendisse mollis placerat leo in pellentesque. Vivamus tellus
     dolor, euismod eget luctus vel, placerat nec metus. Proin nibh
     ligula, porta eu libero ultricies, vulputate sodales augue."
-        Content={() => <CreateNewAuthorization />}
+        Content={() => (
+          <CreateNewAuthorization onClose={disclosureMethods.onClose} />
+        )}
         Trigger={({ onOpen }) => (
           <Button onClick={onOpen} className="w-fit space-x-2">
             <Plus />

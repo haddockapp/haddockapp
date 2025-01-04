@@ -5,12 +5,13 @@ import { Label } from "@radix-ui/react-label";
 import { FC, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateProjectMutation } from "@/services/backendApi/projects";
+import { useCreateProjectMutation } from "@/services/backendApi/projects/projects.service";
 import { Slider } from "@/components/ui/slider";
 import {
   useGetAllRepositoriesQuery,
   useGetAllBranchesByRepositoryQuery,
 } from "@/services/backendApi/github";
+import { useGetAllAuthorizationsQuery } from "@/services/backendApi/authorizations";
 
 type Form = {
   repository: string;
@@ -19,6 +20,7 @@ type Form = {
   disk: number;
   vcpus: number;
   composeName: string;
+  authorization: string;
 };
 
 interface CreateProjectFormProps {
@@ -35,6 +37,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
       disk: 256,
       vcpus: 1,
       composeName: "compose.yml",
+      authorization: "",
     },
   });
   const {
@@ -48,32 +51,27 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const [formStep, setFormStep] = useState<number>(0);
 
+  const { data: authorizations, isFetching: isFetchingAuthorizations } =
+    useGetAllAuthorizationsQuery();
+  const { data: repositories, isFetching: isFetchingRepositories } =
+    useGetAllRepositoriesQuery(
+      {
+        authorization: watch("authorization"),
+      },
+      { skip: !watch("authorization") }
+    );
+  const { data: branches, isFetching: isFetchingBranches } =
+    useGetAllBranchesByRepositoryQuery(
+      {
+        repository: watch("repository"),
+        authorization: watch("authorization"),
+      },
+      {
+        skip: !watch("repository"),
+      }
+    );
+
   const [createProject] = useCreateProjectMutation();
-  const { data: repositories } = useGetAllRepositoriesQuery();
-  const { data: branches } = useGetAllBranchesByRepositoryQuery(
-    watch("repository"),
-    {
-      skip: !watch("repository"),
-    }
-  );
-
-  const repositoriesOptions = useMemo(
-    () =>
-      repositories?.map((repository) => ({
-        label: repository.full_name,
-        value: repository.full_name,
-      })) ?? [],
-    [repositories]
-  );
-
-  const branchesOptions = useMemo(
-    () =>
-      branches?.map((branch) => ({
-        label: branch,
-        value: branch,
-      })) ?? [],
-    [branches]
-  );
 
   const onSubmit: SubmitHandler<Form> = (data) => {
     switch (formStep) {
@@ -89,6 +87,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
           vm_memory: +data.memory,
           vm_disk: +data.disk,
           compose_name: data.composeName,
+          authorization_id: data.authorization,
         })
           .unwrap()
           .then(() => {
@@ -112,11 +111,58 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
     }
   };
 
+  const authorizationsOptions = useMemo(
+    () =>
+      authorizations?.map((authorization) => ({
+        label: authorization.type,
+        value: authorization.id,
+      })) ?? [],
+    [authorizations]
+  );
+
+  const repositoriesOptions = useMemo(
+    () =>
+      repositories?.map((repository) => ({
+        label: repository.full_name,
+        value: repository.full_name,
+      })) ?? [],
+    [repositories]
+  );
+
+  const branchesOptions = useMemo(
+    () =>
+      branches?.map((branch) => ({
+        label: branch,
+        value: branch,
+      })) ?? [],
+    [branches]
+  );
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col justify-between space-y-8">
         {formStep === 0 && (
           <div className="flex flex-col justify-between space-y-4">
+            <div className="flex flex-col justify-between space-y-1">
+              <Label>Authorization</Label>
+              <Controller
+                control={control}
+                name="authorization"
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    disabled={isFetchingAuthorizations}
+                    options={authorizationsOptions}
+                  />
+                )}
+              />
+              {errors.repository && (
+                <span className="text-red-600 text-xs">
+                  {errors.repository && "This field is required"}
+                </span>
+              )}
+            </div>
             <div className="flex flex-col justify-between space-y-1">
               <Label>Repository</Label>
               <Controller
@@ -124,7 +170,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 name="repository"
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Autocomplete {...field} options={repositoriesOptions} />
+                  <Autocomplete
+                    {...field}
+                    disabled={isFetchingRepositories}
+                    options={repositoriesOptions}
+                  />
                 )}
               />
               {errors.repository && (
@@ -140,7 +190,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 name="branch"
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Autocomplete {...field} options={branchesOptions} />
+                  <Autocomplete
+                    {...field}
+                    disabled={isFetchingBranches}
+                    options={branchesOptions}
+                  />
                 )}
               />
               {errors.branch && (

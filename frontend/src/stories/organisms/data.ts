@@ -1,4 +1,4 @@
-import { ProjectDto } from "@/services/backendApi/projects";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import { VmState, VmProvider } from "@/types/vm/vm";
 
 export const baseProject: ProjectDto = {

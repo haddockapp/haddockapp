@@ -1,13 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import EditProjectDialog from "@/components/organisms/ProjectTabs/EditProjectDialog";
-import {
-  ProjectDto,
-  VmProvider,
-  VmState,
-} from "@/services/backendApi/projects";
+
 import { http, HttpResponse } from "msw";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
+import { VmState, VmProvider } from "@/types/vm/vm";
 
 const meta = {
   title: "Organisms/EditProjectDialog",
