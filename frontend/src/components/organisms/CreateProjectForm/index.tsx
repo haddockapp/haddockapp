@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { FC, useMemo, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProjectMutation } from "@/services/backendApi/projects/projects.service";
 import { Slider } from "@/components/ui/slider";
@@ -13,16 +13,40 @@ import {
 import { useGetAllAuthorizationsQuery } from "@/services/backendApi/authorizations";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 
-type Form = {
-  authorization: { label: string; value: string };
-  repository: { label: string; value: string };
-  branch: { label: string; value: string };
-  memory: number;
-  disk: number;
-  vcpus: number;
-  composeName: string;
-};
+const formSchema = z.object({
+  authorization: z
+    .object({
+      label: z.string(),
+      value: z.string(),
+    })
+    .required(),
+  repository: z
+    .object({
+      label: z.string(),
+      value: z.string(),
+    })
+    .required(),
+  branch: z
+    .object({
+      label: z.string(),
+      value: z.string(),
+    })
+    .required(),
+  memory: z.number().int().min(512).max(8192),
+  disk: z.number().int().min(256).max(2048),
+  vcpus: z.number().int().min(1).max(8),
+  composeName: z.string(),
+});
 
 interface CreateProjectFormProps {
   onClose: () => void;
@@ -30,7 +54,8 @@ interface CreateProjectFormProps {
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
 
-  const methods = useForm<Form>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       memory: 512,
       disk: 256,
@@ -38,14 +63,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
       composeName: "compose.yml",
     },
   });
-  const {
-    handleSubmit,
-    reset,
-    register,
-    control,
-    watch,
-    formState: { errors },
-  } = methods;
+  const { handleSubmit, reset, control, watch } = form;
 
   const [formStep, setFormStep] = useState<number>(0);
 
@@ -74,7 +92,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const [createProject] = useCreateProjectMutation();
 
-  const onSubmit: SubmitHandler<Form> = (data) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     switch (formStep) {
       case 0:
         setFormStep(1);
@@ -140,125 +158,161 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col justify-between space-y-8">
+    <Form {...form}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col justify-between space-y-8"
+      >
         {formStep === 0 && (
           <div className="flex flex-col justify-between space-y-4">
-            <div className="flex flex-col justify-between space-y-1">
-              <Label>Authorization</Label>
-              <Controller
-                control={control}
-                name="authorization"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    isLoading={isFetchingAuthorizations}
-                    options={authorizationsOptions}
-                  />
-                )}
-              />
-              {errors.repository && (
-                <span className="text-red-600 text-xs">
-                  {errors.repository && "This field is required"}
-                </span>
+            <FormField
+              control={control}
+              name="authorization"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Authorization</Label>
+                  <FormControl>
+                    <Select
+                      {...field}
+                      isLoading={isFetchingAuthorizations}
+                      options={authorizationsOptions}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex flex-col justify-between space-y-1">
-              <Label>Repository</Label>
-              <Controller
-                control={control}
-                name="repository"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <CreatableSelect
-                    {...field}
-                    isLoading={isFetchingRepositories}
-                    options={repositoriesOptions}
-                  />
-                )}
-              />
-              {errors.repository && (
-                <span className="text-red-600 text-xs">
-                  {errors.repository && "This field is required"}
-                </span>
+            />
+            <FormField
+              control={control}
+              name="repository"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Repository</Label>
+                  <FormControl>
+                    <CreatableSelect
+                      {...field}
+                      isLoading={isFetchingRepositories}
+                      options={repositoriesOptions}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex flex-col justify-between space-y-1">
-              <Label>Branch</Label>
-              <Controller
-                control={control}
-                name="branch"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    isLoading={isFetchingBranches}
-                    isDisabled={!watch("repository")}
-                    options={branchesOptions}
-                  />
-                )}
-              />
-              {errors.branch && (
-                <span className="text-red-600 text-xs">
-                  {errors.repository && "This field is required"}
-                </span>
+            />
+            <FormField
+              control={control}
+              name="branch"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Branch</Label>
+                  <FormControl>
+                    <Select
+                      {...field}
+                      isLoading={isFetchingBranches}
+                      isDisabled={!watch("repository")}
+                      options={branchesOptions}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex flex-col justify-between space-y-1">
-              <Label>Docker compose path</Label>
-              <Input {...register("composeName", { required: true })} />
-              {errors.composeName && (
-                <span className="text-red-600 text-xs">
-                  {errors.repository && "This field is required"}
-                </span>
+            />
+            <FormField
+              control={control}
+              name="composeName"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Docker compose path</Label>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
           </div>
         )}
         {formStep === 1 && (
           <div className="flex flex-col justify-between space-y-6">
-            <div className="flex flex-col justify-between space-y-1">
-              <Label className="flex flex-row justify-between">
-                <span>VCPUs</span>
-                <span className="text-gray-400">{watch("vcpus")}</span>
-              </Label>
-              <Slider
-                {...register("vcpus", { required: true })}
-                min={1}
-                max={8}
-                step={1}
-              />
-            </div>
-            <div className="flex flex-col justify-between space-y-1">
-              <Label className="flex flex-row justify-between">
-                <span>RAM (MB)</span>
-                <span className="text-gray-400">{watch("memory")} MB</span>
-              </Label>
-              <Slider
-                {...register("memory", { required: true })}
-                min={1024}
-                max={8192}
-                step={1024}
-              />
-            </div>
-            <div className="flex flex-col justify-between space-y-1">
-              <Label className="flex flex-row justify-between">
-                <span>Disk (MB)</span>
-                <span className="text-gray-400">{watch("disk")} MB</span>
-              </Label>
-              <Slider
-                {...register("disk", { required: true })}
-                min={256}
-                max={2048}
-                step={256}
-              />
-            </div>
+            <FormField
+              control={control}
+              name="vcpus"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <Label className="flex justify-between">
+                    <span>CPUs</span>
+                    <span className="text-gray-400">{field.value}</span>
+                  </Label>
+                  <FormControl>
+                    <Slider
+                      value={[field.value]}
+                      onValueChange={([v]) => field.onChange(v)}
+                      min={1}
+                      max={8}
+                      step={1}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="memory"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <Label className="flex justify-between">
+                    <span>Memory</span>
+                    <span className="text-gray-400">{field.value} MB</span>
+                  </Label>
+                  <FormControl>
+                    <Slider
+                      value={[field.value]}
+                      onValueChange={([v]) => field.onChange(v)}
+                      min={1024}
+                      max={8192}
+                      step={1024}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="disk"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <Label className="flex justify-between">
+                    <span>Disk</span>
+                    <span className="text-gray-400">{field.value} MB</span>
+                  </Label>
+                  <FormControl>
+                    <Slider
+                      value={[field.value]}
+                      onValueChange={([v]) => field.onChange(v)}
+                      min={256}
+                      max={2048}
+                      step={256}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         )}
         <Button type="submit">{formStep === 0 ? "Next" : "Create"}</Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 
