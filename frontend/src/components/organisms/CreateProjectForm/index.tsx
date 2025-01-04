@@ -1,4 +1,3 @@
-import { Autocomplete } from "@/components/molecules/autocomplete";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
@@ -12,15 +11,17 @@ import {
   useGetAllBranchesByRepositoryQuery,
 } from "@/services/backendApi/github";
 import { useGetAllAuthorizationsQuery } from "@/services/backendApi/authorizations";
+import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 
 type Form = {
-  repository: string;
-  branch: string;
+  authorization: { label: string; value: string };
+  repository: { label: string; value: string };
+  branch: { label: string; value: string };
   memory: number;
   disk: number;
   vcpus: number;
   composeName: string;
-  authorization: string;
 };
 
 interface CreateProjectFormProps {
@@ -31,13 +32,10 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const methods = useForm<Form>({
     defaultValues: {
-      branch: "",
-      repository: "",
       memory: 512,
       disk: 256,
       vcpus: 1,
       composeName: "compose.yml",
-      authorization: "",
     },
   });
   const {
@@ -51,23 +49,26 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const [formStep, setFormStep] = useState<number>(0);
 
-  const { data: authorizations, isFetching: isFetchingAuthorizations } =
+  const watchAuthorization = watch("authorization")?.value;
+  const watchRepository = watch("repository")?.value;
+
+  const { currentData: authorizations, isFetching: isFetchingAuthorizations } =
     useGetAllAuthorizationsQuery();
-  const { data: repositories, isFetching: isFetchingRepositories } =
+  const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
       {
-        authorization: watch("authorization"),
+        authorization: watchAuthorization,
       },
-      { skip: !watch("authorization") }
+      { skip: !watchAuthorization }
     );
-  const { data: branches, isFetching: isFetchingBranches } =
+  const { currentData: branches, isFetching: isFetchingBranches } =
     useGetAllBranchesByRepositoryQuery(
       {
-        repository: watch("repository"),
-        authorization: watch("authorization"),
+        repository: watchRepository,
+        authorization: watchAuthorization,
       },
       {
-        skip: !watch("repository"),
+        skip: !watchRepository,
       }
     );
 
@@ -80,14 +81,14 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
         break;
       case 1:
         createProject({
-          repository_branch: data.branch,
-          repository_name: data.repository.split("/")[1],
-          repository_organisation: data.repository.split("/")[0],
+          repository_branch: data.branch.value,
+          repository_name: data.repository.value.split("/")[1],
+          repository_organisation: data.repository.value.split("/")[0],
           vm_cpus: +data.vcpus,
           vm_memory: +data.memory,
           vm_disk: +data.disk,
           compose_name: data.composeName,
-          authorization_id: data.authorization,
+          authorization_id: data.authorization.value,
         })
           .unwrap()
           .then(() => {
@@ -150,9 +151,9 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 name="authorization"
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Autocomplete
+                  <Select
                     {...field}
-                    disabled={isFetchingAuthorizations}
+                    isLoading={isFetchingAuthorizations}
                     options={authorizationsOptions}
                   />
                 )}
@@ -170,9 +171,9 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 name="repository"
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Autocomplete
+                  <CreatableSelect
                     {...field}
-                    disabled={isFetchingRepositories}
+                    isLoading={isFetchingRepositories}
                     options={repositoriesOptions}
                   />
                 )}
@@ -190,9 +191,10 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 name="branch"
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Autocomplete
+                  <Select
                     {...field}
-                    disabled={isFetchingBranches}
+                    isLoading={isFetchingBranches}
+                    isDisabled={!watch("repository")}
                     options={branchesOptions}
                   />
                 )}

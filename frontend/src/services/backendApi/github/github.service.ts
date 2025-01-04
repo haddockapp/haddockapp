@@ -3,6 +3,7 @@ import {
   Repository,
   GetAllRepositoriesParams,
   GetAllBranchesByRepositoryParams,
+  GetRepositoryByNameParam,
 } from "./github.dto";
 
 const githubApi = backendApi.injectEndpoints({
@@ -22,10 +23,17 @@ const githubApi = backendApi.injectEndpoints({
         params,
       }),
     }),
+    getRepositoryByName: builder.query<Repository, GetRepositoryByNameParam>({
+      query: ({ organization, repository, ...params }) => ({
+        url: `/github/repository/${organization}/${repository}`,
+        params,
+      }),
+    }),
   }),
 });
 
 export const {
   useGetAllRepositoriesQuery,
   useGetAllBranchesByRepositoryQuery,
+  useGetRepositoryByNameQuery,
 } = githubApi;

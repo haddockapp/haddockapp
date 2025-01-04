@@ -15,6 +15,12 @@ export type GetAllRepositoriesParams = {
   authorization: string;
 };
 
+export type GetRepositoryByNameParam = {
+  organization: string;
+  repository: string;
+  authorization: string;
+};
+
 export type GetAllBranchesByRepositoryParams = {
   repository: string;
   authorization: string;
