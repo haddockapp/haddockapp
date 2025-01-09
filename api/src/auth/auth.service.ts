@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/Signup.dto';
 import { SigninDto } from './dto/Signin.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthEnum } from './types/auth.enum';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
 
@@ -41,12 +40,7 @@ export class AuthService {
       data: {
         name: dto.name,
         email: dto.email,
-        auth: {
-          create: {
-            type: AuthEnum.EMAIL_PASSWORD,
-            value: passwordHash,
-          },
-        },
+        password: passwordHash,
       },
     });
     return user;
@@ -58,17 +52,11 @@ export class AuthService {
       throw new BadRequestException('Unknown user');
     }
 
-    const auth = await this.prismaService.auth.findUnique({
-      where: {
-        userId: user.id,
-        type: AuthEnum.EMAIL_PASSWORD,
-      },
-    });
-    if (!auth || auth.type !== AuthEnum.EMAIL_PASSWORD) {
+    if (!user.password) {
       throw new BadRequestException('Bad auth method');
     }
 
-    const goodPassword = await this.verifyPassword(dto.password, auth.value);
+    const goodPassword = await this.verifyPassword(dto.password, user.password);
     if (!goodPassword) {
       throw new BadRequestException('Wrong password');
     }

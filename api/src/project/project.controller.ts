@@ -13,8 +13,7 @@ import {
 import { ProjectRepository } from './project.repository';
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
-import { CurrentUser } from 'src/auth/user.context';
-import { PersistedUserDto } from 'src/user/dto/user.dto';
+import { BadRequestException } from '@nestjs/common';
 import { SourceService } from '../source/source.service';
 import { ComposeService } from 'src/compose/compose.service';
 import { DockerService } from 'src/docker/docker.service';
@@ -22,6 +21,7 @@ import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import ProjectServiceDto from './dto/ProjectService.dto';
 import { ProjectService } from './project.service';
+import { AuthorizationService } from 'src/authorization/authorization.service';
 
 @Controller('project')
 export class ProjectController {
@@ -31,6 +31,7 @@ export class ProjectController {
     private readonly sourceService: SourceService,
     private readonly composeService: ComposeService,
     private readonly dockerService: DockerService,
+    private readonly authorizationService: AuthorizationService,
   ) {}
 
   @Get()
@@ -50,16 +51,18 @@ export class ProjectController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createProject(
-    @Body() data: CreateProjectDto,
-  ) {
-    const canReadSource = await this.authorizationService.canReadSource(data.authorization_id, data.repository_organisation, data.repository_name);
-    if (!canReadSource) {
-      throw new BadRequestException('Provided authorization does not have access to the repository.');
-    }
-    const project = await this.projectRepository.createProject(
-      data
+  async createProject(@Body() data: CreateProjectDto) {
+    const canReadSource = await this.authorizationService.canReadSource(
+      data.authorization_id,
+      data.repository_organisation,
+      data.repository_name,
     );
+    if (!canReadSource) {
+      throw new BadRequestException(
+        'Provided authorization does not have access to the repository.',
+      );
+    }
+    const project = await this.projectRepository.createProject(data);
     await this.sourceService.deploySource(project.sourceId);
     return project;
   }
