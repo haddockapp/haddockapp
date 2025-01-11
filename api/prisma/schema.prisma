@@ -18,6 +18,7 @@ model User {
     name     String
     email    String  @unique
     password String?
+    status   String
 }
 
 model Authorization {

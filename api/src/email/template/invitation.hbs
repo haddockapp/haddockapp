@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitation à rejoindre la plateforme</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bonjour 👋,</h1>
+    <p>{{inviterName}} vous invite à rejoindre Haddock !</p>
+    <p>Pour accepter l'invitation et vous inscrire, cliquez sur le bouton ci-dessous :</p>
+    <a href="{{invitationLink}}" class="button">Rejoindre maintenant</a>
+    <div class="footer">
+      <p>Si le bouton ne fonctionne pas, vous pouvez également accéder à l'invitation en utilisant ce lien direct :</p>
+      <p><a href="{{invitationLink}}" target="_blank">{{invitationLink}}</a></p>
+    </div>
+  </div>
+</body>
+</html>

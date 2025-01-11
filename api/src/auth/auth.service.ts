@@ -7,13 +7,16 @@ import { SigninDto } from './dto/Signin.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
+import { UserStatusEnum } from 'src/user/types/user-status.enum';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
-    private prismaService: PrismaService,
-    private userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+    private readonly prismaService: PrismaService,
+    private readonly userRepository: UserRepository,
+    private readonly cacheService: CacheService,
   ) {}
 
   generateJwt(user: User): string {
@@ -33,7 +36,17 @@ export class AuthService {
     return await bcrypt.compare(password, dbPassword);
   }
 
-  async signup(dto: SignupDto): Promise<User> {
+  async signup(
+    dto: SignupDto,
+    invitationCode: string | undefined,
+  ): Promise<User> {
+    if (invitationCode) {
+      const email = await this.cacheService.getInvitation(invitationCode);
+      if (email !== dto.email) {
+        throw new BadRequestException('Wrong code');
+      }
+    }
+
     const passwordHash = await this.hashPassword(dto.password);
 
     const user = await this.prismaService.user.create({
@@ -41,8 +54,16 @@ export class AuthService {
         name: dto.name,
         email: dto.email,
         password: passwordHash,
+        status: invitationCode
+          ? UserStatusEnum.GUEST
+          : UserStatusEnum.REGISTERED,
       },
     });
+
+    if (invitationCode) {
+      await this.cacheService.delInvitation(invitationCode);
+    }
+
     return user;
   }
 

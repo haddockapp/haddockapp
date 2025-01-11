@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './guard/jwt.guard';
 import { GithubStrategy } from './strategy/github.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigurationModule } from '../configuration/configuration.module';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ConfigurationModule } from '../configuration/configuration.module';
     AuthorizationModule,
     ConfigurationModule,
     UserModule,
+    CacheModule,
   ],
   providers: [
     AuthService,

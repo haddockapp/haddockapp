@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VmModule } from './vm/vm.module';
-import {AuthModule} from "./auth/auth.module";
-import {ProjectModule} from "./project/project.module";
+import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
 import { DockerModule } from './docker/docker.module';
 import { SourceModule } from './source/source.module';
 import { BullModule } from '@nestjs/bull';
@@ -14,6 +14,8 @@ import { DomainsModule } from './domains/domains.module';
 import { StartupModule } from './startup/startup.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from './cache/cache.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { ConfigModule } from '@nestjs/config';
     DomainsModule,
     StartupModule,
     ConfigurationModule,
+    CacheModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

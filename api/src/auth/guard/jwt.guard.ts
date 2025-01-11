@@ -7,35 +7,37 @@ import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private reflector: Reflector, private readonly configurationRepository: ConfigurationRepository) {
-        super();
-    }
+  constructor(
+    private reflector: Reflector,
+    private readonly configurationRepository: ConfigurationRepository,
+  ) {
+    super();
+  }
 
-    private isPublicEndpoint(context: ExecutionContext) {
-        return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
-    }
+  private isPublicEndpoint(context: ExecutionContext) {
+    return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+  }
 
-    private async isAppConfigured(context: ExecutionContext) {
-        const isPublicConfig = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_CONFIG_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
+  private async isAppConfigured(context: ExecutionContext) {
+    const isPublicConfig = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_CONFIG_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-        if (!isPublicConfig) return false;
+    const config =
+      await this.configurationRepository.getConfigurationByKey(CONFIGURED_KEY);
+    return isPublicConfig && config && config.value === true;
+  }
 
-        const config = await this.configurationRepository.getConfigurationByKey(CONFIGURED_KEY);
-        return config && config.value === true;
-    }
+  public async canActivate(context: ExecutionContext) {
+    const isPublic = this.isPublicEndpoint(context);
+    const isAppConfigured = await this.isAppConfigured(context);
 
-    public async canActivate(context: ExecutionContext) {
-        const isPublic = this.isPublicEndpoint(context);
-        const isAppConfigured = await this.isAppConfigured(context);
-
-        if (isPublic) return true;
-        if (!isAppConfigured) return true;
-        return super.canActivate(context) as boolean;
-    }
+    if (isPublic) return true;
+    if (isAppConfigured) return true;
+    return super.canActivate(context) as boolean;
+  }
 }

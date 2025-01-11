@@ -29,6 +29,11 @@ services:
     ports:
       - 6379:6379
 
+  smtp:
+    image: namshi/smtp
+    ports:
+      - 25:25
+
   # api:
   #   restart: unless-stopped
   #   expose:

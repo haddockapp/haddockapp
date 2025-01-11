@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -29,8 +30,11 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async standardSignup(@Body() body: SignupDto) {
-    const user = await this.authService.signup(body);
+  async standardSignup(
+    @Query('code') invitationCode: string | undefined,
+    @Body() body: SignupDto,
+  ) {
+    const user = await this.authService.signup(body, invitationCode);
     const jwt = await this.authService.generateJwt(user);
     return { accessToken: jwt };
   }
