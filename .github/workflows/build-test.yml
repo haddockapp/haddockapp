@@ -1,16 +1,7 @@
 name: Build Test
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to test'
-        required: true
-        default: 'development'
-        type: choice
-        options:
-          - development
-          - production
+  [push, pull_request]
 
 jobs:
   test-backend:
