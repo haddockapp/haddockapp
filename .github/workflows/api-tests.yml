@@ -1,7 +1,7 @@
 name: API Tests
 
 on:
-  [workflow_dispatch, push]
+  [workflow_dispatch]
 
 jobs:
   test:
