@@ -10,16 +10,20 @@ import { ConfigurationService } from '../configuration/configuration.service';
 
 @Injectable()
 export class GithubService {
-
   constructor(
     private readonly authorizationService: AuthorizationService,
     private readonly configurationService: ConfigurationService,
+  ) {}
 
-  ) { }
-
-  private async getWithAuthorization(url: string, authorizationId: string): Promise<any> {
+  private async getWithAuthorization(
+    url: string,
+    authorizationId: string,
+  ): Promise<any> {
     return await axios.get(`https://api.github.com/${url}`, {
-      headers: await this.authorizationService.getHeadersForAuthorization(authorizationId),
+      headers:
+        await this.authorizationService.getHeadersForAuthorization(
+          authorizationId,
+        ),
     });
   }
 
@@ -34,7 +38,9 @@ export class GithubService {
   public async exchangeCode(code: string) {
     const config = await this.configurationService.getGithubConfiguration();
     if (!config) {
-      throw new InternalServerErrorException('No Github OAuth Application setup yet');
+      throw new InternalServerErrorException(
+        'No Github OAuth Application setup yet',
+      );
     }
 
     const CLIENT_ID = config.client_id;
@@ -51,8 +57,8 @@ export class GithubService {
     }
 
     return data.access_token as string;
-
   }
+
   async getUserEmails(token: string): Promise<Email[]> {
     const res = await this.getWithToken('user/emails', token);
     return res.data;
@@ -68,9 +74,14 @@ export class GithubService {
     return res.data;
   }
 
-  async getUserRepositoriesList(authorizationId: string): Promise<Repository[]> {
+  async getUserRepositoriesList(
+    authorizationId: string,
+  ): Promise<Repository[]> {
     // Max repository per page = 100
-    const res = await this.getWithAuthorization('user/repos?per_page=100', authorizationId);
+    const res = await this.getWithAuthorization(
+      'user/repos?per_page=100',
+      authorizationId,
+    );
     return res.data;
   }
 
