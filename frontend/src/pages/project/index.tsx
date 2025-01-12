@@ -1,4 +1,5 @@
 import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
+import ReactflowTab from "@/components/organisms/ProjectTabs/ReactflowTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import TopologyTab from "@/components/organisms/ProjectTabs/TopologyTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,7 +61,8 @@ const ProjectDetails: FC = () => {
         </TabsList>
       </div>
       <TabsContent value="topology">
-        <TopologyTab services={services} projectId={projectId ?? ""} />
+        <ReactflowTab services={services} projectId={projectId ?? ""} />
+        {/* <TopologyTab services={services} projectId={projectId ?? ""} /> */}
       </TabsContent>
       <TabsContent value="monitoring">
         <MonitoringTab />
