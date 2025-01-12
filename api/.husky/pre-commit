@@ -1,0 +1,2 @@
+prettier src/**/*.ts --write --ignore-unknown
+git update-index --again
