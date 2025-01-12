@@ -33,6 +33,17 @@ export class AuthService {
     return await bcrypt.compare(password, dbPassword);
   }
 
+  async validateUser(email: string, password: string): Promise<User | null> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) return null;
+    if (!user.password) return null;
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return null;
+
+    return user;
+  }
+
   async signup(dto: SignupDto): Promise<User> {
     const passwordHash = await this.hashPassword(dto.password);
 
@@ -43,24 +54,6 @@ export class AuthService {
         password: passwordHash,
       },
     });
-    return user;
-  }
-
-  async signin(dto: SigninDto): Promise<User> {
-    const user = await this.userRepository.findByEmail(dto.email);
-    if (!user) {
-      throw new BadRequestException('Unknown user');
-    }
-
-    if (!user.password) {
-      throw new BadRequestException('Bad auth method');
-    }
-
-    const goodPassword = await this.verifyPassword(dto.password, user.password);
-    if (!goodPassword) {
-      throw new BadRequestException('Wrong password');
-    }
-
     return user;
   }
 }

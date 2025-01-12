@@ -37,8 +37,8 @@ export class AuthController {
 
   @Public()
   @Post('signin')
-  async standardSignin(@Body() body: SigninDto) {
-    const user = await this.authService.signin(body);
+  @UseGuards(AuthGuard('local'))
+  async standardSignin(@CurrentUser() user: User) {
     const jwt = await this.authService.generateJwt(user);
     return { accessToken: jwt };
   }

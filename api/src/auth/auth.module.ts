@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './guard/jwt.guard';
 import { GithubStrategy } from './strategy/github.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigurationModule } from '../configuration/configuration.module';
+import { LocalStrategy } from './strategy/local.strategy';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ConfigurationModule } from '../configuration/configuration.module';
     AuthService,
     JwtStrategy,
     GithubStrategy,
+    LocalStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   controllers: [AuthController],
