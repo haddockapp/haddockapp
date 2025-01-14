@@ -4,12 +4,14 @@ import SimpleDialog from "@/components/organisms/SimpleDialog";
 import { Button } from "@/components/ui/button";
 import useConfiguration from "@/hooks/use-configuration";
 import useDisclosure from "@/hooks/use-disclosure";
-import { useAppSelector } from "@/hooks/useStore";
+import { GithubAuthReason } from "@/services/backendApi/auth";
 import { FC } from "react";
 
-const GithubAuthentication: FC = () => {
-  const { isAuth } = useAppSelector((state) => state.auth);
+type GithubAuthenticationProps = {
+  reason: GithubAuthReason;
+};
 
+const GithubAuthentication: FC<GithubAuthenticationProps> = ({ reason }) => {
   const { githubConfig } = useConfiguration();
 
   const disclosureMethods = useDisclosure();
@@ -18,8 +20,7 @@ const GithubAuthentication: FC = () => {
     <div>
       {githubConfig ? (
         <GithubSignInButton
-          isSignedIn={isAuth}
-          redirectUrl={`https://github.com/login/oauth/authorize?client_id=${githubConfig?.clientId}&scope=user%20repo`}
+          redirectUrl={`https://github.com/login/oauth/authorize?client_id=${githubConfig?.clientId}&scope=user%20repo&prompt=select_account&state=${reason}`}
         />
       ) : (
         <SimpleDialog

@@ -1,3 +1,8 @@
+export enum GithubAuthReason {
+  CREATE_AUTHORIZATION = "create_authorization",
+  LOGIN = "login",
+}
+
 export type AuthResponse = {
   accessToken: string;
 };

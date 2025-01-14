@@ -35,12 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import GithubAuthentication from "@/pages/setup/steps/Account/GithubAuthentication";
+import { GithubAuthReason } from "@/services/backendApi/auth";
 
 const DEPLOY_KEY_PLACEHOLDER = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAK...jLV05UD
 -----END RSA PRIVATE KEY-----`;
 const PERSONAL_ACCESS_TOKEN_PLACEHOLDER = `ghp_HDIdBXGBK2M...uqjw9W1uRJ5x`;
-const OAUTH_PLACEHOLDER = `15db4ce0ecba489a2721`;
 
 type Form = {
   type: AuthorizationEnum;
@@ -249,34 +250,29 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
           />
         )}
         {watchType === AuthorizationEnum.OAUTH && (
-          <FormField
-            control={form.control}
-            name="code"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OAuth Code</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder={OAUTH_PLACEHOLDER} />
-                </FormControl>{" "}
-                <FormDescription>
-                  Learn more about OAuth by visiting the{" "}
-                  <a
-                    className="text-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
-                  >
-                    official github documentation
-                  </a>
-                  .
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="space-y-5">
+            <div>
+              <GithubAuthentication
+                reason={GithubAuthReason.CREATE_AUTHORIZATION}
+              />
+            </div>
+            <span className="text-[0.8rem] text-gray-500">
+              Learn more about OAuth by visiting the{" "}
+              <a
+                className="text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
+              >
+                official github documentation
+              </a>
+              .
+            </span>
+          </div>
         )}
-        <Button type="submit">Confirm</Button>
+        {watchType !== AuthorizationEnum.OAUTH && (
+          <Button type="submit">Confirm</Button>
+        )}
       </form>
     </Form>
   );
