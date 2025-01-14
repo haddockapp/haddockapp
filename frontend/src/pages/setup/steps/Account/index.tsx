@@ -1,22 +1,26 @@
-import GithubSignInButton from "@/components/molecules/github-sign-in";
 import { Button } from "@/components/ui/button";
-import { constants } from "@/constants";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { nextSetupStep } from "@/services/authSlice";
 import { ChevronRight } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import OrDivider from "@/components/molecules/or-divider";
+import GithubAuthentication from "./GithubAuthentication";
+import EmailAuthentication from "./EmailAuthentication";
 
 const Account: FC = () => {
   const { isAuth } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    if (isAuth) dispatch(nextSetupStep());
+  }, [dispatch, isAuth]);
+
   return (
     <>
-      <div>
-        <GithubSignInButton
-          isSignedIn={isAuth}
-          redirectUrl={`https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`}
-        />
+      <div className="space-y-4 max-w-[400px] w-full mx-auto">
+        <GithubAuthentication />
+        <OrDivider />
+        <EmailAuthentication />
       </div>
       <Button onClick={() => dispatch(nextSetupStep())} disabled={!isAuth}>
         <ChevronRight />

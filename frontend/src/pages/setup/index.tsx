@@ -6,14 +6,8 @@ import Domains from "./steps/Domains";
 import Stepdots from "@/components/molecules/stepdots";
 import Welcome from "./steps/Welcome";
 import StepTitle from "@/components/atoms/step-title";
-import Configuration from "./steps/Configuration";
 
 const stepHeaders: { title: string; description: string; Component: FC }[] = [
-  {
-    title: "Configuration",
-    description: "Configure your github application before starting.",
-    Component: Configuration,
-  },
   {
     title: "Administrator account",
     description: "Create an administrator account to get started.",
