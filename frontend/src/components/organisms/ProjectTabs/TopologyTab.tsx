@@ -17,7 +17,7 @@ interface TopologyTabProps {
 
 const TopologyTab: FC<TopologyTabProps> = ({ services, projectId }) => {
   return (
-    <div className="mx-8">
+    <div>
       <h1 className="text-3xl font-bold my-8">Services</h1>
       {(services?.length === 0 || !services) && (
         <div className="flex flex-column items-center">

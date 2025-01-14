@@ -31,7 +31,7 @@ const Header: FC = () => {
   const { isAuth } = useAppSelector((state) => state.auth);
 
   return (
-    <div className="flex flex-row justify-between w-full p-8 items-center">
+    <div className="flex flex-row justify-between w-full pt-8 px-8 items-center">
       <div className="flex items-center">
         <img
           className="w-16 cursor-pointer"

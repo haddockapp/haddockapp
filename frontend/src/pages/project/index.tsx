@@ -1,7 +1,6 @@
 import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import TopologyTab from "@/components/organisms/ProjectTabs/TopologyTab";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
 import { FC, useState } from "react";
@@ -19,48 +18,47 @@ const ProjectDetails: FC = () => {
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
 
   return (
-    <Tabs defaultValue="topology">
-      <TabsList className="absolute sm:top-24 lg:top-10 right-10">
-        <TabsTrigger value={TabsValue.Topology} className="-mx-2">
-          <Button
-            variant="link"
+    <Tabs defaultValue="topology" className="px-8">
+      <div className="w-full text-right">
+        <TabsList>
+          <TabsTrigger
+            value={TabsValue.Topology}
             onClick={() => setSelectedTab(TabsValue.Topology)}
-            className={
-              selectedTab === TabsValue.Topology
-                ? "underline"
-                : "text-black-500"
-            }
           >
-            Topology
-          </Button>
-        </TabsTrigger>
-        <TabsTrigger value={TabsValue.Monitoring} className="-mx-2">
-          <Button
-            variant="link"
+            <span
+              className={
+                selectedTab === TabsValue.Topology ? "text-primary" : ""
+              }
+            >
+              Topology
+            </span>
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabsValue.Monitoring}
             onClick={() => setSelectedTab(TabsValue.Monitoring)}
-            className={
-              selectedTab === TabsValue.Monitoring
-                ? "underline"
-                : "text-black-500"
-            }
           >
-            Monitoring
-          </Button>
-        </TabsTrigger>
-        <TabsTrigger value={TabsValue.Settings} className="-mx-2">
-          <Button
-            variant="link"
+            <span
+              className={
+                selectedTab === TabsValue.Monitoring ? "text-primary" : ""
+              }
+            >
+              Monitoring
+            </span>
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabsValue.Settings}
             onClick={() => setSelectedTab(TabsValue.Settings)}
-            className={
-              selectedTab === TabsValue.Settings
-                ? "underline"
-                : "text-black-500"
-            }
           >
-            Settings
-          </Button>
-        </TabsTrigger>
-      </TabsList>
+            <span
+              className={
+                selectedTab === TabsValue.Settings ? "text-primary" : ""
+              }
+            >
+              Settings
+            </span>
+          </TabsTrigger>
+        </TabsList>
+      </div>
       <TabsContent value="topology">
         <TopologyTab services={services} projectId={projectId ?? ""} />
       </TabsContent>
