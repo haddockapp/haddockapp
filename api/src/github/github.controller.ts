@@ -1,12 +1,16 @@
-import { Controller, Get, Param, Query, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { GithubService } from './github.service';
 import Repository from './model/Repository';
 
 @Controller('github')
 export class GithubController {
-  constructor(
-    private githubService: GithubService,
-  ) { }
+  constructor(private githubService: GithubService) {}
 
   @Get('/repository')
   async getUserRepositories(
@@ -18,9 +22,7 @@ export class GithubController {
       );
     }
 
-    return await this.githubService.getUserRepositoriesList(
-      authorization,
-    );
+    return await this.githubService.getUserRepositoriesList(authorization);
   }
 
   @Get('/repository/:orga/:name')
@@ -48,7 +50,6 @@ export class GithubController {
     @Param('name') repositoryName: string,
     @Query('authorization') authorization?: string,
   ) {
-
     if (!authorization) {
       throw new UnauthorizedException(
         'A Github connection is required to perform this actions.',

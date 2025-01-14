@@ -122,6 +122,6 @@ export class StartupService implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
-    await this.start();
+    //await this.start();
   }
 }
