@@ -33,8 +33,8 @@ model Source {
     id   String @id @default(uuid())
     type String
 
-    authorization   Authorization @relation(fields: [authorizationId], references: [id])
-    authorizationId String
+    authorization   Authorization? @relation(fields: [authorizationId], references: [id]) 
+    authorizationId String?
 
     settings Json
 
