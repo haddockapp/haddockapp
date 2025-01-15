@@ -11,9 +11,10 @@ const authApi = backendApi.injectEndpoints({
       }),
     }),
     signIn: builder.mutation<AuthResponse, LoginDto>({
-      query: () => ({
+      query: (body) => ({
         url: "/auth/signin",
         method: "POST",
+        body,
       }),
     }),
     loginGithub: builder.mutation<AuthResponse, GithubOAuthDto>({
