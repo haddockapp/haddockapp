@@ -22,6 +22,7 @@ model User {
 
 model Authorization {
     id    String @id @default(uuid())
+    name  String
     type  String
     value Json
 

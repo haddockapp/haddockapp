@@ -21,6 +21,10 @@ export class CreateAuthorizationDTO {
     @IsEnum(AuthorizationEnum)
     type: AuthorizationEnum;
 
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
     @ValidateNested()
     @IsNotEmpty()
     @Type((obj) => {
