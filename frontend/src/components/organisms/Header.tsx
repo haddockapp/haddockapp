@@ -14,7 +14,8 @@ import SimpleDrawer from "./SimpleDrawer";
 import Settings from "./Settings";
 
 const pathTranslations: Record<string, string> = {
-  ["/"]: "/ setup",
+  ["/"]: "/ authentication",
+  ["/setup"]: "/ setup",
   ["/dashboard"]: "/ dashboard",
   ["/github"]: "",
 };

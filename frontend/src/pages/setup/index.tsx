@@ -1,11 +1,11 @@
 import { useAppSelector } from "@/hooks/useStore";
 import { FC, useMemo } from "react";
-import Account from "./steps/Account";
 import { Navigate } from "react-router-dom";
 import Domains from "./steps/Domains";
 import Stepdots from "@/components/molecules/stepdots";
 import Welcome from "./steps/Welcome";
 import StepTitle from "@/components/atoms/step-title";
+import Account from "./steps/Account";
 
 const stepHeaders: { title: string; description: string; Component: FC }[] = [
   {

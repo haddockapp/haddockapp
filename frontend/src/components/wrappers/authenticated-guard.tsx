@@ -3,10 +3,12 @@ import { FC } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const AuthenticatedGuard: FC = () => {
-  const { token } = useAppSelector((state) => state.auth);
+  const { isAuth, setupStep } = useAppSelector((state) => state.auth);
 
-  if (!token || token === "undefined") return <Navigate to="/" />;
-  else return <Outlet />;
+  if (!isAuth) {
+    if (setupStep === 0) return <Navigate to="/setup" />;
+    return <Navigate to="/" />;
+  } else return <Outlet />;
 };
 
 export default AuthenticatedGuard;

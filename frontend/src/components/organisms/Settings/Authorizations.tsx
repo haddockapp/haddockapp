@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import GithubAuthentication from "@/pages/setup/steps/Account/GithubAuthentication";
+import GithubAuthentication from "@/components/organisms/AuthenticationOptions/GithubAuthentication";
 import { GithubAuthReason } from "@/services/backendApi/auth";
 
 const DEPLOY_KEY_PLACEHOLDER = `-----BEGIN RSA PRIVATE KEY-----

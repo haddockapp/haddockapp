@@ -20,8 +20,6 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       state.isAuth = false;
       state.token = null;
-      state.setupStep = 0;
-      localStorage.setItem("setupStep", state.setupStep.toString());
     },
     setToken(state, action: PayloadAction<string>) {
       localStorage.setItem("token", action.payload);

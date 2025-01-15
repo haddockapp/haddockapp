@@ -9,6 +9,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import useConfig from "./hooks/use-config";
 import Layout from "./components/wrappers/page-layout";
 import AuthenticatedGuard from "./components/wrappers/authenticated-guard";
+import Authentication from "./pages/authentication";
 
 function App() {
   useWebsockets();
@@ -21,7 +22,8 @@ function App() {
         <Routes>
           <Route path="/github" element={<GithubCallback />} />
           <Route element={<Layout />}>
-            <Route index element={<Setup />} />
+            <Route index element={<Authentication />} />
+            <Route path="setup" element={<Setup />} />
             <Route element={<AuthenticatedGuard />}>
               <Route path="dashboard" element={<Projects />} />
               <Route path="project/*">

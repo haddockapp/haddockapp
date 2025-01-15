@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { nextSetupStep, setToken } from "@/services/authSlice";
 import {
   useSignInMutation,
@@ -28,7 +28,11 @@ const formSchema = z.object({
 });
 
 const EmailAuthentication: FC = () => {
-  const [type, setType] = useState<"log-in" | "sign-up">("sign-up");
+  const { setupStep } = useAppSelector((state) => state.auth);
+
+  const [type, setType] = useState<"log-in" | "sign-up">(
+    setupStep > 0 ? "log-in" : "sign-up"
+  );
 
   const dispatch = useAppDispatch();
 
