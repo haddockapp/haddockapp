@@ -12,6 +12,7 @@ export const generateCreateGithubSourceDto = (): CreateGithubSourceDto => ({
   branch: faker.git.branch(),
   authorization: {
     id: faker.string.uuid(),
+    name: faker.company.name(),
     type: AuthorizationEnum.OAUTH,
     value: {
       token: faker.string.alphanumeric(32)

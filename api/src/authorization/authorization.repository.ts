@@ -23,6 +23,7 @@ export class AuthorizationRepository {
     async createAuthorization(authorization: AuthorizationDTO): Promise<Authorization | null> {
         return this.prismaService.authorization.create({
             data: {
+                name: authorization.name,
                 type: authorization.type,
                 value: authorization.data,
             },

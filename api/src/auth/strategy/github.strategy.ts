@@ -63,6 +63,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         username,
       );
       await this.authorizationService.createAuthorization({
+        name: `OAuth ${username}`,
         type: AuthorizationEnum.OAUTH,
         data: {
           token: accessToken,
