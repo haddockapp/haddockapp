@@ -14,6 +14,7 @@ import { DomainsModule } from './domains/domains.module';
 import { StartupModule } from './startup/startup.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ConfigModule } from '@nestjs/config';
     DomainsModule,
     StartupModule,
     ConfigurationModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,12 +1,9 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { spawn } from 'child_process';
-import { promises } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { ProjectRepository } from 'src/project/project.repository';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
-import { execCommand } from 'src/utils/exec-utils';
 import { VmService } from 'src/vm/vm.service';
 
 @Injectable()
@@ -18,43 +15,6 @@ export class StartupService implements OnApplicationBootstrap {
     private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
   ) {}
-
-  private async stopCaddy() {
-    this.logger.log('Stopping all Caddy instances');
-
-    try {
-      await execCommand('pkill -f caddy');
-      this.logger.log('Caddy instances stopped');
-    } catch (error) {
-      this.logger.error('Failed to stop Caddy instances', error.message);
-    }
-  }
-
-  private async clearServicesCaddy() {
-    this.logger.log('Clearing Caddy services');
-
-    try {
-      await promises.truncate(process.env.CADDY_SERVICES_FILE, 0); // Truncate the file to 0 bytes    } catch (error) {
-      this.logger.log('Caddy services cleared');
-    } catch (error) {
-      this.logger.error('Failed to clear Caddy services', error.message);
-    }
-  }
-
-  private async startCaddy() {
-    this.logger.log('Starting Caddy');
-
-    try {
-      const caddyProcess = spawn('caddy', ['run'], {
-        cwd: process.env.CADDY_ROOT_DIR,
-        detached: true,
-        stdio: 'ignore',
-      });
-      this.logger.log(`Caddy started on PID ${caddyProcess.pid}`);
-    } catch (error) {
-      this.logger.error('Failed to start Caddy', error);
-    }
-  }
 
   private async manageVmError(vmId: string) {
     const vm = await this.prisma.vm.findUnique({
@@ -114,14 +74,11 @@ export class StartupService implements OnApplicationBootstrap {
 
   private async start() {
     this.logger.log('Starting Haddock');
-    await this.stopCaddy();
-    await this.clearServicesCaddy();
-    await this.startCaddy();
     await this.manageVms();
     this.logger.log('Haddock started');
   }
 
   async onApplicationBootstrap() {
-    //await this.start();
+    await this.start();
   }
 }
