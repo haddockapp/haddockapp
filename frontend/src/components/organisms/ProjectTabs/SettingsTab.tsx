@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   useDeleteProjectMutation,
   useGetProjectsQuery,
-} from "@/services/backendApi/projects";
+} from "@/services/backendApi/projects/projects.service";
 import DeleteProjectDialog from "./DeleteProjectDialog";
 import EditProjectDialog from "./EditProjectDialog";
 
@@ -19,7 +19,7 @@ const SettingsTab: FC = () => {
     navigate("/dashboard");
   };
   return (
-    <div className="mx-8">
+    <div>
       <h1 className="text-3xl font-bold mt-8 mb-4">Settings</h1>
       <div className="flex flex-row justify-between items-center border-b pb-4">
         <div className="flex flex-col space-y-2">

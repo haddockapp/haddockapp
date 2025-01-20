@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { FC } from "react";
 import { FolderGit2 } from "lucide-react";
-import { ProjectDto, VmState } from "@/services/backendApi/projects";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
+import { VmState } from "@/types/vm/vm";
 
 interface ProjectCardProps {
   onClick?: () => void;

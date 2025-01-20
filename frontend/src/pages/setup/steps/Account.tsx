@@ -1,23 +1,21 @@
-import GithubSignInButton from "@/components/molecules/github-sign-in";
+import AuthenticationOptions from "@/components/organisms/AuthenticationOptions";
 import { Button } from "@/components/ui/button";
-import { constants } from "@/constants";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { nextSetupStep } from "@/services/authSlice";
 import { ChevronRight } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 const Account: FC = () => {
   const { isAuth } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    if (isAuth) dispatch(nextSetupStep());
+  }, [dispatch, isAuth]);
+
   return (
     <>
-      <div>
-        <GithubSignInButton
-          isSignedIn={isAuth}
-          redirectUrl={`https://github.com/login/oauth/authorize?client_id=${constants.githubClientId}&scope=user%20repo`}
-        />
-      </div>
+      <AuthenticationOptions />
       <Button onClick={() => dispatch(nextSetupStep())} disabled={!isAuth}>
         <ChevronRight />
         <span>Next</span>

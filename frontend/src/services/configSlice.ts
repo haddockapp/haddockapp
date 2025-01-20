@@ -1,12 +1,14 @@
-import { constants } from "@/constants";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface ConfigState {
   backendUrl: string;
 }
 
 const initialState: ConfigState = {
-  backendUrl: constants.apiUrl,
+  backendUrl: await axios
+    .get("./config.json")
+    .then((res) => res.data.backendUrl),
 };
 
 const configSlice = createSlice({

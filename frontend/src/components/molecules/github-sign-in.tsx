@@ -29,7 +29,7 @@ const GithubSignInButton: FC<GithubSignInButtonProps> = ({
           className="w-5 bg-white invert rounded-full"
           src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg"
         />
-        <span className="font-semibold">Signup with Github</span>
+        <span className="font-semibold">Login with GitHub</span>
       </>
     )}
   </Button>

@@ -42,7 +42,7 @@ const MonitoringTab: FC = () => {
   }, [projectId]);
 
   return (
-    <div className="mx-8">
+    <div>
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
       <div className="flex flex-row space-x-12 justify-center">
         <div className="flex flex-col space-y-2 text-center">

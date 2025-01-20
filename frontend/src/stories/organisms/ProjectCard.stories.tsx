@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import ProjectCard from "@/components/organisms/ProjectCard";
-import { VmState } from "@/services/backendApi/projects";
 import { baseProject } from "./data";
+import { VmState } from "@/types/vm/vm";
 
 const meta: Meta<typeof ProjectCard> = {
   title: "Organisms/ProjectCard",

@@ -9,7 +9,11 @@ const Welcome: FC = () => {
 
   return (
     <div>
-      <Button onClick={() => dispatch(nextSetupStep())} className="space-x-2">
+      <Button
+        variant="link"
+        onClick={() => dispatch(nextSetupStep())}
+        className="space-x-2"
+      >
         <CircleGauge size="16px" />
         <span>Go to dashboard</span>
       </Button>
