@@ -15,7 +15,7 @@ sudo chown $USER:$USER /opt/haddock
 # Extract files
 output "Extracting files..."
 sudo unzip -q /tmp/haddock.zip -d /opt/haddock &
-spinner $! "Extracting files..."    
+spinner $! "Extracting files..."
 
 # Remove the zip file
 sudo rm -f /tmp/haddock.zip
@@ -38,12 +38,12 @@ run_command "Setting up backend configuration..." bash -c '
 if [ ! -f /opt/haddock/api/.env ]; then
     output "Generating API configuration..."
     JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(256).toString('base64'));" 2>/dev/null)
-    
+
     # Create .env file without showing output
     sudo tee /opt/haddock/api/.env >/dev/null << EOF
 DATABASE_URL=postgresql://haddock:haddock@localhost:5432/haddock
 REDIS_URL=redis://localhost:6379
-CADDY_ROOT_DIR=./
+CADDY_ROOT_DIR=/etc/caddy/
 CADDY_SERVICES_FILE=services.caddy
 CADDY_APP_FILE=app.caddy
 JWT_SECRET=$JWT_SECRET

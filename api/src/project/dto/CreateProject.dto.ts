@@ -27,7 +27,7 @@ export class CreateProjectDto {
   vm_disk: number;
 
   @IsNumber()
-  @AllowedValues([1, 4, 8])
+  @AllowedValues([1, 2, 3, 4, 5, 6, 7, 8])
   vm_cpus: number;
 
   @IsUUID()
