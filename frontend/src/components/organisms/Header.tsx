@@ -1,4 +1,4 @@
-import { useGetProjectsQuery } from "@/services/backendApi/projects/projects.service";
+import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { FC, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";

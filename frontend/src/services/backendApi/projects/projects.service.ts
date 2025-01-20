@@ -1,5 +1,5 @@
 import { backendApi, QueryKeys } from "..";
-import { ProjectDto, CreateProjectDto, UpdateProjectDto } from "./projects.dto";
+import { CreateProjectDto, ProjectDto, UpdateProjectDto } from "./projects.dto";
 
 const projectsApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({

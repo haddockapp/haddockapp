@@ -4,7 +4,7 @@ import EditProjectDialog from "@/components/organisms/ProjectTabs/EditProjectDia
 import { http, HttpResponse } from "msw";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
-import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
+import { ProjectDto } from "@/services/backendApi/projects";
 import { VmState, VmProvider } from "@/types/vm/vm";
 
 const meta = {
