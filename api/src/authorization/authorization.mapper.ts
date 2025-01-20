@@ -10,6 +10,7 @@ import { AuthorizationEnum } from './types/authorization.enum';
 export class AuthorizationMapper {
     public toAuthorizationObject(authorization: Authorization): AuthorizationDTO {
         return {
+            name: authorization.name,
             type: authorization.type as AuthorizationEnum,
             data: authorization.value as any,
         };
@@ -18,6 +19,7 @@ export class AuthorizationMapper {
     public toResponse(authorization: Authorization): AuthorizationResponse {
         return {
             id: authorization.id,
+            name: authorization.name,
             type: authorization.type,
         };
     }

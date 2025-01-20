@@ -1,6 +1,10 @@
 import { AuthorizationEnum } from "../types/authorization.enum";
 
-export type AuthorizationDTO = {
+interface AuthorizationMetadata {
+    name: string;
+}
+
+export type AuthorizationDTO = AuthorizationMetadata & ({
     type: AuthorizationEnum.OAUTH;
     data: {
         token: string
@@ -15,4 +19,4 @@ export type AuthorizationDTO = {
     data: {
         key: string
     }
-};
+});

@@ -68,7 +68,16 @@ export class AuthorizationService {
     }
   }
 
-  public async canReadSource(authorizationId: string, organization: string, repo: string) {
+  private isPublicRepo(organization: string, repo: string) {
+    return axios.get(`https://api.github.com/repos/${organization}/${repo}`)
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  public async canReadSource(authorizationId: string | null, organization: string, repo: string) {
+    if (!authorizationId) {
+      return this.isPublicRepo(organization, repo);
+    }
     const authorization = await this.repository.findById(authorizationId);
     const object = this.mapper.toAuthorizationObject(authorization);
 

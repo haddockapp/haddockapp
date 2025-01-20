@@ -73,10 +73,9 @@ export class DomainsService {
   private async linkDomain(domain: Domain, canBeLinked: boolean) {
     await this.domainRepository.linkDomain(domain.id, canBeLinked);
 
-    
     if (domain.main && canBeLinked) {
       const serverIp = '127.0.0.1';
-      const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_SERVICES_FILE}`;
+      const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
       const data = {
         data: [
           {

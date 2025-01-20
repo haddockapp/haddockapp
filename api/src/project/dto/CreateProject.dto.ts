@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { AllowedValues } from '../validator/AllowedValues.validator';
 
 export class CreateProjectDto {
@@ -31,5 +31,6 @@ export class CreateProjectDto {
   vm_cpus: number;
 
   @IsUUID()
-  authorization_id: string;
+  @IsOptional()
+  authorization_id: string | null;
 }

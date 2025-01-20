@@ -9,7 +9,7 @@ import pirateShips from './pirateShips';
 
 @Injectable()
 export class ProjectRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async findAllProjects(): Promise<PersistedProjectDto[]> {
     return this.prismaService.project.findMany({
@@ -67,9 +67,11 @@ export class ProjectRepository {
               branch: data.repository_branch,
               composeName: data.compose_name,
             },
-            authorization: {
-              connect: { id: data.authorization_id },
-            },
+            ... (data.authorization_id ? {
+              authorization: {
+                connect: { id: data.authorization_id },
+              }
+            } : {})
           },
         },
       },

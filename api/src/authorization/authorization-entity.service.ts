@@ -39,6 +39,7 @@ export class AuthorizationEntityService {
     switch (authorization.type) {
       case AuthorizationEnum.OAUTH:
         return {
+          name: authorization.name,
           type: AuthorizationEnum.OAUTH,
           data: {
             token: await this.getOAuthToken((authorization.data as OAuthData).code),
@@ -46,6 +47,7 @@ export class AuthorizationEntityService {
         };
       case AuthorizationEnum.PERSONAL_ACCESS_TOKEN:
         return {
+          name: authorization.name,
           type: AuthorizationEnum.PERSONAL_ACCESS_TOKEN,
           data: {
             token: (authorization.data as PersonalAccessTokenData).token,
@@ -53,6 +55,7 @@ export class AuthorizationEntityService {
         };
       case AuthorizationEnum.DEPLOY_KEY:
         return {
+          name: authorization.name,
           type: AuthorizationEnum.DEPLOY_KEY,
           data: {
             key: (authorization.data as DeployKeyData).key,
