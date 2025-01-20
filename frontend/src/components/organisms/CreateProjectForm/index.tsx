@@ -4,7 +4,7 @@ import { Label } from "@radix-ui/react-label";
 import { FC, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateProjectMutation } from "@/services/backendApi/projects/projects.service";
+import { useCreateProjectMutation } from "@/services/backendApi/projects";
 import { Slider } from "@/components/ui/slider";
 import {
   useGetAllRepositoriesQuery,

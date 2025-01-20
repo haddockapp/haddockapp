@@ -14,7 +14,7 @@ import useDisclosure from "@/hooks/use-disclosure";
 import {
   ProjectDto,
   useUpdateProjectMutation,
-} from "@/services/backendApi/projects/projects.service";
+} from "@/services/backendApi/projects";
 import { FC } from "react";
 import { Pencil } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";

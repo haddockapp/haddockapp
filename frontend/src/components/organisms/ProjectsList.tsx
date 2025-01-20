@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { Skeleton } from "../ui/skeleton";
 import ProjectCard from "./ProjectCard";
-import { useNavigate } from "react-router-dom";
-import { ProjectDto } from "@/services/backendApi/projects/projects.service";
+import { useNavigate } from "react-router-dom"; 
+import { ProjectDto } from "@/services/backendApi/projects";
 
 const ProjectsListEmptyState: FC = () => (
   <div className="flex flex-column justify-center items-center">

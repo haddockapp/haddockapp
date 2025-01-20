@@ -1,14 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 interface ConfigState {
-  backendUrl: string;
+  backendUrl: string | null;
 }
 
 const initialState: ConfigState = {
-  backendUrl: await axios
-    .get("./config.json")
-    .then((res) => res.data.backendUrl),
+  backendUrl: null,
 };
 
 const configSlice = createSlice({

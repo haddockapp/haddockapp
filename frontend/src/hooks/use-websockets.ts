@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "./useStore";
 import { backendApi } from "@/services/backendApi";
-import { ProjectDto } from "@/services/backendApi/projects/projects.service";
 import { VmState } from "@/types/vm/vm";
 import socket from "@/services/websockets";
 import { toast } from "./use-toast";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 
 type SocketMessage = {
   event: string;

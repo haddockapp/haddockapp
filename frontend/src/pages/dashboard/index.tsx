@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useGetProjectsQuery } from "@/services/backendApi/projects/projects.service";
+import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import ProjectsList from "@/components/organisms/ProjectsList";
 import CreateProjectForm from "@/components/organisms/CreateProjectForm";
 import SimpleDialog from "@/components/organisms/SimpleDialog";
