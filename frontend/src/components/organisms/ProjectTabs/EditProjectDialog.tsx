@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useDisclosure from "@/hooks/use-disclosure";
 import {
-  ProjectDto,
   useUpdateProjectMutation,
 } from "@/services/backendApi/projects";
 import { FC } from "react";
@@ -20,6 +19,7 @@ import { Pencil } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { EditProjectForm } from "./type";
 import { useToast } from "@/hooks/use-toast";
+import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 
 interface EditProjectDialogProps {
   project: ProjectDto | undefined;
