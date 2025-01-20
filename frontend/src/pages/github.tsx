@@ -27,7 +27,18 @@ const GithubCallback: FC = () => {
     const code = params.get("code");
     const state = params.get("state");
     if (code && state) {
-      switch (state) {
+      const stateParsed = JSON.parse(state) as {
+        reason: GithubAuthReason;
+        authorizationName?: string;
+      };
+      if (!stateParsed.reason) {
+        toast({
+          title: "Error",
+          description: "Invalid state",
+        });
+        return;
+      }
+      switch (stateParsed.reason) {
         case GithubAuthReason.LOGIN:
           triggerLoginGithub({ code })
             .unwrap()
@@ -39,6 +50,7 @@ const GithubCallback: FC = () => {
           triggerCreateAuthorization({
             type: AuthorizationEnum.OAUTH,
             data: { code },
+            name: stateParsed.authorizationName ?? "Github OAuth",
           })
             .unwrap()
             .then(() => {
