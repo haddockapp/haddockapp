@@ -27,7 +27,7 @@ output "\n${BLUE}▶ Installing dependencies...${NC}"
 }
 
 # Install dependencies
-DEPENDENCIES=("curl" "wget" "gpg" "git" "unzip" "redis-server" "qemu-system" "libvirt-daemon-system" "libvirt-dev" "bc")
+DEPENDENCIES=("curl" "wget" "gpg" "git" "unzip" "redis-server" "qemu-system" "libvirt-daemon-system" "libvirt-dev" "bc" "rubygems" "ruby-dev" "build-essential")
 total=${#DEPENDENCIES[@]}
 current=0
 
@@ -84,9 +84,9 @@ if ask_yes_no "Do you want to install Vagrant?"; then
         else
             CODENAME=$(grep -Po 'VERSION_CODENAME=\K[^"]*' /etc/os-release 2>/dev/null || echo "stable")
         fi
-        
-        run_command "Adding Hashicorp repository..." "curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/hashicorp.asc"
-        run_command "Configuring repository..." "sudo bash -c 'echo \"deb [arch=amd64] https://apt.releases.hashicorp.com ${CODENAME} main\" > /etc/apt/sources.list.d/hashicorp.list'"
+
+        run_command "Adding Hashicorp repository..." "wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg"
+        run_command "Configuring repository..." 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list'
         run_command "Updating package lists..." "sudo apt update"
         if run_command "Installing Vagrant..." "sudo apt install -y vagrant"; then
             output "${GREEN}✓${NC} Vagrant installed successfully"
@@ -98,7 +98,7 @@ if ask_yes_no "Do you want to install Vagrant?"; then
         # Install Vagrant plugin and box
         run_command "Installing vagrant-libvirt plugin..." "vagrant plugin install vagrant-libvirt"
         run_command "Adding Debian 12 box..." "vagrant box add generic/debian12 --provider=libvirt --force"
-        
+
         if [ $? -eq 0 ]; then
             output "${GREEN}✓${NC} Vagrant plugin and box installed successfully"
         else
@@ -116,7 +116,7 @@ if ask_yes_no "Do you want to install Vagrant?"; then
         # Install Vagrant plugin and box
         run_command "Installing vagrant-libvirt plugin..." "vagrant plugin install vagrant-libvirt"
         run_command "Adding Debian 12 box..." "vagrant box add generic/debian12 --provider=libvirt --force"
-        
+
         if [ $? -eq 0 ]; then
             output "${GREEN}✓${NC} Vagrant plugin and box installed successfully"
         else
