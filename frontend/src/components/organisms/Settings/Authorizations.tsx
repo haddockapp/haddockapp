@@ -57,6 +57,7 @@ const authorizationTypeLabels: Record<AuthorizationEnum, string> = {
 };
 
 const formSchema = z.object({
+  name: z.string(),
   type: z.enum([
     AuthorizationEnum.DEPLOY_KEY,
     AuthorizationEnum.OAUTH,
@@ -98,16 +99,19 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
         triggerCreateAuthorization({
           type: AuthorizationEnum.DEPLOY_KEY,
           data: { key },
+          name: data.name,
         });
       const createOAuth = (code: string) =>
         triggerCreateAuthorization({
           type: AuthorizationEnum.OAUTH,
           data: { code },
+          name: data.name,
         });
       const createToken = (token: string) =>
         triggerCreateAuthorization({
           type: AuthorizationEnum.PERSONAL_ACCESS_TOKEN,
           data: { token },
+          name: data.name,
         });
 
       let createFn;
@@ -143,6 +147,20 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="flex flex-col space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Label</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="My Authorization Method" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="type"
@@ -307,6 +325,7 @@ const Authorizations: FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Label</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Token</TableHead>
               <TableHead></TableHead>
@@ -315,6 +334,9 @@ const Authorizations: FC = () => {
           <TableBody>
             {authorizations?.map((a) => (
               <TableRow key={a.id}>
+                <TableCell>
+                  <p>{a.name}</p>
+                </TableCell>
                 <TableCell>
                   <p>{a.type.toUpperCase()}</p>
                 </TableCell>
