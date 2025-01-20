@@ -139,6 +139,7 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
   const onSubmit = form.handleSubmit(handleCreateAuthorization);
 
   const watchType = form.watch("type");
+  const watchName = form.watch("name");
 
   return (
     <Form {...form}>
@@ -253,6 +254,7 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
           <div className="space-y-5">
             <div>
               <GithubAuthentication
+                authorizationName={watchName}
                 reason={GithubAuthReason.CREATE_AUTHORIZATION}
               />
             </div>

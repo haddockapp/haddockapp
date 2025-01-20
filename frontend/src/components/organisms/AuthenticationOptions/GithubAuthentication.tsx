@@ -10,9 +10,13 @@ import { FC } from "react";
 
 type GithubAuthenticationProps = {
   reason: GithubAuthReason;
+  authorizationName?: string;
 };
 
-const GithubAuthentication: FC<GithubAuthenticationProps> = ({ reason }) => {
+const GithubAuthentication: FC<GithubAuthenticationProps> = ({
+  reason,
+  authorizationName,
+}) => {
   const { githubConfig } = useConfiguration();
 
   const disclosureMethods = useDisclosure();
@@ -28,11 +32,13 @@ const GithubAuthentication: FC<GithubAuthenticationProps> = ({ reason }) => {
           }
           redirectUrl={`https://github.com/login/oauth/authorize?client_id=${
             githubConfig?.clientId
-          }&scope=user%20repo${
+          }&redirect_uri=${window.location.protocol}//${
+            window.location.host
+          }/github&scope=user%20repo${
             reason === GithubAuthReason.CREATE_AUTHORIZATION
               ? "&prompt=select_account&"
               : "&"
-          }state=${reason}`}
+          }state=${JSON.stringify({ reason, authorizationName })}`}
         />
       ) : (
         <SimpleDialog
