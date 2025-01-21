@@ -15,14 +15,14 @@ run_command "Enabling Caddy..." "sudo systemctl enable --now caddy"
 cd /opt/haddock/api
 run_command "Cleaning up PM2 processes..." "pm2 delete haddock-api 2>/dev/null || true"
 run_command "Starting API with PM2..." "cd /opt/haddock/api && pm2 start yarn --name haddock-api -- start:prod"
+run_command "Enabling PM2 startup..." "pm2 startup"
 run_command "Saving PM2 configuration..." "pm2 save"
-run_command "Setting up PM2 startup script..." "sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER"
 run_command "Enabling PM2 service..." "sudo systemctl enable pm2-$USER"
 
 validate_installation() {
     local component=$1
     log_info "Validating component: $component"
-    
+
     case $component in
         "database")
             if sudo -u postgres psql -c '\l' | grep -q haddock; then
@@ -107,7 +107,7 @@ if [ ${#failed_installations[@]} -eq 0 ] && [ "$VALIDATION_FAILED" = false ]; th
     printf "1. Access Haddock at ${BLUE}http://%s${NC}\n" "$IP"
     printf "2. Configure your first project\n"
     printf "3. Read the docs at ${BLUE}https://docs.haddock.ovh${NC}\n"
-    
+
     # Create backup quietly
     mkdir -p "$BACKUP_DIR" 2>/dev/null
     if [ -d "/opt/haddock" ]; then
