@@ -76,7 +76,6 @@ export default {
     'Giant',
     'Titan',
     'Ranger',
-    'Baby',
     'Diamond',
     'Haddock',
     'Swordfish',
