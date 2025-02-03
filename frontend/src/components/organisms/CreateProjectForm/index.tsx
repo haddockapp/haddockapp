@@ -45,7 +45,7 @@ const formSchema = z.object({
   memory: z.number().int().min(512).max(8192),
   disk: z.number().int().min(256).max(2048),
   vcpus: z.number().int().min(1).max(8),
-  composeName: z.string(),
+  composePath: z.string(),
 });
 
 interface CreateProjectFormProps {
@@ -60,7 +60,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
       memory: 512,
       disk: 256,
       vcpus: 1,
-      composeName: "compose.yml",
+      composePath: "compose.yml",
     },
   });
   const { handleSubmit, reset, control, watch } = form;
@@ -105,7 +105,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
           vm_cpus: +data.vcpus,
           vm_memory: +data.memory,
           vm_disk: +data.disk,
-          compose_name: data.composeName,
+          compose_path: data.composePath,
           authorization_id: data.authorization.value,
         })
           .unwrap()
@@ -222,7 +222,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             />
             <FormField
               control={control}
-              name="composeName"
+              name="composePath"
               rules={{ required: true }}
               render={({ field }) => (
                 <FormItem>

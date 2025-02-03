@@ -84,7 +84,7 @@ export class VmService {
     const output = await execCommand(`cd ${vm.project.path} && vagrant up`);
 
     await execCommand(
-      `cd ${vm.project.path} && vagrant ssh -c "cd service && docker-compose up --build -d"`,
+      `cd ${vm.project.path} && vagrant ssh -c "cd service && docker-compose -f ${vm.project.compose_path} up --build -d"`,
     );
 
     const ip = this.getIpFromOutput(output);

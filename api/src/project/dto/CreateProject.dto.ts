@@ -16,7 +16,7 @@ export class CreateProjectDto {
 
   @IsString()
   @IsNotEmpty()
-  compose_name: string;
+  compose_path: string;
 
   @IsNumber()
   @AllowedValues([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192])

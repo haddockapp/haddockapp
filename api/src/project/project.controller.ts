@@ -107,7 +107,7 @@ export class ProjectController {
     );
     const rawCompose = this.composeService.readComposeFile(
       project.id,
-      settings.composeName,
+      settings.composePath,
     );
     if (!rawCompose) {
       return [];
@@ -152,7 +152,7 @@ export class ProjectController {
     );
     const rawCompose = this.composeService.readComposeFile(
       project.id,
-      settings.composeName,
+      settings.composePath,
     );
     if (!rawCompose) {
       throw new NotFoundException('Service not found');

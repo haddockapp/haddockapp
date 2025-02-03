@@ -50,6 +50,7 @@ export class ProjectRepository {
     return this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
+        compose_path: data.compose_path,
         vm: {
           create: {
             memory: data.vm_memory,
@@ -65,7 +66,7 @@ export class ProjectRepository {
               organization: data.repository_organisation,
               repository: data.repository_name,
               branch: data.repository_branch,
-              composeName: data.compose_name,
+              composePath: data.compose_path,
             },
             ... (data.authorization_id ? {
               authorization: {
