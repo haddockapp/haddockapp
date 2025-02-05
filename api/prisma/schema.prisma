@@ -46,7 +46,6 @@ model Project {
     name               String
     description        String?
     path               String?             @unique
-    compose_path       String?
     source             Source              @relation(fields: [sourceId], references: [id])
     sourceId           String              @unique
     vm                 Vm                  @relation(fields: [vmId], references: [id])

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { compile } from 'handlebars';
-import { Prisma, Vm } from '@prisma/client';
+import { Prisma, Project, Source, Vm } from '@prisma/client';
 import { writeFile } from 'fs/promises';
 import { VmRepository } from './vm.repository';
 import { VmState } from 'src/types/vm.enum';
@@ -9,6 +9,8 @@ import { WebSocketService } from '../websockets/websocket.service';
 import { EventScope, EventType } from '../websockets/dto/websocket-event.dto';
 import { NetworksService } from 'src/networks/networks.service';
 import { execCommand } from 'src/utils/exec-utils';
+import { getSettings } from 'src/source/utils/get-settings';
+import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 
 @Injectable()
 export class VmService {
@@ -53,6 +55,26 @@ export class VmService {
     return undefined;
   }
 
+  private async deploySource(project: Project, source: Source): Promise<void> {
+    switch (source.type) {
+      case 'github': {
+        const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        if (settings.composePath === undefined || !settings.composePath) {
+          throw new Error('Compose path not set');
+        }
+        await execCommand(
+          `cd ${project.path} && vagrant ssh -c "cd service && docker-compose -f ${settings.composePath} up --build -d"`,
+        );
+        break;
+      }
+      default:
+        throw new Error('Invalid source type');
+    }
+    this.logger.log(
+      `Source ${source.id} of type ${source.type} deployed for project ${project.id}`,
+    );
+  }
+
   async setVagrantFile(vmId: string, deployPath: string): Promise<Vm> {
     const vm = await this.vmRepository.getVm({ id: vmId });
 
@@ -68,9 +90,13 @@ export class VmService {
   async upVm(vmId: string, force: boolean = false): Promise<void> {
     const vm: Prisma.VmGetPayload<{
       include: {
-        project: true;
+        project: {
+          include: {
+            source: true;
+          };
+        };
       };
-    }> = await this.vmRepository.getVmAndProject({ id: vmId });
+    }> = await this.vmRepository.getVmAndProjectAndSource({ id: vmId });
 
     if (
       !force &&
@@ -83,9 +109,7 @@ export class VmService {
 
     const output = await execCommand(`cd ${vm.project.path} && vagrant up`);
 
-    await execCommand(
-      `cd ${vm.project.path} && vagrant ssh -c "cd service && docker-compose -f ${vm.project.compose_path} up --build -d"`,
-    );
+    await this.deploySource(vm.project, vm.project.source);
 
     const ip = this.getIpFromOutput(output);
 

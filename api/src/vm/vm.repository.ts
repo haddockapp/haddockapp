@@ -29,6 +29,29 @@ export class VmRepository {
         });
     }
 
+    async getVmAndProjectAndSource(
+        vmWhereUniqueInput: Prisma.VmWhereUniqueInput,
+    ): Promise<Prisma.VmGetPayload<{
+        include: {
+            project: {
+                include: {
+                    source: true;
+                };
+            };
+        };
+    }> | null> {
+        return this.prismaService.vm.findUnique({
+            where: vmWhereUniqueInput,
+            include: {
+                project: {
+                    include: {
+                        source: true,
+                    },
+                },
+            },
+        });
+    }
+
     async getVms(
         params: {
             skip?: number;
