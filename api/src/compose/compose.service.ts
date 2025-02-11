@@ -53,14 +53,14 @@ export class ComposeService {
         return res;
     }
 
-    readComposeFile(projectId: string, composeName: string): string {
+    readComposeFile(projectId: string, composePath: string): string {
         const path = `${__dirname.split('/api')[0]}/workspaces/${projectId}`;
 
-        if (!fs.existsSync(`${path}/${composeName}`)) {
+        if (!fs.existsSync(`${path}/${composePath}`)) {
             return '';
         }
 
-        const composeContent = fs.readFileSync(`${path}/${composeName}`);
+        const composeContent = fs.readFileSync(`${path}/${composePath}`);
         if (!composeContent) {
             return '';
         }

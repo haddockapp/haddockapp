@@ -8,7 +8,7 @@ export type CreateProjectDto = {
   vm_memory: number;
   vm_disk: number;
   vm_cpus: number;
-  compose_name: string;
+  compose_path: string;
   authorization_id: string;
 };
 
