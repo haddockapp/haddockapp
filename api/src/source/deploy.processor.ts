@@ -13,6 +13,10 @@ import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { AuthorizationService } from '../authorization/authorization.service';
+import { execCommand } from 'src/utils/exec-utils';
+import { AuthorizationEnum } from 'src/authorization/types/authorization.enum';
+import { join } from 'path';
+import { tmpdir } from 'os';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -21,7 +25,7 @@ export class DeployConsumer {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vmService: VmService,
-    private readonly authorizationService: AuthorizationService
+    private readonly authorizationService: AuthorizationService,
   ) {}
 
   @OnQueueFailed()
@@ -44,23 +48,63 @@ export class DeployConsumer {
       `Cloning github repository ${organization}/${repository}#${branch} to ${deployPath}`,
     );
 
-    await git
-      .clone({
-        fs,
-        http,
-        url: `https://github.com/${organization}/${repository}.git`,
-        dir: deployPath,
-        ref: branch,
-        singleBranch: true,
-        onAuth: () => this.authorizationService.getDeployHeaderForAuthorization(source.authorizationId),
-        onAuthFailure: () => {
-          throw new DeployError('Failed to authenticate with github');
-        },
-      })
-      .catch((err) => {
-        this.logger.error(`Failed to clone repository: ${err.message}`);
-        throw new DeployError('Failed to clone repository');
-      });
+    const authorizationType: AuthorizationEnum =
+      await this.authorizationService.getAuthorizationType(
+        source.authorizationId,
+      );
+
+    switch (authorizationType) {
+      case AuthorizationEnum.DEPLOY_KEY: {
+        const tempFilePath = join(tmpdir(), `ssh-key-${Date.now()}`);
+
+        try {
+          const key =
+            (await this.authorizationService.getAuthorizationKey(
+              source.authorizationId,
+            )) + '\n';
+
+          fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
+
+          await execCommand(
+            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${deployPath}`,
+          );
+
+        } catch (e) {
+          fs.unlinkSync(tempFilePath);
+
+          if (e instanceof ExecutionError) {
+            this.logger.error(`Failed to clone repository: ${e.message}`);
+          }
+          throw new DeployError('Failed to clone repository');
+        }
+
+        fs.unlinkSync(tempFilePath);
+        break;
+      }
+      case AuthorizationEnum.OAUTH:
+      case AuthorizationEnum.PERSONAL_ACCESS_TOKEN: {
+        await git
+          .clone({
+            fs,
+            http,
+            url: `https://github.com/${organization}/${repository}.git`,
+            dir: deployPath,
+            ref: branch,
+            singleBranch: true,
+            onAuth: () =>
+              this.authorizationService.getDeployHeaderForAuthorization(
+                source.authorizationId,
+              ),
+            onAuthFailure: () => {
+              throw new DeployError('Failed to authenticate with github');
+            },
+          })
+          .catch((err) => {
+            this.logger.error(`Failed to clone repository: ${err.message}`);
+            throw new DeployError('Failed to clone repository');
+          });
+      }
+    }
     return deployPath;
   }
 
