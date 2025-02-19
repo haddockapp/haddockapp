@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  NotImplementedException
+  NotImplementedException,
 } from '@nestjs/common';
 import { AuthorizationRepository } from './authorization.repository';
 import { AuthorizationEnum } from './types/authorization.enum';
@@ -15,6 +15,25 @@ export class AuthorizationService {
     private readonly repository: AuthorizationRepository,
     private readonly mapper: AuthorizationMapper
   ) { }
+
+  public async getAuthorizationType(authorizationId: string): Promise<AuthorizationEnum> {
+    const authorization = await this.repository.findById(authorizationId);
+    const object = this.mapper.toAuthorizationObject(authorization);
+    return object.type;
+  }
+
+  public async getAuthorizationKey(authorizationId: string): Promise<string> {
+    const authorization = await this.repository.findById(authorizationId);
+    const object = this.mapper.toAuthorizationObject(authorization);
+
+    switch (object.type) {
+      case AuthorizationEnum.DEPLOY_KEY:
+        return object.data.key;
+      case AuthorizationEnum.OAUTH:
+      case AuthorizationEnum.PERSONAL_ACCESS_TOKEN:
+        throw NotImplementedException;
+    }
+  }
 
   public async getHeadersForAuthorization(authorizationId: string) {
     const authorization = await this.repository.findById(authorizationId);
