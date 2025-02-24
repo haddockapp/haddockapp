@@ -20,7 +20,7 @@ Script d'installation :
 
 ## Étape(s) du test
 
-Lancer le scipt d'installation, suivre les étapes en accèptant l'installation des dépendances et rentrer les informations demandées par le scritp (ex: ip).
+- Lancer le scipt d'installation, suivre les étapes en accèptant l'installation des dépendances et rentrer les informations demandées par le scritp :
 
 ```shell
 $> ls
@@ -29,25 +29,16 @@ install.sh scripts
 $> ./install.sh
 ```
 
-Accèpter l'exécution du script en tant que root :
+- Accèpter l'exécution du script en tant que root
 
-![sudo](./assets/sudo.png)
+- Accèpter l'installation de [vagrant](https://developer.hashicorp.com/vagrant) :
 
 
-Accèpter l'installation de [vagrant](https://developer.hashicorp.com/vagrant) :
-
-![vagrant](./assets/vagrant.png)
-
-Renter l'addresse ip de la machine hôte :
-
-![ip](./assets/ip.png)
-
+- Renter l'addresse ip de la machine hôte
 
 ## Résultat(s) attendu(s)
 
-Le script d'installation se termine avec succès, toutes les étapes on réussit (voir le récape à la fin du script).
-
-![result](./assets/result.png)
+Le script d'installation se termine avec succès, toutes les étapes on réussit (voir le récape à la fin du script). Une URL temporaire doit être affichée à l'utilisateur
 
 ## Résultat(s) obtenu(s)
 
