@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { compile } from 'handlebars';
-import { Prisma, Project, Source, Vm } from '@prisma/client';
+import { Project, Source, Vm } from '@prisma/client';
 import { writeFile } from 'fs/promises';
 import { VmRepository } from './vm.repository';
 import { VmState } from 'src/types/vm.enum';
@@ -11,6 +11,7 @@ import { NetworksService } from 'src/networks/networks.service';
 import { execCommand } from 'src/utils/exec-utils';
 import { getSettings } from 'src/source/utils/get-settings';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
+import { PersistedVmDto } from './dto/vm.dto';
 
 @Injectable()
 export class VmService {
@@ -33,7 +34,7 @@ export class VmService {
       data: { status },
     });
 
-    const vm = await this.vmRepository.getVmAndProject({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     this.websocketService.notifyAll({
       scope: EventScope.PROJECT,
@@ -76,7 +77,7 @@ export class VmService {
   }
 
   async setVagrantFile(vmId: string, deployPath: string): Promise<Vm> {
-    const vm = await this.vmRepository.getVm({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     const template: string = this.template(vm);
 
@@ -88,15 +89,7 @@ export class VmService {
   }
 
   async upVm(vmId: string, force: boolean = false): Promise<void> {
-    const vm: Prisma.VmGetPayload<{
-      include: {
-        project: {
-          include: {
-            source: true;
-          };
-        };
-      };
-    }> = await this.vmRepository.getVmAndProjectAndSource({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     if (
       !force &&
@@ -133,11 +126,7 @@ export class VmService {
   }
 
   async downVm(vmId: string, force: boolean = false): Promise<void> {
-    const vm: Prisma.VmGetPayload<{
-      include: {
-        project: true;
-      };
-    }> = await this.vmRepository.getVmAndProject({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     if (!force && vm.status === VmState.Stopped) {
       throw new Error('VM is already stopped');
@@ -151,11 +140,7 @@ export class VmService {
   }
 
   async restartVm(vmId: string): Promise<void> {
-    const vm: Prisma.VmGetPayload<{
-      include: {
-        project: true;
-      };
-    }> = await this.vmRepository.getVmAndProject({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     if (vm.status === VmState.Stopped) {
       throw new Error('VM is stopped');
@@ -178,7 +163,7 @@ export class VmService {
   }
 
   async deletePhisicalVm(vmId: string): Promise<void> {
-    const vm = await this.vmRepository.getVmAndProject({ id: vmId });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
     if (vm.status === VmState.Starting) {
       throw new Error('VM is starting');

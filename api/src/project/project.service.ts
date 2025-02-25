@@ -11,6 +11,8 @@ import { NetworksService } from 'src/networks/networks.service';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
 import { execCommand } from 'src/utils/exec-utils';
+import { UpdateProjectDto } from './dto/UpdateProject.dto';
+import { Project } from '@prisma/client';
 
 @Injectable()
 export class ProjectService {
@@ -22,6 +24,19 @@ export class ProjectService {
     private readonly sourceService: SourceService,
     private readonly networksService: NetworksService,
   ) {}
+
+  async updateProject(projectId: string, data: UpdateProjectDto): Promise<Project> {
+
+    const project = await this.projectRepository.updateProject({
+        where: { id: projectId },
+        data: {
+            name: data.name,
+            description: data.description,
+        },
+    });
+
+    return project;
+  }
 
   async deleteProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);

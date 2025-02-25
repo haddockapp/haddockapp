@@ -4,7 +4,6 @@ import { Job } from 'bull';
 import * as fs from 'fs';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
-import { PrismaService } from '../prisma/prisma.service';
 import { VmState } from '../types/vm.enum';
 import { VmService } from '../vm/vm.service';
 import { GithubSourceSettingsDto } from './dto/settings.dto';
@@ -17,13 +16,17 @@ import { execCommand } from 'src/utils/exec-utils';
 import { AuthorizationEnum } from 'src/authorization/types/authorization.enum';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { ProjectRepository } from 'src/project/project.repository';
+import { VmRepository } from 'src/vm/vm.repository';
+import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 
 @Processor('deploys')
 export class DeployConsumer {
   private readonly logger = new Logger(DeployConsumer.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly vmRepository: VmRepository,
+    private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
   ) {}
@@ -68,7 +71,6 @@ export class DeployConsumer {
           await execCommand(
             `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${deployPath}`,
           );
-
         } catch (e) {
           fs.unlinkSync(tempFilePath);
 
@@ -124,10 +126,8 @@ export class DeployConsumer {
     try {
       const deployPath: string = await this.getDeployPath(source);
 
-      await this.prisma.project.update({
-        where: {
-          id: source.project.id,
-        },
+      await this.projectRepository.updateProject({
+        where: { id: source.project.id },
         data: {
           path: deployPath,
         },
@@ -148,11 +148,11 @@ export class DeployConsumer {
       } else {
         this.logger.error(`Unexpected error: ${e.message}`);
       }
-      const vm = await this.prisma.vm.findUnique({
-        where: {
-          id: source.project.vmId,
-        },
+
+      const vm: PersistedVmDto = await this.vmRepository.getVm({
+        id: source.project.vmId,
       });
+
       if (vm.status === VmState.Starting || vm.status === VmState.Running) {
         try {
           await this.vmService.downVm(source.project.vmId);

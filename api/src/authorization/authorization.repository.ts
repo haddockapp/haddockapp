@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { Authorization } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthorizationDTO } from "./dto/authorization.dto";
-import { AuthorizationMapper } from "./authorization.mapper";
 
 @Injectable()
 export class AuthorizationRepository {
