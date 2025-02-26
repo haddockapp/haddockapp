@@ -71,7 +71,7 @@ export class LogsHandler implements Handler {
   }
 
   async handleUnsubscribe(client: Client, data: any): Promise<void> {
-    this.clients = this.clients.filter((c) => c.userId !== client.userId);
+    this.clients = this.clients.filter((c) => c.socket !== client.socket);
     if (this.clients.length === 0) {
       this.job.stop();
     }

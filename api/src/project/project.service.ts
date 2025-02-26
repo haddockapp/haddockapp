@@ -13,6 +13,7 @@ import { VmState } from 'src/types/vm.enum';
 import { execCommand } from 'src/utils/exec-utils';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { Project } from '@prisma/client';
+import { WebSocketService } from 'src/websockets/websocket.service';
 
 @Injectable()
 export class ProjectService {
@@ -23,6 +24,7 @@ export class ProjectService {
     private readonly vmService: VmService,
     private readonly sourceService: SourceService,
     private readonly networksService: NetworksService,
+    private readonly webSocketService: WebSocketService,
   ) {}
 
   async updateProject(projectId: string, data: UpdateProjectDto): Promise<Project> {
@@ -44,6 +46,8 @@ export class ProjectService {
       throw new NotFoundException('Project not found.');
     }
 
+    await this.webSocketService.removeProject(projectId);
+
     try {
       await this.vmService.deletePhisicalVm(project.vmId);
     } catch (e) {
@@ -52,6 +56,7 @@ export class ProjectService {
       }
       return;
     }
+
     await this.projectRepository.deleteProject(projectId);
 
     await this.vmService.deleteVmDb(project.vmId);

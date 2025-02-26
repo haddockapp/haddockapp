@@ -29,6 +29,18 @@ export class WebSocketService {
     if (userId) {
       delete this.clients[userId];
     }
+
+    Object.values(this.projects).forEach((project: ProjectHandlers) => {
+      Object.values(project).forEach((handler: Handler) => {
+        const clientRemove: Client = handler.clients.find(
+          (c) => c.socket === client && c.userId === userId,
+        );
+
+        if (clientRemove) {
+          handler.handleUnsubscribe(clientRemove, {});
+        }
+      });
+    });
   }
 
   notifyUser(userId: string, message: object) {
@@ -46,6 +58,16 @@ export class WebSocketService {
 
   getClient(userId: string): Client | undefined {
     return this.clients[userId];
+  }
+
+  async removeProject(projectId: string) {
+    if (this.projects[projectId]) {
+        const project = this.projects[projectId];
+        Object.values(project).forEach((handler: Handler) => {
+          handler.job.stop();
+        });
+      delete this.projects[projectId];
+    }
   }
 
   async protectService(client: Socket, eventData: ProjectEventDto) {
