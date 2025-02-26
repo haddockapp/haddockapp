@@ -8,7 +8,7 @@ export class ProjectHandlers {
     logs: Handler;
 
     constructor(project: PersistedProjectDto) {
-      this.metrics = new MetricsHandler(project.path);
-      this.logs = new LogsHandler(project.path);
+      this.metrics = new MetricsHandler(project);
+      this.logs = new LogsHandler(project);
     }
   }
