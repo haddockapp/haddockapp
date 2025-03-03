@@ -1,9 +1,7 @@
-/* Arrière-plan de ReactFlow */
 .react-flow__background {
   fill: white;
 }
 
-/* Animation du dégradé de bordure */
 @keyframes rotateGradient {
   0% {
     background-position: 0% 50%;
@@ -18,12 +16,9 @@
   }
 }
 
-/* Style des nodes */
 .custom-node {
   position: relative;
   background: white;
-  /* Fond blanc */
-  /* Vert foncé pour le texte */
   padding: 12px 16px;
   text-align: center;
   font-weight: bold;
@@ -94,7 +89,6 @@
   }
 }
 
-/* Effet Hover */
 .custom-node.Running:hover {
   animation: runningPulse 1.2s infinite;
     transform: scale(1.03);
@@ -105,7 +99,6 @@
   transform: scale(1.03);
 }
 
-/* ❌ Hover Error : Glow rouge intense */
 .custom-node.Stopped:hover {
   animation: stoppedPulse 1.2s infinite;
     transform: scale(1.03);
@@ -114,10 +107,6 @@
 /* Style des connexions (edges) */
 .react-flow__edge path {
   stroke: #000000 !important;
-  /* Blanc bleuté */
   stroke-width: 3;
   stroke-dasharray: 5 5;
-  /* Effet pointillé */
-  filter: drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.8));
-  /* Glow blanc bleuté */
 }

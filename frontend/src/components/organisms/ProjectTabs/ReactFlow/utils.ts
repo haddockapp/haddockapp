@@ -51,58 +51,58 @@ const defineInitalNodes = (services: ServiceDto[]): Node[] => {
   });
 };
 
-const modifyNodePosition = (
-  nodes: ServiceDto[],
-  edges: Edge[],
-  projectId: string
-): Node[] => {
-  const positions: { [name: string]: { x: number; y: number } } = {};
-  const clusters: string[][] = [];
+export const calculateCircularPosition = (
+  services: ServiceDto[],
+  projectId: string,
+  center = { x: 500, y: 500 },
+  baseSpacing = 200,
+  minDistance = 120
+) => {
+  const networkGroups: Record<string, string[]> = {};
+  const positions: Record<string, { x: number; y: number }> = {};
   const initialNodesPositions: NodePositions = JSON.parse(
     localStorage.getItem(`${projectId}ServicePositions`) ?? "{}"
   );
 
-  edges.forEach((edge) => {
-    const sourceCluster = clusters.find((cluster) =>
-      cluster.includes(edge.source)
-    );
-    const targetCluster = clusters.find((cluster) =>
-      cluster.includes(edge.target)
-    );
-
-    if (sourceCluster && targetCluster && sourceCluster !== targetCluster) {
-      sourceCluster.push(...targetCluster);
-      clusters.splice(clusters.indexOf(targetCluster), 1);
-    } else if (sourceCluster) {
-      sourceCluster.push(edge.target);
-    } else if (targetCluster) {
-      targetCluster.push(edge.source);
-    } else {
-      clusters.push([edge.source, edge.target]);
-    }
+  services.forEach((service) => {
+    const network = service.networks?.length > 0 ? service.networks[0] : "none";
+    if (!networkGroups[network]) networkGroups[network] = [];
+    networkGroups[network].push(service.name);
   });
 
-  nodes.forEach((node) => {
-    if (!clusters.some((cluster) => cluster.includes(node.name))) {
-      clusters.push([node.name]);
-    }
-  });
+  const networkSort = (a: string, b: string) => {
+    if (a === "default") return -1;
+    if (b === "default") return 1;
+    return 0;
+  };
+  const sortedNetworks = Object.keys(networkGroups).sort(networkSort);
 
-  const clusterSpacing = 500;
-  const nodeSpacing = 150;
-  let clusterX = 0;
+  sortedNetworks.forEach((network, networkIndex) => {
+    let radius = baseSpacing + networkIndex * baseSpacing;
+    const nodes = networkGroups[network];
+    const angleStep = (2 * Math.PI) / nodes.length;
 
-  clusters.forEach((cluster, clusterIndex) => {
-    const clusterY = clusterIndex * clusterSpacing;
+    nodes.forEach((node, index) => {
+      let angle = index * angleStep;
+      let x = center.x + radius * Math.cos(angle);
+      let y = center.y + radius * Math.sin(angle);
 
-    cluster.forEach((nodeName, index) => {
-      positions[nodeName] = {
-        x: clusterX + (index % 5) * nodeSpacing,
-        y: clusterY + Math.floor(index / 5) * nodeSpacing,
-      };
+      let iteration = 0;
+      while (
+        Object.values(positions).some(
+          (pos) => Math.hypot(pos.x - x, pos.y - y) < minDistance
+        ) &&
+        iteration < 10
+      ) {
+        radius += 10;
+        angle += angleStep / 5;
+        x = center.x + radius * Math.cos(angle);
+        y = center.y + radius * Math.sin(angle);
+        iteration++;
+      }
+
+      positions[node] = { x, y };
     });
-
-    clusterX += clusterSpacing;
   });
 
   const getNodePosition = (name: string) => {
@@ -112,12 +112,12 @@ const modifyNodePosition = (
     return positions[name];
   };
 
-  return nodes.map((node) => ({
-    id: node.name,
-    position: getNodePosition(node.name),
-    data: { label: node.name },
+  return services.map((service) => ({
+    id: service.name,
+    position: getNodePosition(service.name),
+    data: { label: service.name },
     type: "custom",
   }));
 };
 
-export { defineInitialEdges, defineInitalNodes, modifyNodePosition };
+export { defineInitialEdges, defineInitalNodes };

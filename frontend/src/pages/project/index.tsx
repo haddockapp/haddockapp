@@ -4,6 +4,7 @@ import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import TopologyTab from "@/components/organisms/ProjectTabs/TopologyTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
+import { ReactFlowProvider } from "@xyflow/react";
 import { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -61,7 +62,9 @@ const ProjectDetails: FC = () => {
         </TabsList>
       </div>
       <TabsContent value="topology">
-        <ReactflowTab services={services} projectId={projectId ?? ""} />
+        <ReactFlowProvider>
+          <ReactflowTab projectId={projectId ?? ""} />
+        </ReactFlowProvider>
         {/* <TopologyTab services={services} projectId={projectId ?? ""} /> */}
       </TabsContent>
       <TabsContent value="monitoring">
