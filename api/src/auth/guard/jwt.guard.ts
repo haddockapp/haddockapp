@@ -29,7 +29,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const config =
       await this.configurationRepository.getConfigurationByKey(CONFIGURED_KEY);
-    return isPublicConfig && config && config.value === true;
+    return isPublicConfig && (!config || (config && config.value === false));
   }
 
   public async canActivate(context: ExecutionContext) {
