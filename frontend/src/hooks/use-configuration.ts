@@ -8,7 +8,6 @@ const useConfiguration = () => {
   const { data: configuration } = useGetConfigurationQuery();
   const githubConfig = useMemo<{
     clientId: string;
-    clientSecret: string;
   } | null>(() => {
     function getConfigurationValue(toFind: ConfigurationType) {
       const value = configuration?.find(({ key }) => key === toFind)?.value;
@@ -20,9 +19,6 @@ const useConfiguration = () => {
     try {
       return {
         clientId: getConfigurationValue(ConfigurationType.GITHUB_CLIENT_ID),
-        clientSecret: getConfigurationValue(
-          ConfigurationType.GITHUB_CLIENT_SECRET
-        ),
       };
     } catch {
       return null;
