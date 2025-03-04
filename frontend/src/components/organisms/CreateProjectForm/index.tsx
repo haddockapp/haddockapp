@@ -10,7 +10,10 @@ import {
   useGetAllRepositoriesQuery,
   useGetAllBranchesByRepositoryQuery,
 } from "@/services/backendApi/github";
-import { useGetAllAuthorizationsQuery } from "@/services/backendApi/authorizations";
+import {
+  AuthorizationEnum,
+  useGetAllAuthorizationsQuery,
+} from "@/services/backendApi/authorizations";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { z } from "zod";
@@ -72,12 +75,20 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const { currentData: authorizations, isFetching: isFetchingAuthorizations } =
     useGetAllAuthorizationsQuery();
+
+  const isDeployKeyAuthorization = useMemo(() => {
+    const authorization = authorizations?.find(
+      (authorization) => authorization.id === watchAuthorization
+    );
+    return authorization?.type === AuthorizationEnum.DEPLOY_KEY;
+  }, [authorizations, watchAuthorization]);
+
   const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
       {
         authorization: watchAuthorization,
       },
-      { skip: !watchAuthorization }
+      { skip: !watchAuthorization || isDeployKeyAuthorization }
     );
   const { currentData: branches, isFetching: isFetchingBranches } =
     useGetAllBranchesByRepositoryQuery(
@@ -86,7 +97,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
         authorization: watchAuthorization,
       },
       {
-        skip: !watchRepository,
+        skip: !watchRepository || isDeployKeyAuthorization,
       }
     );
 
@@ -133,7 +144,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const authorizationsOptions = useMemo(
     () =>
       authorizations?.map((authorization) => ({
-        label: authorization.type,
+        label: `${authorization.name} (${authorization.type})`,
         value: authorization.id,
       })) ?? [],
     [authorizations]
@@ -209,7 +220,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem>
                   <Label>Branch</Label>
                   <FormControl>
-                    <Select
+                    <CreatableSelect
                       {...field}
                       isLoading={isFetchingBranches}
                       isDisabled={!watch("repository")}
