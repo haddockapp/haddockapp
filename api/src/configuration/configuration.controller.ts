@@ -9,7 +9,6 @@ import { ConfigurationRepository } from './configuration.repository';
 import { SetupGitbubDto } from './dto/setup-github.dto';
 import { ConfigurationService } from './configuration.service';
 import { Public, PublicConfig } from 'src/auth/auth.decorator';
-import { ConfigurationStatusResponseDto } from './dto/configuration-status-response.dto';
 
 @Controller('configuration')
 export class ConfigurationController {
@@ -18,9 +17,10 @@ export class ConfigurationController {
     private readonly configurationService: ConfigurationService,
   ) {}
 
+  @Public()
   @Get()
   async getConfiguration() {
-    return this.configurationRepository.getConfiguration();
+    return await this.configurationService.getPubliConfiguration();
   }
 
   @PublicConfig()
@@ -41,12 +41,5 @@ export class ConfigurationController {
       data.client_id,
       data.client_secret,
     );
-  }
-
-  @Public()
-  @Get('status')
-  async getConfigurationStatus(): Promise<ConfigurationStatusResponseDto> {
-    const status = await this.configurationService.getConfigurationStatus();
-    return { configured: status };
   }
 }

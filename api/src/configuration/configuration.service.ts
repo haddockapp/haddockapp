@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigurationRepository } from './configuration.repository';
 import { GithubConfiguration } from './model/github-configuration';
-import {
-  CONFIGURED_KEY,
-  GITHUB_ID_KEY,
-  GITHUB_SECRET_KEY,
-} from './utils/consts';
+import { GITHUB_ID_KEY, GITHUB_SECRET_KEY } from './utils/consts';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ConfigurationService {
+  private configBlacklist = [GITHUB_SECRET_KEY];
+
   constructor(
     private readonly configurationRepository: ConfigurationRepository,
   ) {}
@@ -73,9 +71,10 @@ export class ConfigurationService {
     }
   }
 
-  async getConfigurationStatus(): Promise<boolean> {
-    const config =
-      await this.configurationRepository.getConfigurationByKey(CONFIGURED_KEY);
-    return (config && config.value === true) || false;
+  async getPubliConfiguration() {
+    const configs = await this.configurationRepository.getConfiguration();
+    return configs.filter(
+      (config) => !this.configBlacklist.includes(config.key),
+    );
   }
 }
