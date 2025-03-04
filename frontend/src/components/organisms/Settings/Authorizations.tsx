@@ -217,7 +217,7 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
                   />
                 </FormControl>
                 <FormDescription className="pt-2">
-                  You can execute the command{" "}
+                  <span>You can execute the command </span>
                   <span
                     onClick={() => {
                       navigator.clipboard.writeText("cat ~/.ssh/id_rsa");
@@ -230,7 +230,11 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
                   >
                     cat ~/.ssh/id_rsa
                   </span>{" "}
-                  inside a terminal to print out your SSH key.
+                  <span>inside a terminal to print out your SSH key.</span>
+                </FormDescription>
+                <FormDescription>
+                  Please make sure the private key you use is not protected by a
+                  password.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
