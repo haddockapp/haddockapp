@@ -9,6 +9,7 @@ import { ProjectService } from './project.service';
 import { VmModule } from 'src/vm/vm.module';
 import { NetworksModule } from 'src/networks/networks.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
+import { WebsocketModule } from 'src/websockets/websocket.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { AuthorizationModule } from '../authorization/authorization.module';
     DockerModule,
     forwardRef(() => VmModule),
     NetworksModule,
-    AuthorizationModule
+    AuthorizationModule,
+    forwardRef(() => WebsocketModule),
   ],
   controllers: [ProjectController],
   providers: [ProjectService, ProjectRepository],
