@@ -1,9 +1,10 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { ProjectRepository } from 'src/project/project.repository';
 import { ExecutionError } from 'src/types/error/execution.error';
 import { VmState } from 'src/types/vm.enum';
+import { PersistedVmDto } from 'src/vm/dto/vm.dto';
+import { VmRepository } from 'src/vm/vm.repository';
 import { VmService } from 'src/vm/vm.service';
 
 @Injectable()
@@ -11,17 +12,14 @@ export class StartupService implements OnApplicationBootstrap {
   private readonly logger = new Logger(StartupService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly vmRepository: VmRepository,
     private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
   ) {}
 
   private async manageVmError(vmId: string) {
-    const vm = await this.prisma.vm.findUnique({
-      where: {
-        id: vmId,
-      },
-    });
+    const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
+
     if (vm.status === VmState.Starting || vm.status === VmState.Running) {
       try {
         await this.vmService.downVm(vmId);

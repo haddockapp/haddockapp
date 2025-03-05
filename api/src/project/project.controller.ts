@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -13,7 +14,6 @@ import {
 import { ProjectRepository } from './project.repository';
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
-import { BadRequestException } from '@nestjs/common';
 import { SourceService } from '../source/source.service';
 import { ComposeService } from 'src/compose/compose.service';
 import { DockerService } from 'src/docker/docker.service';
@@ -87,7 +87,7 @@ export class ProjectController {
       throw new NotFoundException('Project not found.');
     }
 
-    return await this.projectRepository.updateProject(project.id, data);
+    return await this.projectService.updateProject(project.id, data);
   }
 
   @Delete(':id')

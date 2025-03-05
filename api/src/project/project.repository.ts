@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Project } from '@prisma/client';
+import { Prisma, Project } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { VmProvider } from '../types/vm.enum';
 import { CreateProjectDto } from './dto/CreateProject.dto';
-import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
 import pirateShips from './pirateShips';
 
 @Injectable()
 export class ProjectRepository {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAllProjects(): Promise<PersistedProjectDto[]> {
     return this.prismaService.project.findMany({
@@ -44,9 +43,7 @@ export class ProjectRepository {
     return `${prefix} ${suffix}`;
   }
 
-  async createProject(
-    data: CreateProjectDto,
-  ): Promise<Project> {
+  async createProject(data: CreateProjectDto): Promise<Project> {
     return this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
@@ -67,52 +64,34 @@ export class ProjectRepository {
               branch: data.repository_branch,
               composePath: data.compose_path,
             },
-            ... (data.authorization_id ? {
-              authorization: {
-                connect: { id: data.authorization_id },
-              }
-            } : {})
+            ...(data.authorization_id
+              ? {
+                  authorization: {
+                    connect: { id: data.authorization_id },
+                  },
+                }
+              : {}),
           },
         },
       },
     });
   }
 
-  async updateProject(
-    projectId: string,
-    data: UpdateProjectDto,
-  ): Promise<Project> {
-    const project = await this.prismaService.project.findUnique({
-      where: {
-        id: projectId,
-      },
-      include: {
-        source: true,
-      },
-    });
+  async updateProject(params: {
+    where: Prisma.ProjectWhereUniqueInput;
+    data: Partial<Project>;
+  }): Promise<Project> {
+    const { where, data } = params;
+
+    const updateData: Prisma.ProjectUpdateInput = {
+      name: data.name,
+      description: data.description,
+      path: data.path,
+    };
 
     return this.prismaService.project.update({
-      where: {
-        id: projectId,
-      },
-      data: {
-        name: data.name,
-        description: data.description,
-        vm: {
-          update: {
-            cpus: data.cpus,
-            memory: data.memory,
-          },
-        },
-        source: {
-          update: {
-            ...project.source, // Spread the entire 'source' object
-            settings: {
-              repository: data.repository_branch,
-            },
-          },
-        },
-      },
+      data: updateData,
+      where,
     });
   }
 
