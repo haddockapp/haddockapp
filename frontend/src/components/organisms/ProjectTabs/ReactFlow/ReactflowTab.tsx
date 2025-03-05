@@ -97,12 +97,14 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }, []);
 
   return (
-    <div className="h-screen w-full mx-8" ref={reactFlowWrapper}>
-      <h1 className="text-3xl font-bold my-8">Services</h1>
+    <div className="mt-2 h-[75vh]" ref={reactFlowWrapper}>
       {(services?.length === 0 || !services) && (
-        <div className="flex flex-column items-center">
-          <p className="text-lg">No services found</p>
-        </div>
+        <>
+          <h1 className="text-3xl font-bold my-8">Services</h1>
+          <div className="flex flex-column items-center">
+            <p className="text-lg">No services found</p>
+          </div>
+        </>
       )}
       {services && (
         <>
@@ -125,19 +127,21 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               </DrawerContent>
             </DrawerPortal>
           </Drawer>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onNodeClick={onNodeClick}
-            onPaneClick={() => setSelectedService(null)}
-            onNodeDragStop={onNodeDragStop}
-            nodeTypes={{ custom: CustomNode }}
-            fitView
-          >
-            <Background />
-            <Controls />
-          </ReactFlow>
+          <div className="relative border-4 border-gray-200 rounded-lg shadow-lg w-full h-full">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onNodeClick={onNodeClick}
+              onPaneClick={() => setSelectedService(null)}
+              onNodeDragStop={onNodeDragStop}
+              nodeTypes={{ custom: CustomNode }}
+              fitView
+            >
+              <Background />
+              <Controls />
+            </ReactFlow>
+          </div>
         </>
       )}
     </div>
