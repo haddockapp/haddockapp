@@ -1,6 +1,6 @@
 import psutil
 
-def get_system_metrics():
+async def get_system_metrics():
     return {
         'cpu_usage': {
             'user': psutil.cpu_times().user,
