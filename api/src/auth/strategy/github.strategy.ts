@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -11,12 +12,15 @@ import { AuthorizationEnum } from '../../authorization/types/authorization.enum'
 import { ConnectGithubDto } from '../dto/ConnectGithub.dto';
 import { AuthError } from '../error/AuthError';
 import { AuthorizationService } from '../../authorization/authorization.service';
+import { UserRoleEnum } from 'src/user/types/user-role.enum';
+import { InvitationRepository } from 'src/invitation/invitation.repository';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(
     private githubService: GithubService,
     private userRepository: UserRepository,
+    private invitationRepository: InvitationRepository,
     private authorizationService: AuthorizationService,
   ) {
     super();
@@ -58,10 +62,16 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
 
     let user = await this.userRepository.findByEmail(useremail);
     if (!user) {
-      const createdUser = await this.userRepository.createUser(
-        useremail,
-        username,
-      );
+      const count = await this.userRepository.nbUsers();
+
+      const invitation = await this.invitationRepository.findByEmail(useremail);
+      if (!invitation && count > 0) throw new ForbiddenException();
+
+      const createdUser = await this.userRepository.createUser({
+        email: useremail,
+        name: username,
+        role: count === 0 ? UserRoleEnum.ADMIN : UserRoleEnum.MEMBER,
+      });
       await this.authorizationService.createAuthorization({
         name: `OAuth ${username}`,
         type: AuthorizationEnum.OAUTH,
@@ -69,6 +79,9 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
           token: accessToken,
         },
       });
+      if (invitation && count > 0)
+        await this.invitationRepository.delete(invitation.id);
+
       user = { ...createdUser };
     }
 
