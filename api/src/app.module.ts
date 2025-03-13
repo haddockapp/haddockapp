@@ -15,6 +15,7 @@ import { StartupModule } from './startup/startup.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
+import { VMManagerModule } from './vm-manager/vm.manager.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { HealthModule } from './health/health.module';
     StartupModule,
     ConfigurationModule,
     HealthModule,
+    VMManagerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

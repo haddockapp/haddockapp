@@ -1,32 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { readFileSync } from 'fs';
-import { compile } from 'handlebars';
-import { Project, Source, Vm } from '@prisma/client';
-import { writeFile } from 'fs/promises';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Vm } from '@prisma/client';
 import { VmRepository } from './vm.repository';
 import { VmState } from 'src/types/vm.enum';
 import { WebSocketService } from '../websockets/websocket.service';
 import { EventScope, EventType } from '../websockets/dto/websocket-event.dto';
 import { NetworksService } from 'src/networks/networks.service';
-import { execCommand } from 'src/utils/exec-utils';
-import { getSettings } from 'src/source/utils/get-settings';
-import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { PersistedVmDto } from './dto/vm.dto';
+import { IVMManager } from 'src/vm-manager/types/ivm.manager';
 
 @Injectable()
 export class VmService {
-  private readonly template: HandlebarsTemplateDelegate<any>;
   private readonly logger = new Logger(VmService.name);
 
   constructor(
     private readonly vmRepository: VmRepository,
     private readonly websocketService: WebSocketService,
     private readonly networkService: NetworksService,
-  ) {
-    this.template = compile(
-      readFileSync('./src/vm/template/Vagrantfile.hbs', 'utf-8'),
-    );
-  }
+    @Inject('IVM_MANAGER') private readonly vmManager: IVMManager,
+  ) {}
 
   async changeVmStatus(vmId: string, status: VmState): Promise<void> {
     await this.vmRepository.updateVm({
@@ -46,46 +37,10 @@ export class VmService {
     });
   }
 
-  private getIpFromOutput(output: string): string | undefined {
-    const sshAddressRegex = /SSH address: (\S+:\d+)/;
-    const match = RegExp(sshAddressRegex).exec(output);
-
-    if (match) {
-      return match[1].split(':')[0];
-    }
-    return undefined;
-  }
-
-  private async deploySource(project: Project, source: Source): Promise<void> {
-    switch (source.type) {
-      case 'github': {
-        const settings = getSettings<GithubSourceSettingsDto>(source.settings);
-        if (settings.composePath === undefined || !settings.composePath) {
-          throw new Error('Compose path not set');
-        }
-        await execCommand(
-          `cd ${project.path} && vagrant ssh -c "cd service && docker-compose -f ${settings.composePath} up --build -d"`,
-        );
-        break;
-      }
-      default:
-        throw new Error('Invalid source type');
-    }
-    this.logger.log(
-      `Source ${source.id} of type ${source.type} deployed for project ${project.id}`,
-    );
-  }
-
-  async setVagrantFile(vmId: string, deployPath: string): Promise<Vm> {
+  async createVM(vmId: string, deployPath: string): Promise<Vm> {
     const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
 
-    const template: string = this.template(vm);
-
-    await writeFile(`${deployPath}/Vagrantfile`, template, {
-      encoding: 'utf-8',
-    });
-
-    return vm;
+    return this.vmManager.createVM(vm, deployPath);
   }
 
   async upVm(vmId: string, force: boolean = false): Promise<void> {
@@ -100,29 +55,18 @@ export class VmService {
 
     await this.changeVmStatus(vm.id, VmState.Starting);
 
-    const output = await execCommand(`cd ${vm.project.path} && vagrant up`);
-
-    await this.deploySource(vm.project, vm.project.source);
-
-    const ip = this.getIpFromOutput(output);
-
-    if (
-      !(force && (vm.ip !== undefined || vm.ip !== '' || vm.ip !== null)) &&
-      ip === undefined
-    ) {
-      throw new Error('Failed to get IP address');
-    }
+    const upVM: Vm = await this.vmManager.startVM(vm, force);
 
     await this.vmRepository.updateVm({
       where: { id: vm.id },
-      data: { ip },
+      data: { ...upVM },
     });
 
     await this.networkService.updateNetworksfile();
 
     await this.changeVmStatus(vm.id, VmState.Running);
 
-    this.logger.log(`VM ${vm.id} is running on IP ${ip || vm.ip}`);
+    this.logger.log(`VM ${vm.id} is running on IP ${upVM.ip}`);
   }
 
   async downVm(vmId: string, force: boolean = false): Promise<void> {
@@ -132,7 +76,7 @@ export class VmService {
       throw new Error('VM is already stopped');
     }
 
-    await execCommand(`cd ${vm.project.path} && vagrant halt`);
+    await this.vmManager.stopVM(vm);
 
     await this.changeVmStatus(vm.id, VmState.Stopped);
 
@@ -148,13 +92,11 @@ export class VmService {
 
     await this.changeVmStatus(vm.id, VmState.Starting);
 
-    const output = await execCommand(`cd ${vm.project.path} && vagrant reload`);
-
-    const ip = this.getIpFromOutput(output);
+    const restartedVM: Vm = await this.vmManager.restartVM(vm);
 
     await this.vmRepository.updateVm({
       where: { id: vm.id },
-      data: { ip },
+      data: { ...restartedVM },
     });
 
     await this.changeVmStatus(vm.id, VmState.Running);
@@ -170,7 +112,8 @@ export class VmService {
     }
 
     try {
-      await execCommand(`cd ${vm.project.path} && vagrant destroy -f`);
+      await this.vmManager.destroyVM(vm);
+
       this.logger.log(`VM ${vm.id} destroyed`);
     } catch (e) {}
   }

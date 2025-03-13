@@ -134,7 +134,7 @@ export class DeployConsumer {
       });
 
       this.logger.log(`Setting up VM for project ${source.project.id}`);
-      await this.vmService.setVagrantFile(source.project.vmId, deployPath);
+      await this.vmService.createVM(source.project.vmId, deployPath);
 
       this.logger.log(`Starting VM for project ${source.project.id}`);
       await this.vmService.upVm(source.project.vmId);
