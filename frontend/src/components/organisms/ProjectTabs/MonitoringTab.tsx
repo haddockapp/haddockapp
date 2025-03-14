@@ -1,4 +1,5 @@
 import RadialTextChart from "@/components/ui/charts/radial-text-chart";
+import { useGetSelfQuery } from "@/services/backendApi/users";
 import socket, { handleProjectSubcription } from "@/services/websockets";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -11,17 +12,19 @@ interface MetricsSocketType {
 const MonitoringTab: FC = () => {
   const { projectId } = useParams();
 
+  const { data: me } = useGetSelfQuery();
+
   const [cpuUsage, setCpuUsage] = useState<number>(0);
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
 
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId || !me) return;
 
     handleProjectSubcription({
       projectId,
       service: "metrics",
       subscribe: true,
-      userId: "abcd",
+      userId: me.id,
       data: {},
     });
 
@@ -31,15 +34,9 @@ const MonitoringTab: FC = () => {
     });
 
     return () => {
-      handleProjectSubcription({
-        projectId,
-        service: "metrics",
-        subscribe: false,
-        userId: "abcd",
-        data: {},
-      });
+      socket.off("metrics");
     };
-  }, [projectId]);
+  }, [me, projectId]);
 
   return (
     <div>
