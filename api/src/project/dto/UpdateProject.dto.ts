@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
+import {IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID} from "class-validator";
 import {AllowedValues} from "../validator/AllowedValues.validator";
 
 export class UpdateProjectDto {
@@ -15,6 +15,10 @@ export class UpdateProjectDto {
     @IsString()
     @IsOptional()
     repository_branch?: string;
+
+    @IsUUID()
+    @IsOptional()
+    authorization_id?: string | null;
 
     @IsNumber()
     @AllowedValues([1, 4, 8])
