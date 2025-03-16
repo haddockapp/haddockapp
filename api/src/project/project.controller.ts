@@ -11,17 +11,17 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ProjectRepository } from './project.repository';
-import { CreateProjectDto } from './dto/CreateProject.dto';
-import { UpdateProjectDto } from './dto/UpdateProject.dto';
-import { SourceService } from '../source/source.service';
+import { AuthorizationService } from 'src/authorization/authorization.service';
 import { ComposeService } from 'src/compose/compose.service';
 import { DockerService } from 'src/docker/docker.service';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { getSettings } from 'src/source/utils/get-settings';
+import { SourceService } from '../source/source.service';
+import { CreateProjectDto } from './dto/CreateProject.dto';
 import ProjectServiceDto from './dto/ProjectService.dto';
+import { UpdateProjectDto } from './dto/UpdateProject.dto';
+import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
-import { AuthorizationService } from 'src/authorization/authorization.service';
 
 @Controller('project')
 export class ProjectController {
@@ -32,7 +32,7 @@ export class ProjectController {
     private readonly composeService: ComposeService,
     private readonly dockerService: DockerService,
     private readonly authorizationService: AuthorizationService,
-  ) {}
+  ) { }
 
   @Get()
   async findAllProjects() {
@@ -86,6 +86,20 @@ export class ProjectController {
     if (!project) {
       throw new NotFoundException('Project not found.');
     }
+    if (data.authorization_id !== undefined) {
+      const { organization, repository } = getSettings<GithubSourceSettingsDto>(project.source.settings);
+      const canReadSource = await this.authorizationService.canReadSource(
+        data.authorization_id,
+        organization,
+        repository,
+      );
+
+      if (!canReadSource) {
+        throw new BadRequestException(
+          'Provided authorization does not have access to the repository.',
+        );
+      }
+    }
 
     return await this.projectService.updateProject(project.id, data);
   }
@@ -131,7 +145,7 @@ export class ProjectController {
           .then((icon) => {
             result.icon = icon;
           })
-          .catch((e) => {});
+          .catch((e) => { });
         return result;
       }),
     );

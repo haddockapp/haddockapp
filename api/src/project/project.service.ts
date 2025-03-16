@@ -25,19 +25,23 @@ export class ProjectService {
     private readonly sourceService: SourceService,
     private readonly networksService: NetworksService,
     private readonly webSocketService: WebSocketService,
-  ) {}
+  ) { }
 
   async updateProject(projectId: string, data: UpdateProjectDto): Promise<Project> {
-
-    const project = await this.projectRepository.updateProject({
-        where: { id: projectId },
-        data: {
-            name: data.name,
-            description: data.description,
-        },
+    return await this.projectRepository.updateProject({
+      where: { id: projectId },
+      data: {
+        name: data.name,
+        description: data.description,
+        ...(data.authorization_id !== undefined ? {
+          source: {
+            update: {
+              authorizationId: data.authorization_id,
+            },
+          }
+        } : {})
+      },
     });
-
-    return project;
   }
 
   async deleteProject(projectId: string) {
