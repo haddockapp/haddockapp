@@ -10,11 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import useConfiguration from "@/hooks/use-configuration";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch } from "@/hooks/useStore";
-import { nextSetupStep } from "@/services/authSlice";
 import { useCreateConfigurationMutation } from "@/services/backendApi/configuration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
 import { FC, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,8 +30,6 @@ const Configuration: FC<ConfigurationProps> = ({
   isAppSetup = true,
   onClose,
 }) => {
-  const dispatch = useAppDispatch();
-
   const [triggerCreateConfiguration] = useCreateConfigurationMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -114,14 +109,7 @@ const Configuration: FC<ConfigurationProps> = ({
             )}
           />
         </div>
-        {!githubConfig || !isAppSetup ? (
-          <Button type="submit">{!isAppSetup ? "Update" : "Submit"}</Button>
-        ) : (
-          <Button onClick={() => dispatch(nextSetupStep())}>
-            <ChevronRight />
-            <span>Next</span>
-          </Button>
-        )}
+        <Button type="submit">{!isAppSetup ? "Update" : "Submit"}</Button>
       </form>
     </Form>
   );

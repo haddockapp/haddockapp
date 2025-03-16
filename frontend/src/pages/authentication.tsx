@@ -1,19 +1,14 @@
 import AuthenticationOptions from "@/components/organisms/AuthenticationOptions";
+
 import { useAppSelector } from "@/hooks/useStore";
 import { FC } from "react";
 import { Navigate } from "react-router-dom";
 
 const Authentication: FC = () => {
-  const { setupStep, isAuth } = useAppSelector((state) => state.auth);
+  const { isAuth, isSetupComplete } = useAppSelector((state) => state.auth);
 
-  if (setupStep === 0 || !setupStep) {
-    return <Navigate to="/setup" />;
-  }
-
-  if (isAuth) {
-    return <Navigate to="/dashboard" />;
-  }
-
+  if (!isSetupComplete) return <Navigate to="/setup" />;
+  if (isAuth) return <Navigate to="/dashboard" />;
   return (
     <div>
       <div className="justify-center py-8 text-center">
