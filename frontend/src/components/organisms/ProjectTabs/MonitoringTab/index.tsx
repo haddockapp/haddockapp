@@ -7,7 +7,7 @@ import socket, {
 } from "@/services/websockets";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import testData from "../testData.json";
+import testData from "./testData.json";
 import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 
