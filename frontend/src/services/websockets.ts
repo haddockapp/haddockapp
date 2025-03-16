@@ -1,7 +1,7 @@
 import { constants } from "@/constants";
 import { io } from "socket.io-client";
 
-type Service = "metrics";
+type Service = "metrics" | "logs";
 
 interface ProjectEventDto {
   userId: string;
