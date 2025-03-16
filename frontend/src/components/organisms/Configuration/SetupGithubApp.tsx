@@ -25,10 +25,14 @@ const formSchema = z.object({
 });
 
 export type ConfigurationProps = {
-  onClose: () => void;
+  isAppSetup?: boolean;
+  onClose?: () => void;
 };
 
-const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
+const Configuration: FC<ConfigurationProps> = ({
+  isAppSetup = true,
+  onClose,
+}) => {
   const dispatch = useAppDispatch();
 
   const [triggerCreateConfiguration] = useCreateConfigurationMutation();
@@ -49,7 +53,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
             title: "Configuration created successfully",
             variant: "default",
           });
-          onClose();
+          onClose?.();
         })
         .catch((e) => {
           toast({
@@ -68,8 +72,8 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
     if (githubConfig) {
       if (githubConfig.clientId)
         form.setValue("clientId", githubConfig.clientId);
-      if (githubConfig.clientSecret)
-        form.setValue("clientSecret", githubConfig.clientSecret);
+      // if (githubConfig.clientSecret)
+      //   form.setValue("clientSecret", githubConfig.clientSecret);
     }
   }, [form, githubConfig]);
 
@@ -77,10 +81,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={onSubmit}
-        className="mx-auto space-y-8 w-[400px] text-start"
-      >
+      <form onSubmit={onSubmit} className="space-y-8 text-start">
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -113,8 +114,8 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
             )}
           />
         </div>
-        {!githubConfig ? (
-          <Button type="submit">Submit</Button>
+        {!githubConfig || !isAppSetup ? (
+          <Button type="submit">{!isAppSetup ? "Update" : "Submit"}</Button>
         ) : (
           <Button onClick={() => dispatch(nextSetupStep())}>
             <ChevronRight />
