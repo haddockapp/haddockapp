@@ -1,10 +1,10 @@
-import { Controller, ForbiddenException, Get, Param, UnauthorizedException } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
 import Repository from './model/Repository';
 
 @Controller('github')
 export class GithubController {
-  constructor(private githubService: GithubService) {}
+  constructor(private readonly githubService: GithubService) {}
 
   @Get('/repository')
   async getUserRepositories(
