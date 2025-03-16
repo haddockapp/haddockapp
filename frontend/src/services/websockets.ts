@@ -1,20 +1,37 @@
 import { constants } from "@/constants";
 import { io } from "socket.io-client";
 
-type Service = "metrics" | "logs";
+export enum WebsocketService {
+  Metrics = "metrics",
+  Logs = "logs",
+}
+
+export type MetricsSocketType = {
+  cpuUsage: number;
+  memoryUsage: number;
+};
+
+export type LogsSocketType = {
+  logs: string[];
+};
 
 interface ProjectEventDto {
   userId: string;
   projectId: string;
-  service: Service;
+  service: WebsocketService;
   subscribe: boolean;
-  data: any;
+  data: unknown;
 }
 
 const socket = io(constants.socketUrl, { autoConnect: false });
 
-const handleProjectSubcription = (data: ProjectEventDto) =>
+function handleProjectSubcription<T extends MetricsSocketType | LogsSocketType>(
+  data: ProjectEventDto,
+  onListen: (res: T) => void
+) {
   socket.emit("project", data);
+  socket.on(data.service, onListen);
+}
 
 export { handleProjectSubcription };
 export default socket;
