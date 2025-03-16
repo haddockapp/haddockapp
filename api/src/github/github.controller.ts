@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, UnauthorizedException } from '@nestjs/common';
 import { GithubService } from './github.service';
 import Repository from './model/Repository';
 
@@ -17,7 +11,7 @@ export class GithubController {
     @Query('authorization') authorization?: string,
   ): Promise<Repository[]> {
     if (!authorization) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'A Github connection is required to perform this action.',
       );
     }
@@ -32,8 +26,8 @@ export class GithubController {
     @Query('authorization') authorization?: string,
   ) {
     if (!authorization) {
-      throw new UnauthorizedException(
-        'A Github connection is required to perform this actions.',
+      throw new ForbiddenException(
+        'A Github connection is required to perform this action.',
       );
     }
 
@@ -51,8 +45,8 @@ export class GithubController {
     @Query('authorization') authorization?: string,
   ) {
     if (!authorization) {
-      throw new UnauthorizedException(
-        'A Github connection is required to perform this actions.',
+      throw new ForbiddenException(
+        'A Github connection is required to perform this action.',
       );
     }
 
