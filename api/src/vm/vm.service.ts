@@ -66,7 +66,7 @@ export class VmService {
 
     await this.changeVmStatus(vm.id, VmState.Running);
 
-    this.logger.log(`VM ${vm.id} is running on IP ${upVM.ip}`);
+    this.logger.log(`VM ${vm.id} is running on IP ${vm.ip || upVM.ip}`);
   }
 
   async downVm(vmId: string, force: boolean = false): Promise<void> {

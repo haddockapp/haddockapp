@@ -97,7 +97,7 @@ export class VagrantManager implements IVMManager {
     const ip = this.getIpFromOutput(output);
 
     if (
-      !(force && (vm.ip !== undefined || vm.ip !== '' || vm.ip !== null)) &&
+      !(force && (ip !== undefined || ip !== '' || ip !== null)) &&
       ip === undefined
     ) {
       throw new Error('Failed to get IP address');
@@ -105,7 +105,7 @@ export class VagrantManager implements IVMManager {
 
     this.logger.log(`VM ${vm.id} is running on IP ${ip || vm.ip}`);
 
-    vm.ip = ip;
+    vm.ip = ip || vm.ip;
 
     return vm;
   }
@@ -126,13 +126,13 @@ export class VagrantManager implements IVMManager {
     const ip = this.getIpFromOutput(output);
 
     if (
-      !(vm.ip !== undefined || vm.ip !== '' || vm.ip !== null) &&
+      !(ip !== undefined || ip !== '' || ip !== null) &&
       ip === undefined
     ) {
       throw new Error('Failed to get IP address');
     }
 
-    vm.ip = ip;
+    vm.ip = ip || vm.ip;
 
     this.logger.log(`VM ${vm.id} restarted on IP ${ip || vm.ip}`);
 
