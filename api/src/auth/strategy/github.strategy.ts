@@ -13,15 +13,15 @@ import { ConnectGithubDto } from '../dto/ConnectGithub.dto';
 import { AuthError } from '../error/AuthError';
 import { AuthorizationService } from '../../authorization/authorization.service';
 import { UserRoleEnum } from 'src/user/types/user-role.enum';
-import { InvitationRepository } from 'src/invitation/invitation.repository';
+import { InvitationService } from 'src/invitation/invitation.service';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(
     private githubService: GithubService,
     private userRepository: UserRepository,
-    private invitationRepository: InvitationRepository,
     private authorizationService: AuthorizationService,
+    private invitationService: InvitationService,
   ) {
     super();
   }
@@ -63,9 +63,10 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     let user = await this.userRepository.findByEmail(useremail);
     if (!user) {
       const count = await this.userRepository.nbUsers();
+      const invitation = await this.invitationService.findByEmail(useremail);
 
-      const invitation = await this.invitationRepository.findByEmail(useremail);
-      if (!invitation && count > 0) throw new ForbiddenException();
+      if (this.invitationService.userCanRegister(count, invitation))
+        throw new ForbiddenException();
 
       const createdUser = await this.userRepository.createUser({
         email: useremail,
@@ -79,8 +80,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
           token: accessToken,
         },
       });
-      if (invitation && count > 0)
-        await this.invitationRepository.delete(invitation.id);
+      await this.invitationService.deleteInvitation(invitation);
 
       user = { ...createdUser };
     }

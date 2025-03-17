@@ -9,6 +9,6 @@ import { UserModule } from 'src/user/user.module';
   imports: [PrismaModule, forwardRef(() => UserModule)],
   controllers: [InvitationController],
   providers: [InvitationService, InvitationRepository],
-  exports: [InvitationRepository],
+  exports: [InvitationRepository, InvitationService],
 })
 export class InvitationModule {}

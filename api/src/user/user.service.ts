@@ -28,7 +28,7 @@ export class UserService {
     };
   }
 
-  invitationToResponse(invitation: Invitation): UserResponseDto {
+  private invitationToResponse(invitation: Invitation): UserResponseDto {
     return {
       id: invitation.id,
       name: invitation.email,

@@ -14,7 +14,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { LocalStrategy } from './strategy/local.strategy';
 import { InvitationModule } from 'src/invitation/invitation.module';
-import { DisabledGuard } from './guard/disabled.guard';
+import { AccessGuard } from './guard/access.guard';
 
 @Module({
   imports: [
@@ -38,7 +38,7 @@ import { DisabledGuard } from './guard/disabled.guard';
     GithubStrategy,
     LocalStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
-    { provide: APP_GUARD, useClass: DisabledGuard },
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
   controllers: [AuthController],
   exports: [],

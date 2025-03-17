@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InvitationRepository } from './invitation.repository';
 import { UserRepository } from 'src/user/user.repository';
+import { Invitation } from '@prisma/client';
 
 @Injectable()
 export class InvitationService {
@@ -13,6 +14,10 @@ export class InvitationService {
     return await this.invitationRepository.findAll();
   }
 
+  async findByEmail(email: string) {
+    return await this.invitationRepository.findByEmail(email);
+  }
+
   async createInvitation(email: string) {
     const user = await this.userRepository.findByEmail(email);
     if (user) throw new BadRequestException();
@@ -20,7 +25,17 @@ export class InvitationService {
     return await this.invitationRepository.create(email);
   }
 
-  async deleteInvitation(id: string) {
+  async deleteInvitationById(id: string) {
     return await this.invitationRepository.delete(id);
+  }
+
+  userCanRegister(nbUsers: number, invitation: Invitation) {
+    return invitation || nbUsers === 0;
+  }
+
+  async deleteInvitation(invitation: Invitation) {
+    if (invitation) {
+      await this.invitationRepository.delete(invitation.id);
+    }
   }
 }

@@ -10,7 +10,7 @@ import { ConfigurationRepository } from 'src/configuration/configuration.reposit
 import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
 
 @Injectable()
-export class DisabledGuard implements CanActivate {
+export class AccessGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private readonly configurationRepository: ConfigurationRepository,

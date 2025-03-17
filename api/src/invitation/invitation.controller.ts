@@ -21,7 +21,8 @@ export class InvitationController {
   }
 
   @Delete(':/id')
+  @UseGuards(AdminGuard)
   async deleteInvitation(@Param('id') id: string) {
-    await this.invitationService.deleteInvitation(id);
+    await this.invitationService.deleteInvitationById(id);
   }
 }
