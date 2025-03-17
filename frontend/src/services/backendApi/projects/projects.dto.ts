@@ -24,9 +24,7 @@ export type ProjectDto = {
 };
 
 export type UpdateProjectDto = {
-  repository_branch?: string;
-  vcpu?: number;
-  ram?: number;
   name?: string;
   description?: string;
+  authorization_id?: string;
 };

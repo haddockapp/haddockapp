@@ -67,7 +67,14 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
   const { handleSubmit, control } = methods;
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
-    editProject({ projectId: project?.id ?? "", body: data })
+    editProject({
+      projectId: project?.id ?? "",
+      body: {
+        name: data.name,
+        description: data.description,
+        authorization_id: data.authorization.value,
+      },
+    })
       .unwrap()
       .then(() => {
         toast({ title: "Project updated successfully", duration: 1000 });
