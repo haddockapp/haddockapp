@@ -79,18 +79,12 @@ export class ProjectRepository {
 
   async updateProject(params: {
     where: Prisma.ProjectWhereUniqueInput;
-    data: Partial<Project>;
+    data: Prisma.ProjectUpdateInput;
   }): Promise<Project> {
     const { where, data } = params;
 
-    const updateData: Prisma.ProjectUpdateInput = {
-      name: data.name,
-      description: data.description,
-      path: data.path,
-    };
-
     return this.prismaService.project.update({
-      data: updateData,
+      data: data,
       where,
     });
   }
