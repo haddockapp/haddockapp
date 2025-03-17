@@ -132,8 +132,7 @@ export class ProjectController {
       services.map(async (service) => {
         const result: ProjectServiceDto = {
           icon: 'https://i.imgur.com/ZMxf3Iy.png',
-          image: service.image.startsWith('.') ? 'custom' : service.image,
-          name: service.name,
+          ...service,
         };
 
         const serviceName = service.image.split(':')[0];

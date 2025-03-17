@@ -1,12 +1,5 @@
 import { backendApi } from ".";
 
-export interface ServiceDto {
-  name: string;
-  image: string;
-  icon: string;
-  ports: string[];
-}
-
 export interface ServiceUser {
   uid: string;
   gid: string;
@@ -23,9 +16,13 @@ export interface ServiceInformationDto {
   ports: string[];
   networks: string[];
   depends_on: string[];
-  environment: string[];
+  environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
+}
+
+export interface ServiceDto extends ServiceInformationDto {
+  icon: string;
 }
 
 const servicesApi = backendApi.injectEndpoints({

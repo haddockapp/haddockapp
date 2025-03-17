@@ -1,5 +1,5 @@
-export default interface ProjectServiceDto {
-    name: string;
-    image: string;
-    icon: string;
+import Service from 'src/compose/model/Service';
+
+export default interface ProjectServiceDto extends Service {
+  icon: string;
 }
