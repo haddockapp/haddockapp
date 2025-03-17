@@ -1,5 +1,5 @@
 import { ServiceDto } from "@/services/backendApi/services";
-import { NodePositions } from "@/types/services/services";
+import { ReactFlowStateStorage } from "@/types/services/services";
 import { Edge, Node } from "@xyflow/react";
 
 const checkEdgeConditions = (nodeA: ServiceDto, nodeB: ServiceDto) => {
@@ -60,8 +60,8 @@ export const calculateCircularPosition = (
 ) => {
   const networkGroups: Record<string, string[]> = {};
   const positions: Record<string, { x: number; y: number }> = {};
-  const initialNodesPositions: NodePositions = JSON.parse(
-    localStorage.getItem(`${projectId}ServicePositions`) ?? "{}"
+  const initialNodesPositions: ReactFlowStateStorage = JSON.parse(
+    localStorage.getItem(`${projectId}FlowState`) ?? "{}"
   );
 
   services.forEach((service) => {
@@ -106,8 +106,8 @@ export const calculateCircularPosition = (
   });
 
   const getNodePosition = (name: string) => {
-    if (initialNodesPositions[name]) {
-      return initialNodesPositions[name];
+    if (initialNodesPositions.servicesPositions?.[name]) {
+      return initialNodesPositions.servicesPositions[name];
     }
     return positions[name];
   };

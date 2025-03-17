@@ -11,6 +11,7 @@ import {
   Edge,
   Node,
   NodeChange,
+  MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
@@ -20,13 +21,14 @@ import {
   DrawerContent,
 } from "@/components/ui/drawer";
 import ServiceDrawerContent from "../../ServicesDrawer/ServiceDrawerContent";
-import { NodePositions } from "@/types/services/services";
+import { ReactFlowStateStorage } from "@/types/services/services";
 import {
   calculateCircularPosition,
   defineInitalNodes,
   defineInitialEdges,
 } from "./utils";
 import CustomNode from "./CustomNode";
+import CheckBoxWithText from "@/components/molecules/text-checkbox";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -38,6 +40,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const initialEdges: Edge[] = defineInitialEdges(services ?? []);
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [showEdges, setShowEdges] = useState(true);
   const [selectedService, setSelectedService] = useState<ServiceDto | null>(
     null
   );
@@ -49,6 +52,10 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       const newNodes = calculateCircularPosition(services, projectId);
       setNodes(newNodes);
       setEdges(newEdges);
+      const initialState: ReactFlowStateStorage = JSON.parse(
+        localStorage.getItem(`${projectId}FlowState`) ?? "{}"
+      );
+      setShowEdges(initialState.showEdges ?? true);
     }
   }, [projectId, services]);
   const onNodesChange = useCallback(
@@ -63,15 +70,18 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   };
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      const currentNodesPositions: NodePositions = JSON.parse(
-        localStorage.getItem(`${projectId}ServicePositions`) ?? "{}"
+      const currentNodesPositions: ReactFlowStateStorage = JSON.parse(
+        localStorage.getItem(`${projectId}FlowState`) ?? "{}"
       );
-      currentNodesPositions[node.id] = {
+      if (!currentNodesPositions.servicesPositions) {
+        currentNodesPositions.servicesPositions = {};
+      }
+      currentNodesPositions.servicesPositions[node.id] = {
         x: node.position.x,
         y: node.position.y,
       };
       localStorage.setItem(
-        `${projectId}ServicePositions`,
+        `${projectId}FlowState`,
         JSON.stringify(currentNodesPositions)
       );
     },
@@ -95,6 +105,18 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  const onChangeShowEdges = (checked: boolean) => {
+    setShowEdges(checked);
+    const currentFlowState: ReactFlowStateStorage = JSON.parse(
+      localStorage.getItem(`${projectId}FlowState`) ?? "{}"
+    );
+    currentFlowState.showEdges = checked;
+    localStorage.setItem(
+      `${projectId}FlowState`,
+      JSON.stringify(currentFlowState)
+    );
+  };
 
   return (
     <div className="mt-2 h-[75vh]" ref={reactFlowWrapper}>
@@ -130,7 +152,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
           <div className="relative border-4 border-gray-200 rounded-lg shadow-lg w-full h-full">
             <ReactFlow
               nodes={nodes}
-              edges={edges}
+              edges={showEdges ? edges : []}
               onNodesChange={onNodesChange}
               onNodeClick={onNodeClick}
               onPaneClick={() => setSelectedService(null)}
@@ -140,6 +162,14 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
             >
               <Background />
               <Controls />
+              <MiniMap />
+              <CheckBoxWithText
+                id="showEdges"
+                text="Show Edges"
+                checked={showEdges}
+                onCheckedChange={(checked) => onChangeShowEdges(checked)}
+                containerClassName="absolute top-2 right-2 z-10"
+              />
             </ReactFlow>
           </div>
         </>
