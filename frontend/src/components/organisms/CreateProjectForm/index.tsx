@@ -32,7 +32,7 @@ const formSchema = z.object({
       label: z.string(),
       value: z.string(),
     })
-    .required(),
+    .optional(),
   repository: z
     .object({
       label: z.string(),
@@ -86,7 +86,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
       {
-        authorization: watchAuthorization,
+        authorization: watchAuthorization!,
       },
       { skip: !watchAuthorization || isDeployKeyAuthorization }
     );
@@ -94,7 +94,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
     useGetAllBranchesByRepositoryQuery(
       {
         repository: watchRepository,
-        authorization: watchAuthorization,
+        authorization: watchAuthorization!,
       },
       {
         skip: !watchRepository || isDeployKeyAuthorization,
@@ -117,7 +117,9 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
           vm_memory: +data.memory,
           vm_disk: +data.disk,
           compose_path: data.composePath,
-          authorization_id: data.authorization.value,
+          authorization_id: data.authorization
+            ? data.authorization.value
+            : undefined,
         })
           .unwrap()
           .then(() => {
@@ -179,7 +181,6 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             <FormField
               control={control}
               name="authorization"
-              rules={{ required: true }}
               render={({ field }) => (
                 <FormItem>
                   <Label>Authorization</Label>
