@@ -9,8 +9,7 @@ const Welcome: FC = () => {
   const [, setSearchParams] = useSearchParams();
   useEffect(() => {
     setSearchParams({ step: "welcome" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setSearchParams]);
 
   return (
     <div>

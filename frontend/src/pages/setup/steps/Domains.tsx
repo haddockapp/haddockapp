@@ -20,8 +20,7 @@ const Domains: FC = () => {
   const [, setSearchParams] = useSearchParams();
   useEffect(() => {
     if (!isLoading) setSearchParams({ step: "domains" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isLoading, setSearchParams]);
 
   return (
     <>
