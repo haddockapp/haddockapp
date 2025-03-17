@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Put,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
@@ -12,6 +13,7 @@ import { CurrentUser } from 'src/auth/user.context';
 import { UserService } from './user.service';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { AdminGuard } from 'src/auth/guard/admin.guard';
+import { Response } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -55,8 +57,10 @@ export class UserController {
   }
 
   @Get(':id/data')
-  async downloadUserData(@Param('id') id: string) {
-    // @TODO: define user data scope
-    return id;
+  async downloadUserData(@Param('id') id: string, @Res() res: Response) {
+    const buffer = await this.userService.getUserDataFile(id);
+
+    res.attachment(`${id}.json`);
+    res.send(buffer);
   }
 }

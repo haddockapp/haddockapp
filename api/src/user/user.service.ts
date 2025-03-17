@@ -80,7 +80,12 @@ export class UserService {
     return await this.userRepository.delete(id);
   }
 
-  async getAllUserData(id: string) {
-    return id;
+  async getUserDataFile(id: string) {
+    const user = await this.userRepository.findById(id);
+
+    const data = {
+      user: this.toResponse(user), // Remove password for security
+    };
+    return Buffer.from(JSON.stringify(data, null, 2));
   }
 }
