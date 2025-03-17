@@ -7,7 +7,6 @@ import socket, {
 } from "@/services/websockets";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import testData from "../testData.json";
 import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 
@@ -18,7 +17,7 @@ const MonitoringTab: FC = () => {
 
   const [cpuUsage, setCpuUsage] = useState<number>(0);
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
-  const [logs, setLogs] = useState<string[]>(testData);
+  const [logs, setLogs] = useState<string[]>([]);
 
   useEffect(() => {
     if (!projectId || !me) return;
