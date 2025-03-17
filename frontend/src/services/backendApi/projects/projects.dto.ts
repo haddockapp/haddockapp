@@ -9,7 +9,7 @@ export type CreateProjectDto = {
   vm_disk: number;
   vm_cpus: number;
   compose_path: string;
-  authorization_id: string;
+  authorization_id?: string;
 };
 
 export type ProjectDto = {
