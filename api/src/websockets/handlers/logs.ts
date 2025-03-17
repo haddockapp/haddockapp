@@ -46,6 +46,7 @@ export class LogsHandler implements Handler {
         `Error fetching Logs usage for VM ${this.project.path}:`,
         error.message,
       );
+      return [];
     }
   }
 
