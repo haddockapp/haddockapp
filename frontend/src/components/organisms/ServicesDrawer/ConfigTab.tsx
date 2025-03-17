@@ -29,12 +29,14 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {serviceInformations.environment.map((env, index) => (
-                <TableRow key={index}>
-                  <TableCell>{env.split("=")[0]}</TableCell>
-                  <TableCell>{env.split("=")[1]}</TableCell>
-                </TableRow>
-              ))}
+              {Object.entries(serviceInformations.environment).map(
+                ([key, value]) => (
+                  <TableRow key={key}>
+                    <TableCell>{key}</TableCell>
+                    <TableCell>{value}</TableCell>
+                  </TableRow>
+                )
+              )}
             </TableBody>
           </Table>
         )}

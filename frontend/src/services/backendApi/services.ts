@@ -16,7 +16,7 @@ export interface ServiceInformationDto {
   ports: string[];
   networks: string[];
   depends_on: string[];
-  environment: string[];
+  environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
 }
