@@ -52,7 +52,7 @@ const formSchema = z.object({
 });
 
 interface CreateProjectFormProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
@@ -132,7 +132,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               duration: 1000,
             });
             reset();
-            onClose();
+            onClose?.();
             setFormStep(0);
           })
           .catch(() => {

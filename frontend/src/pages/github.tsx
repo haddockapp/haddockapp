@@ -1,6 +1,6 @@
-import HaddockSpinner from "@/components/atoms/spinner";
+import { HaddockLoader } from "@/components/atoms/spinner";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { setToken } from "@/services/authSlice";
 import {
   GithubAuthReason,
@@ -14,6 +14,8 @@ import { FC, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const GithubCallback: FC = () => {
+  const { isSetupComplete } = useAppSelector((state) => state.auth);
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -45,6 +47,8 @@ const GithubCallback: FC = () => {
             .then(({ accessToken }) => {
               dispatch(setToken(accessToken));
             });
+          if (!isSetupComplete) navigate("/setup?step=domains");
+          else navigate("/dashboard");
           break;
         case GithubAuthReason.CREATE_AUTHORIZATION:
           triggerCreateAuthorization({
@@ -60,17 +64,19 @@ const GithubCallback: FC = () => {
                   "You can now use this authorization to access your repositories.",
               });
             });
+          navigate("/dashboard");
           break;
       }
-      navigate("/");
     }
-  }, [dispatch, navigate, triggerCreateAuthorization, triggerLoginGithub]);
+  }, [
+    dispatch,
+    isSetupComplete,
+    navigate,
+    triggerCreateAuthorization,
+    triggerLoginGithub,
+  ]);
 
-  return (
-    <div className="h-screen items-center justify-center flex flex-col">
-      <HaddockSpinner />
-    </div>
-  );
+  return <HaddockLoader />;
 };
 
 export default GithubCallback;

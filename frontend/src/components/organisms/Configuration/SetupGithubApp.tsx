@@ -10,11 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import useConfiguration from "@/hooks/use-configuration";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch } from "@/hooks/useStore";
-import { nextSetupStep } from "@/services/authSlice";
 import { useCreateConfigurationMutation } from "@/services/backendApi/configuration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
 import { FC, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,12 +22,14 @@ const formSchema = z.object({
 });
 
 export type ConfigurationProps = {
-  onClose: () => void;
+  isAppSetup?: boolean;
+  onClose?: () => void;
 };
 
-const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
-  const dispatch = useAppDispatch();
-
+const Configuration: FC<ConfigurationProps> = ({
+  isAppSetup = true,
+  onClose,
+}) => {
   const [triggerCreateConfiguration] = useCreateConfigurationMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,7 +48,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
             title: "Configuration created successfully",
             variant: "default",
           });
-          onClose();
+          onClose?.();
         })
         .catch((e) => {
           toast({
@@ -68,8 +67,8 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
     if (githubConfig) {
       if (githubConfig.clientId)
         form.setValue("clientId", githubConfig.clientId);
-      if (githubConfig.clientSecret)
-        form.setValue("clientSecret", githubConfig.clientSecret);
+      // if (githubConfig.clientSecret)
+      //   form.setValue("clientSecret", githubConfig.clientSecret);
     }
   }, [form, githubConfig]);
 
@@ -77,10 +76,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={onSubmit}
-        className="mx-auto space-y-8 w-[400px] text-start"
-      >
+      <form onSubmit={onSubmit} className="space-y-8 text-start">
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -113,14 +109,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
             )}
           />
         </div>
-        {!githubConfig ? (
-          <Button type="submit">Submit</Button>
-        ) : (
-          <Button onClick={() => dispatch(nextSetupStep())}>
-            <ChevronRight />
-            <span>Next</span>
-          </Button>
-        )}
+        <Button type="submit">{!isAppSetup ? "Update" : "Submit"}</Button>
       </form>
     </Form>
   );

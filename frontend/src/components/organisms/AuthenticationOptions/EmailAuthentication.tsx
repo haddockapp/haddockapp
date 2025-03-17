@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
-import { nextSetupStep, setToken } from "@/services/authSlice";
+import { setToken } from "@/services/authSlice";
 import {
   useSignInMutation,
   useSignUpMutation,
@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
 import { FC, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -28,10 +29,12 @@ const formSchema = z.object({
 });
 
 const EmailAuthentication: FC = () => {
-  const { setupStep } = useAppSelector((state) => state.auth);
+  const { isSetupComplete } = useAppSelector((state) => state.auth);
+
+  const navigate = useNavigate();
 
   const [type, setType] = useState<"log-in" | "sign-up">(
-    setupStep > 0 ? "log-in" : "sign-up"
+    isSetupComplete ? "log-in" : "sign-up"
   );
 
   const dispatch = useAppDispatch();
@@ -66,7 +69,8 @@ const EmailAuthentication: FC = () => {
         .unwrap()
         .then(({ accessToken }) => {
           dispatch(setToken(accessToken));
-          dispatch(nextSetupStep());
+          if (!isSetupComplete) navigate("/setup?step=domains");
+          else navigate("/dashboard");
         })
         .catch((e) =>
           toast({
@@ -76,7 +80,15 @@ const EmailAuthentication: FC = () => {
           })
         );
     },
-    [dispatch, form, triggerLogin, triggerSignUp, type]
+    [
+      dispatch,
+      form,
+      isSetupComplete,
+      navigate,
+      triggerLogin,
+      triggerSignUp,
+      type,
+    ]
   );
 
   return (

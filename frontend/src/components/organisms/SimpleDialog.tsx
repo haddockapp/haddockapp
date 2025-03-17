@@ -11,7 +11,7 @@ import Divider from "../atoms/divider";
 
 interface SimpleDialogProps {
   Trigger: FC<{ onOpen: () => void }>;
-  Content: FC<{ onClose: () => void }>;
+  Content: FC<{ onClose?: () => void; isAppSetup?: boolean }>;
   title: string;
   description: string;
   isOpen: boolean;

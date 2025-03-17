@@ -1,17 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { useAppDispatch } from "@/hooks/useStore";
-import { nextSetupStep } from "@/services/authSlice";
 import { CircleGauge } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Welcome: FC = () => {
-  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const [, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    setSearchParams({ step: "welcome" });
+  }, [setSearchParams]);
 
   return (
     <div>
       <Button
         variant="link"
-        onClick={() => dispatch(nextSetupStep())}
+        onClick={() => navigate("/dashboard")}
         className="space-x-2"
       >
         <CircleGauge size="16px" />
