@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { DrawerTitle } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FC, useState } from "react";
-import { TabsValue } from "../ProjectTabs/type";
 import StatusTab from "./StatusTab";
 import {
   ServiceDto,
@@ -10,6 +9,12 @@ import {
 } from "@/services/backendApi/services";
 import ConfigTab from "./ConfigTab";
 import NetworksTab from "./NetworksTab";
+
+enum TabsValue {
+  Status = "status",
+  Config = "config",
+  Networks = "networks",
+}
 
 interface ServiceDrawerContentProps {
   service: ServiceDto;

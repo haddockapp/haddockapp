@@ -21,7 +21,7 @@ export class LogsHandler implements Handler {
       const logs: string[] = await this.getLogs();
 
       if (
-        this.prevLogs.length === logs.length &&
+        this.prevLogs?.length === logs?.length &&
         this.prevLogs.every((value, index) => value === logs[index])
       ) {
         return;
@@ -30,7 +30,7 @@ export class LogsHandler implements Handler {
       this.clients.forEach((c) => {
         c.socket.emit('logs', { logs });
       });
-      this.prevLogs = logs;
+      this.prevLogs = logs ?? [];
     });
   }
 

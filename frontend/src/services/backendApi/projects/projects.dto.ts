@@ -16,6 +16,7 @@ export type ProjectDto = {
   id: string;
   sourceId: string;
   name: string;
+  authorizationId?: string;
   description?: string;
   vmId: string;
   vm: VMInfos;
@@ -23,9 +24,7 @@ export type ProjectDto = {
 };
 
 export type UpdateProjectDto = {
-  repository_branch?: string;
-  vcpu?: number;
-  ram?: number;
   name?: string;
   description?: string;
+  authorization_id?: string;
 };

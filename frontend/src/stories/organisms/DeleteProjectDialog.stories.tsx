@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import DeleteProjectDialog from "@/components/organisms/ProjectTabs/DeleteProjectDialog";
+import DeleteProjectDialog from "@/components/organisms/ProjectTabs/SettingsTab/DeleteProjectDialog";
 
 const meta = {
   title: "Organisms/DeleteProjectDialog",
