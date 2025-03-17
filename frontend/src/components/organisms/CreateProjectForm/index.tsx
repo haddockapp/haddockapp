@@ -15,7 +15,6 @@ import {
   useGetAllAuthorizationsQuery,
 } from "@/services/backendApi/authorizations";
 import Select from "react-select";
-import CreatableSelect from "react-select/creatable";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,6 +24,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import CreateSelect from "@/components/molecules/create-select";
 
 const formSchema = z.object({
   authorization: z
@@ -32,7 +32,7 @@ const formSchema = z.object({
       label: z.string(),
       value: z.string(),
     })
-    .required(),
+    .optional(),
   repository: z
     .object({
       label: z.string(),
@@ -76,28 +76,30 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { currentData: authorizations, isFetching: isFetchingAuthorizations } =
     useGetAllAuthorizationsQuery();
 
-  const isDeployKeyAuthorization = useMemo(() => {
+  const canFetchReposAndBranches = useMemo(() => {
+    if (!watchAuthorization) return false;
     const authorization = authorizations?.find(
       (authorization) => authorization.id === watchAuthorization
     );
-    return authorization?.type === AuthorizationEnum.DEPLOY_KEY;
+    if (!authorization) return false;
+    return authorization?.type !== AuthorizationEnum.DEPLOY_KEY;
   }, [authorizations, watchAuthorization]);
 
   const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
       {
-        authorization: watchAuthorization,
+        authorization: watchAuthorization!,
       },
-      { skip: !watchAuthorization || isDeployKeyAuthorization }
+      { skip: !watchAuthorization || !canFetchReposAndBranches }
     );
   const { currentData: branches, isFetching: isFetchingBranches } =
     useGetAllBranchesByRepositoryQuery(
       {
         repository: watchRepository,
-        authorization: watchAuthorization,
+        authorization: watchAuthorization!,
       },
       {
-        skip: !watchRepository || isDeployKeyAuthorization,
+        skip: !watchRepository || !canFetchReposAndBranches,
       }
     );
 
@@ -117,7 +119,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
           vm_memory: +data.memory,
           vm_disk: +data.disk,
           compose_path: data.composePath,
-          authorization_id: data.authorization.value,
+          authorization_id: data.authorization
+            ? data.authorization?.value.length > 0
+              ? data.authorization?.value
+              : undefined
+            : undefined,
         })
           .unwrap()
           .then(() => {
@@ -179,7 +185,6 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             <FormField
               control={control}
               name="authorization"
-              rules={{ required: true }}
               render={({ field }) => (
                 <FormItem>
                   <Label>Authorization</Label>
@@ -187,7 +192,10 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                     <Select
                       {...field}
                       isLoading={isFetchingAuthorizations}
-                      options={authorizationsOptions}
+                      options={[
+                        { value: "", label: "N/A" },
+                        ...authorizationsOptions,
+                      ]}
                     />
                   </FormControl>
                   <FormMessage />
@@ -202,10 +210,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem>
                   <Label>Repository</Label>
                   <FormControl>
-                    <CreatableSelect
-                      {...field}
+                    <CreateSelect
                       isLoading={isFetchingRepositories}
                       options={repositoriesOptions}
+                      isSelect={canFetchReposAndBranches}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -220,11 +229,12 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem>
                   <Label>Branch</Label>
                   <FormControl>
-                    <CreatableSelect
-                      {...field}
+                    <CreateSelect
                       isLoading={isFetchingBranches}
                       isDisabled={!watch("repository")}
                       options={branchesOptions}
+                      isSelect={canFetchReposAndBranches}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
