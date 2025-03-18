@@ -19,11 +19,11 @@ class Collector:
     def __init__(self):
         self.store = {}
         self.collectors = []
-    
+
     def register_collector(self, name: CollectorEnum, collector: Callable, interval: int):
         self.store[name.value] = None
         self.collectors.append(CallableCollector(name, collector, interval))
-    
+
     async def run(self, names: set = None):
         for collector in self.collectors:
             if names is not None and collector.name.value not in names:
@@ -31,6 +31,6 @@ class Collector:
             result = await collector.run()
             if result is not None:
                 self.store[collector.name.value] = result
-    
+
     def get_collected(self, name: CollectorEnum):
         return self.store[name]

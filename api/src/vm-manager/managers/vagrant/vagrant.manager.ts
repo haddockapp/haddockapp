@@ -70,7 +70,13 @@ export class VagrantManager implements IVMManager {
   }
 
   async createVM(vm: PersistedVmDto, deployPath: string): Promise<Vm> {
-    const template: string = this.template(vm);
+    const composePath = this.getComposePath(vm.project.source);
+
+    const template: string = this.template({
+      ...vm,
+      name: vm.project.id,
+      compose_path: composePath,
+    });
 
     await writeFile(`${deployPath}/Vagrantfile`, template, {
       encoding: 'utf-8',
@@ -125,10 +131,7 @@ export class VagrantManager implements IVMManager {
 
     const ip = this.getIpFromOutput(output);
 
-    if (
-      !(ip !== undefined || ip !== '' || ip !== null) &&
-      ip === undefined
-    ) {
+    if (!(ip !== undefined || ip !== '' || ip !== null) && ip === undefined) {
       throw new Error('Failed to get IP address');
     }
 

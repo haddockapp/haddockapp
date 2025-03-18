@@ -44,7 +44,7 @@ class SocketServer:
         async def unsubscribe(sid, data):
             print(f'Client {sid} unsubscribed')
             self.subscriptions.pop(sid, None)
-    
+
     def get_data_to_collect(self):
         to_collect = set()
         for _, subscriptions in self.subscriptions.items():
@@ -56,7 +56,7 @@ class SocketServer:
             to_collect = self.get_data_to_collect()
             await self.collector.run(to_collect)
             await asyncio.sleep(3)
-    
+
     async def send_data(self):
         for sid, subscriptions in self.subscriptions.items():
             try:
@@ -67,7 +67,7 @@ class SocketServer:
             except (socketio.exceptions.BadNamespaceError, socketio.exceptions.ConnectionError) as e:
                 print(f'Error sending to {sid}: {e}')
                 self.subscriptions.pop(sid, None)
-        
+
 
     async def _emit_metrics(self):
         while True:

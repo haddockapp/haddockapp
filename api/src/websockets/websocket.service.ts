@@ -50,7 +50,6 @@ export class WebSocketService {
   }
 
   removeProject(projectId: string) {
-    console.log(this.projects);
     if (this.projects[projectId]) {
         this.projects[projectId].clients.forEach((client) => {
             client.socket.disconnect();
@@ -60,7 +59,6 @@ export class WebSocketService {
         delete this.projects[projectId];
         this.logger.log(`Project ${projectId} removed`);
     }
-    console.log(this.projects);
   }
 
   removeClientFromProject(client: Socket, projectId: string) {
@@ -116,7 +114,7 @@ export class WebSocketService {
 
     this.projects[projectId] = {
       clients: [],
-      websocket: io('ws://localhost:55000', { reconnection: false }),
+      websocket: io(`ws://${project.vm.ip}:55000`, { reconnection: false }),
     };
 
     const ws = this.projects[projectId].websocket;
