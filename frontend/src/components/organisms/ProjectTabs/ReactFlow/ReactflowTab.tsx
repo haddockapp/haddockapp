@@ -29,6 +29,7 @@ import {
 } from "./utils";
 import CustomNode from "./CustomNode";
 import CheckBoxWithText from "@/components/molecules/text-checkbox";
+import Divider from "@/components/atoms/divider";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -44,8 +45,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [selectedService, setSelectedService] = useState<ServiceDto | null>(
     null
   );
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
+
   useMemo(() => {
     if (services) {
       const newEdges = defineInitialEdges(services);
@@ -88,24 +88,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     [projectId]
   );
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        reactFlowWrapper.current &&
-        !reactFlowWrapper.current.contains(event.target as HTMLElement) &&
-        drawerRef.current &&
-        !drawerRef.current.contains(event.target as HTMLElement)
-      ) {
-        setSelectedService(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
   const onChangeShowEdges = (checked: boolean) => {
     setShowEdges(checked);
     const currentFlowState: ReactFlowStateStorage = JSON.parse(
@@ -118,8 +100,12 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     );
   };
 
+  const handlePaneClick = () => {
+    setSelectedService(null);
+  };
+
   return (
-    <div className="mt-2 h-[75vh]" ref={reactFlowWrapper}>
+    <div className="mt-2 h-[75vh] pt-8">
       {(services?.length === 0 || !services) && (
         <>
           <h1 className="text-3xl font-bold my-8">Services</h1>
@@ -130,18 +116,10 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       )}
       {services && (
         <>
-          <Drawer
-            direction="right"
-            open={selectedService !== null}
-            onClose={() => setSelectedService(null)}
-            modal={false}
-          >
+          <Drawer direction="right" open={selectedService !== null}>
             <DrawerPortal>
-              <DrawerOverlay className="fixed inset-0 z-0 bg-black/40" />
-              <DrawerContent
-                className="right-0 top-0 bottom-0 fixed z-10 flex outline-none w-2/5"
-                ref={drawerRef}
-              >
+              <DrawerOverlay className="fixed inset-0 z-30 bg-black/40" />
+              <DrawerContent className="right-0 top-0 bottom-0 fixed z-50 flex outline-none w-2/5">
                 <ServiceDrawerContent
                   service={selectedService}
                   projectId={projectId}
@@ -149,26 +127,28 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               </DrawerContent>
             </DrawerPortal>
           </Drawer>
-          <div className="relative border-4 border-gray-200 rounded-lg shadow-lg w-full h-full">
+          <Divider />
+          <div className="relative w-full h-full z-40">
             <ReactFlow
+              className="z-40"
               nodes={nodes}
               edges={showEdges ? edges : []}
               onNodesChange={onNodesChange}
               onNodeClick={onNodeClick}
-              onPaneClick={() => setSelectedService(null)}
+              onPaneClick={handlePaneClick}
               onNodeDragStop={onNodeDragStop}
               nodeTypes={{ custom: CustomNode }}
               fitView
             >
-              <Background />
-              <Controls />
-              <MiniMap />
+              <Background className="z-40" />
+              <Controls className="z-40" />
+              <MiniMap className="z-40" />
               <CheckBoxWithText
                 id="showEdges"
                 text="Show Edges"
                 checked={showEdges}
                 onCheckedChange={(checked) => onChangeShowEdges(checked)}
-                containerClassName="absolute top-2 right-2 z-10"
+                containerClassName="absolute top-2 left-2 z-50"
               />
             </ReactFlow>
           </div>
