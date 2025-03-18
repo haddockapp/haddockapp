@@ -8,7 +8,7 @@ const networksApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
     getNetworksConnection: builder.query<NetworkConnectionDto[], string>({
       query: (projectId) => ({
-        url: `network-connection/project/${projectId}`,
+        url: `/network-connection/project/${projectId}`,
       }),
       providesTags: [{ type: QueryKeys.Redirections, id: "LIST" }],
     }),
@@ -17,7 +17,7 @@ const networksApi = backendApi.injectEndpoints({
       CreateNetworkConnectionDto
     >({
       query: (body) => ({
-        url: `network-connection`,
+        url: `/network-connection`,
         method: "POST",
         body,
       }),
@@ -25,7 +25,7 @@ const networksApi = backendApi.injectEndpoints({
     }),
     deleteNetworkConnection: builder.mutation<NetworkConnectionDto, string>({
       query: (id) => ({
-        url: `network-connection/${id}`,
+        url: `/network-connection/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: [{ type: QueryKeys.Redirections, id: "LIST" }],
