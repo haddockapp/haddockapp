@@ -1,4 +1,4 @@
-enum ServiceEnum {
+export enum ServiceEnum {
     METRICS = 'metrics',
     LOGS = 'logs',
     STATUS = 'status'
@@ -7,7 +7,7 @@ enum ServiceEnum {
 export interface ProjectEventDto {
   userId: string;
   projectId: string;
-  service: ServiceEnum;
+  services: ServiceEnum[];
   subscribe: boolean;
   data: any;
 }

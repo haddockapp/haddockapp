@@ -41,10 +41,11 @@ function handleProjectSubcription<T extends MetricsSocketType | LogsSocketType>(
   data: ProjectEventDto,
   onListen: (res: T) => void
 ) {
-  const s = getSocket();
-  if (!s) return;
-  s.emit("project", data);
-  s.on(data.service, onListen);
+  socket.emit("project", {
+    ...data,
+    services: [data.service],
+  });
+  socket.on(data.service, onListen);
 }
 
 export { handleProjectSubcription };

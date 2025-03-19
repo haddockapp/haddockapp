@@ -175,6 +175,8 @@ export class DeployConsumer {
       this.logger.log(`Starting VM for project ${source.project.id}`);
       await this.vmService.upVm(source.project.vmId);
 
+      await this.websocketService.createProject(source.project.id);
+
       this.logger.log(`Deployed project ${source.project.id}`);
     } catch (e) {
       if (e instanceof DeployError) {

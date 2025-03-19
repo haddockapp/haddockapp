@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Client } from './types/client';
 import { WebsocketEventDto } from './dto/websocket-event.dto';
-import { ProjectEventDto } from './dto/project-event.dto';
-import { ProjectHandler } from './types/project-handler';
+import { ProjectEventDto, ServiceEnum } from './dto/project-event.dto';
+import { MetricsClient, ProjectHandler } from './types/project-handler';
 import { ProjectRepository } from 'src/project/project.repository';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { io } from 'socket.io-client';
@@ -21,6 +21,7 @@ export class WebSocketService {
       userId,
       socket: client,
     };
+    this.logger.log(`Client ${userId} connected`);
   }
 
   removeClient(client: Socket) {
@@ -34,6 +35,8 @@ export class WebSocketService {
     Object.keys(this.projects).forEach((projectId) => {
       this.removeClientFromProject(client, projectId);
     });
+
+    this.logger.log(`Client ${userId} disconnected`);
   }
 
   notifyUser(userId: string, message: object) {
@@ -49,31 +52,45 @@ export class WebSocketService {
     });
   }
 
-  removeProject(projectId: string) {
-    if (this.projects[projectId]) {
-        this.projects[projectId].clients.forEach((client) => {
-            client.socket.disconnect();
-        });
-
-        this.projects[projectId].websocket.close();
-        delete this.projects[projectId];
-        this.logger.log(`Project ${projectId} removed`);
+  async createProject(projectId: string) {
+    if (!this.projects[projectId]) {
+      await this.createProjectHandler(projectId);
+      this.logger.log(`Project ${projectId} created`);
     }
   }
 
-  removeClientFromProject(client: Socket, projectId: string) {
+  removeProject(projectId: string) {
     if (this.projects[projectId]) {
-      this.projects[projectId].clients = this.projects[
-        projectId
-      ].clients.filter((c) => c.socket !== client);
+      this.projects[projectId].clients.forEach((client) => {
+        client.client.socket.disconnect();
+      });
+
+      this.projects[projectId].websocket.close();
+      delete this.projects[projectId];
+      this.logger.log(`Project ${projectId} removed`);
     }
   }
 
   async handleUnscribe(client: Socket, eventData: ProjectEventDto) {
-    this.removeClientFromProject(client, eventData.projectId);
-    this.logger.log(
-      `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
-    );
+    if (this.projects[eventData.projectId]) {
+      const subscribed: MetricsClient = this.projects[
+        eventData.projectId
+      ].clients.find((c) => c.client.userId === eventData.userId);
+
+      subscribed.subscriptions = subscribed.subscriptions.filter(
+        (s) => !eventData.services.includes(s),
+      );
+
+      if (subscribed.subscriptions.length === 0) {
+        this.removeClientFromProject(client, eventData.projectId);
+        this.logger.log(
+          `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
+        );
+      }
+      this.logger.log(
+        `Client ${eventData.userId} unsubscribed from services ${eventData.services} in project ${eventData.projectId}`,
+      );
+    }
   }
 
   async handleSubscribe(client: Socket, eventData: ProjectEventDto) {
@@ -81,24 +98,39 @@ export class WebSocketService {
       await this.createProjectHandler(eventData.projectId);
     }
 
-    if (
-      this.projects[eventData.projectId].clients.some(
-        (c) => c.socket === client,
-      )
-    ) {
+    const clientAlreadySubscribed = this.projects[
+      eventData.projectId
+    ].clients.find((c) => c.client.userId === eventData.userId);
+
+    if (clientAlreadySubscribed) {
+      clientAlreadySubscribed.subscriptions = Array.from(
+        new Set([
+          ...clientAlreadySubscribed.subscriptions,
+          ...eventData.services,
+        ]),
+      );
       this.logger.log(
-        `Client ${eventData.userId} already subscribed to project ${eventData.projectId}`,
+        `Client ${eventData.userId} subscribed to project ${eventData.projectId} updated with services ${clientAlreadySubscribed.subscriptions}`,
       );
       return;
     }
 
     this.projects[eventData.projectId].clients.push({
-      userId: eventData.userId,
-      socket: client,
+      client: {
+        userId: eventData.userId,
+        socket: client,
+      },
+      subscriptions: eventData.services,
     });
 
     this.logger.log(
-      `Client ${eventData.userId} subscribed to project ${eventData.projectId}`,
+      `Client ${eventData.userId} subscribed to project ${eventData.projectId} with services ${eventData.services}`,
+    );
+  }
+
+  private removeClientFromProject(client: Socket, projectId: string) {
+    this.projects[projectId].clients = this.projects[projectId].clients.filter(
+      (c) => c.client.socket !== client,
     );
   }
 
@@ -138,24 +170,47 @@ export class WebSocketService {
     });
 
     ws.on('metrics', (data) => {
-        this.projects[projectId].clients.forEach((client) => {
-            client.socket.emit('metrics', {
-                cpuUsage: data.cpu_usage.percent,
-                memoryUsage: data.memory_usage.percent,
-                diskUsage: data.disk_usage.percent,
-            });
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.METRICS)) {
+          return;
+        }
+        client.client.socket.emit('metrics', {
+          cpuUsage: data.cpu_usage.percent,
+          memoryUsage: data.memory_usage.percent,
+          diskUsage: data.disk_usage.percent,
         });
+      });
     });
 
     ws.on('logs', (data) => {
-        this.projects[projectId].clients.forEach((client) => {
-            client.socket.emit('logs', {
-                logs: data.split('\n'),
-            });
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.LOGS)) {
+          return;
+        }
+        client.client.socket.emit('logs', {
+          logs: data.split('\n'),
         });
+      });
     });
 
     ws.on('status', (data) => {
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.STATUS)) {
+          return;
+        }
+        client.client.socket.emit('status', {
+          status: data,
+        });
+      });
     });
   }
 }
