@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VmModule } from './vm/vm.module';
-import {AuthModule} from "./auth/auth.module";
-import {ProjectModule} from "./project/project.module";
+import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
 import { DockerModule } from './docker/docker.module';
 import { SourceModule } from './source/source.module';
 import { BullModule } from '@nestjs/bull';
@@ -16,6 +16,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { VMManagerModule } from './vm-manager/vm.manager.module';
+import { InvitationModule } from './invitation/invitation.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { VMManagerModule } from './vm-manager/vm.manager.module';
     ConfigurationModule,
     HealthModule,
     VMManagerModule,
+    InvitationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

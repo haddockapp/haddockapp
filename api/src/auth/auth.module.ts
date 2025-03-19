@@ -13,6 +13,8 @@ import { GithubStrategy } from './strategy/github.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { LocalStrategy } from './strategy/local.strategy';
+import { InvitationModule } from 'src/invitation/invitation.module';
+import { AccessGuard } from './guard/access.guard';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { LocalStrategy } from './strategy/local.strategy';
     AuthorizationModule,
     ConfigurationModule,
     UserModule,
+    InvitationModule,
   ],
   providers: [
     AuthService,
@@ -35,6 +38,7 @@ import { LocalStrategy } from './strategy/local.strategy';
     GithubStrategy,
     LocalStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
   controllers: [AuthController],
   exports: [],

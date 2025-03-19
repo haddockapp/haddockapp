@@ -18,6 +18,8 @@ model User {
     name     String
     email    String  @unique
     password String?
+    role     String
+    isActive Boolean @default(true)
 }
 
 model Authorization {
@@ -87,4 +89,9 @@ model Domain {
 model AppConfiguration {
     key   String @unique
     value Json
+}
+
+model Invitation {
+    id    String @id @default(uuid())
+    email String @unique
 }

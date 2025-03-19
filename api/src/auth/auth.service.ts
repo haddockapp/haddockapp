@@ -1,12 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import JwtBody from './dto/JwtBody.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/Signup.dto';
-import { SigninDto } from './dto/Signin.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
+import { UserRoleEnum } from 'src/user/types/user-role.enum';
+import { InvitationRepository } from 'src/invitation/invitation.repository';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
     private prismaService: PrismaService,
     private userRepository: UserRepository,
+    private invitationRepository: InvitationRepository,
   ) {}
 
   generateJwt(user: User): string {
@@ -45,6 +47,11 @@ export class AuthService {
   }
 
   async signup(dto: SignupDto): Promise<User> {
+    const count = await this.prismaService.user.count();
+
+    const invitation = await this.invitationRepository.findByEmail(dto.email);
+    if (!invitation && count > 0) throw new ForbiddenException();
+
     const passwordHash = await this.hashPassword(dto.password);
 
     const user = await this.prismaService.user.create({
@@ -52,8 +59,12 @@ export class AuthService {
         name: dto.name,
         email: dto.email,
         password: passwordHash,
+        role: count === 0 ? UserRoleEnum.ADMIN : UserRoleEnum.MEMBER,
       },
     });
+
+    if (invitation && count > 0)
+      await this.invitationRepository.delete(invitation.id);
     return user;
   }
 }
