@@ -17,7 +17,9 @@ const CheckBoxWithText: FC<CheckBoxWithTextProps> = ({
   containerClassName,
 }) => {
   return (
-    <div className={`items-top flex space-x-2 ${containerClassName}`}>
+    <div
+      className={`items-center flex space-x-2 align-middle ${containerClassName}`}
+    >
       <Checkbox id={id} checked={checked} onCheckedChange={onCheckedChange} />
       <label htmlFor={id} className="text-sm font-medium">
         {text}
