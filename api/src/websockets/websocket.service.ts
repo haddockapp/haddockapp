@@ -71,7 +71,7 @@ export class WebSocketService {
     }
   }
 
-  async handleUnscribe(client: Socket, eventData: ProjectEventDto) {
+  async handleUnsubscribe(client: Socket, eventData: ProjectEventDto) {
     if (this.projects[eventData.projectId]) {
       const subscribed: MetricsClient = this.projects[
         eventData.projectId
@@ -178,9 +178,7 @@ export class WebSocketService {
           return;
         }
         client.client.socket.emit('metrics', {
-          cpuUsage: data.cpu_usage.percent,
-          memoryUsage: data.memory_usage.percent,
-          diskUsage: data.disk_usage.percent,
+          data,
         });
       });
     });

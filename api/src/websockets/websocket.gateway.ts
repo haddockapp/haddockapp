@@ -40,7 +40,7 @@ export class WSGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     if (data.subscribe === false) {
-      await this.websocketService.handleUnscribe(client, data);
+      await this.websocketService.handleUnsubscribe(client, data);
     } else {
       await this.websocketService.handleSubscribe(client, data);
     }
