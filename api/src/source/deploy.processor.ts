@@ -19,6 +19,9 @@ import { tmpdir } from 'os';
 import { ProjectRepository } from 'src/project/project.repository';
 import { VmRepository } from 'src/vm/vm.repository';
 import { PersistedVmDto } from 'src/vm/dto/vm.dto';
+import { WebSocketService } from 'src/websockets/websocket.service';
+import { ComposeService } from 'src/compose/compose.service';
+import { ServiceDto } from 'src/compose/model/Service';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -29,6 +32,8 @@ export class DeployConsumer {
     private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
+    private readonly websocketService: WebSocketService,
+    private readonly composeService: ComposeService,
   ) {}
 
   @OnQueueFailed()
@@ -117,6 +122,35 @@ export class DeployConsumer {
     throw new Error(`Unknown source type ${source.type}`);
   }
 
+  private getComposePath(source: PersistedSourceDto): string {
+    switch (source.type) {
+      case 'github': {
+        const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        return settings.composePath;
+      }
+      default:
+        throw new Error(`Unknown source type ${source.type}`);
+    }
+  }
+
+  private async handleProjectServices(projectId: string, source: PersistedSourceDto) {
+    const composePath: string = this.getComposePath(source);
+
+    const rawCompose = this.composeService.readComposeFile(
+      projectId,
+      composePath,
+    );
+    if (!rawCompose) {
+      return;
+    }
+
+    const services: ServiceDto[] = this.composeService.parseServices(rawCompose.toString());
+
+    await this.projectRepository.setServicesToProject(projectId, services);
+
+    this.logger.log(`Added services to project ${projectId}`);
+  }
+
   @Process('deploy')
   async deploy(job: Job<PersistedSourceDto>) {
     this.logger.log(`Deploying source for project ${job.data.project.id}`);
@@ -132,6 +166,8 @@ export class DeployConsumer {
           path: deployPath,
         },
       });
+
+      await this.handleProjectServices(source.project.id, source);
 
       this.logger.log(`Setting up VM for project ${source.project.id}`);
       await this.vmService.createVM(source.project.vmId, deployPath);

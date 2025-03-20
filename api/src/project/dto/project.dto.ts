@@ -1,3 +1,3 @@
-import { Project, Vm, Source } from '@prisma/client';
+import { Project, Vm, Source, Service } from '@prisma/client';
 
-export type PersistedProjectDto = Project & { vm?: Vm; source?: Source };
+export type PersistedProjectDto = Project & { vm?: Vm; source?: Source, services?: Service[] };

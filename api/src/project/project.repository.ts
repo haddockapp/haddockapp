@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Project } from '@prisma/client';
+import { Prisma, Project, Service } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { VmProvider } from '../types/vm.enum';
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
 import pirateShips from './pirateShips';
+import { ServiceDto } from 'src/compose/model/Service';
+import { EnvironmentVar } from './dto/environmentVar';
 
 @Injectable()
 export class ProjectRepository {
@@ -30,6 +32,7 @@ export class ProjectRepository {
         vm: true,
         source: true,
         networkConnections: true,
+        services: true,
       },
     });
   }
@@ -93,6 +96,98 @@ export class ProjectRepository {
     return this.prismaService.project.delete({
       where: {
         id: projectId,
+      },
+    });
+  }
+
+  async addServiceToProject(projectId: string, service: ServiceDto) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          create: {
+            ...service,
+            environment: JSON.stringify(service.environment),
+            user: JSON.stringify(service.user),
+            deployment: JSON.stringify(service.deployment),
+          },
+        },
+      },
+    });
+  }
+
+  async setServicesToProject(projectId: string, services: ServiceDto[]) {
+    return this.prismaService.$transaction([
+      this.prismaService.service.deleteMany({
+        where: { projectId },
+      }),
+      this.prismaService.project.update({
+        where: { id: projectId },
+        data: {
+          services: {
+            createMany: {
+              data: services.map((service) => ({
+                ...service,
+                environment: JSON.stringify(service.environment),
+                user: JSON.stringify(service.user),
+                deployment: JSON.stringify(service.deployment),
+              })),
+            },
+          },
+        },
+      }),
+    ]);
+  }
+
+  async removeServiceFromProject(projectId: string, serviceName: string) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          delete: {
+            name: serviceName,
+          },
+        },
+      },
+    });
+  }
+
+  async getProjectServices(projectId: string): Promise<Service[]> {
+    return this.prismaService.service.findMany({
+      where: {
+        projectId,
+      },
+    });
+  }
+
+  async getProjectService(
+    projectId: string,
+    serviceName: string,
+  ): Promise<Service | null> {
+    return this.prismaService.service.findFirst({
+      where: {
+        projectId,
+        name: serviceName,
+      },
+    });
+  }
+
+  async updateEnvironmentVars(
+    projectId: string,
+    environmentVars: EnvironmentVar[],
+  ) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        environmentVars: {
+          set: environmentVars,
+        },
       },
     });
   }

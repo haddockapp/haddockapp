@@ -1,5 +1,3 @@
-import Service from "src/compose/model/Service";
-
 export const customBuildComposeConfig = `
 version: '3'
 services:

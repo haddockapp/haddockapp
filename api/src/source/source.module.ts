@@ -8,6 +8,8 @@ import { SourceService } from './source.service';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { SourceRepository } from './source.repository';
 import { ProjectModule } from 'src/project/project.module';
+import { WebsocketModule } from 'src/websockets/websocket.module';
+import { ComposeModule } from 'src/compose/compose.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ProjectModule } from 'src/project/project.module';
       name: 'deploys',
     }),
     AuthorizationModule,
+    forwardRef(() => WebsocketModule),
+    ComposeModule,
   ],
   providers: [SourceService, SourceFactory, DeployConsumer, SourceRepository],
   exports: [SourceService],

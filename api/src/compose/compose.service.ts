@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { parse } from 'yaml';
-import Service from './model/Service';
 import * as fs from 'fs';
 import { ServiceUser } from './model/ServiceUser';
 import { ServiceDeployment } from './model/ServiceDeployment';
+import { ServiceDto } from './model/Service';
 
 @Injectable()
 export class ComposeService {
-  parseServices(yaml: string): Service[] {
+  parseServices(yaml: string): ServiceDto[] {
     const composeObj: any = parse(yaml);
-    const res: Service[] = [];
+    const res: ServiceDto[] = [];
 
     if (!composeObj.services) {
       return [];
