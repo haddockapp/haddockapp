@@ -1,7 +1,6 @@
 import asyncio
 import socketio
 from config import Config
-from collector import collector
 from project_types import CollectorEnum
 
 from collector import Collector, get_system_metrics, get_docker_logs, get_docker_status
@@ -9,7 +8,7 @@ from project_types import CollectorEnum
 
 
 class SocketServer:
-    def __init__(self, host='0.0.0.0', port=Config.PORT):
+    def __init__(self, host='0.0.0.0', port=Config.WS_PORT):
         self.sio = socketio.AsyncServer(async_mode='asgi')
         self.app = socketio.ASGIApp(self.sio)
         self.host = host
