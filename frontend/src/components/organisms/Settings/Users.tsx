@@ -28,23 +28,27 @@ const UsersSettings: FC = () => {
         purus ut sem malesuada tincidunt. Nullam nec purus ut sem malesuada
         tincidunt. Nullam nec purus ut sem malesuada tincidunt.
       </span>
-      {connectedUser?.role === UserRole.Admin && (
-        <SimpleDialog
-          Content={() => <InviteUserForm onSuccess={onCloseInviteUserDialog} />}
-          Trigger={({ onOpen }) => (
-            <Button className="space-x-2 w-fit" onClick={onOpen}>
-              <MailPlusIcon size={20} />
-              <span>Invite User</span>
-            </Button>
-          )}
-          description="Invite a new user to the platform"
-          title="Invite User"
-          isOpen={isInviteUserDialogOpen}
-          onClose={onCloseInviteUserDialog}
-          onOpen={onOpenInviteUserDialog}
-        />
-      )}
       <UsersTable users={data || []} />
+      <div className="flex items-center space-x-2 justify-end">
+        {connectedUser?.role === UserRole.Admin && (
+          <SimpleDialog
+            Content={() => (
+              <InviteUserForm onSuccess={onCloseInviteUserDialog} />
+            )}
+            Trigger={({ onOpen }) => (
+              <Button className="space-x-2" onClick={onOpen}>
+                <MailPlusIcon size={20} />
+                <span>Invite User</span>
+              </Button>
+            )}
+            description="Invite a new user to the platform"
+            title="Invite User"
+            isOpen={isInviteUserDialogOpen}
+            onClose={onCloseInviteUserDialog}
+            onOpen={onOpenInviteUserDialog}
+          />
+        )}
+      </div>
     </div>
   );
 };

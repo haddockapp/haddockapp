@@ -1,13 +1,6 @@
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { FC, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppDispatch } from "@/hooks/useStore";
-import { logout } from "@/services/authSlice";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import SimpleDrawer from "./SimpleDrawer";
@@ -33,8 +26,6 @@ const Header: FC = () => {
     [projects, projectId]
   );
 
-  const dispatch = useAppDispatch();
-
   const { isSetupComplete } = useSetup();
 
   return (
@@ -51,15 +42,6 @@ const Header: FC = () => {
             : pathTranslations[window.location.pathname] ??
               window.location.pathname}
         </h3>
-        <Tooltip delayDuration={250}>
-          <TooltipTrigger>
-            <Button variant="ghost" onClick={() => dispatch(logout())} />
-          </TooltipTrigger>
-          <TooltipContent>
-            I'm here for debug purposes only, please don't delete me before I'm
-            given a stable home ! 감사합니다 !!!
-          </TooltipContent>
-        </Tooltip>
       </div>
       {isSetupComplete && (
         <SimpleDrawer
