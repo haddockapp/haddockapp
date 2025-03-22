@@ -28,11 +28,11 @@ enum ColumnName {
 
 type GenerateColumnsProps = {
   connectedUser: UserDto;
-  onResetPassword: (id: string) => void;
-  onActivate: (id: string) => void;
-  onDeactivate: (id: string) => void;
-  onDownloadPersonalData: (id: string) => void;
-  onDelete: (id: string) => void;
+  onResetPassword: (user: UserDto) => void;
+  onActivate: (user: UserDto) => void;
+  onDeactivate: (user: UserDto) => void;
+  onDownloadPersonalData: (user: UserDto) => void;
+  onDelete: (user: UserDto) => void;
 };
 
 export const generateColumns = ({
@@ -63,9 +63,10 @@ export const generateColumns = ({
               <DropdownMenuItem
                 disabled={
                   row.original.id === connectedUser.id ||
-                  connectedUser.role !== UserRole.Admin
+                  connectedUser.role !== UserRole.Admin ||
+                  row.original.role === UserRole.Invited
                 }
-                onClick={() => onActivate(row.original.id)}
+                onClick={() => onActivate(row.original)}
                 className="text-positive cursor-pointer"
               >
                 <CircleCheckIcon />
@@ -75,9 +76,10 @@ export const generateColumns = ({
               <DropdownMenuItem
                 disabled={
                   row.original.id === connectedUser.id ||
-                  connectedUser.role !== UserRole.Admin
+                  connectedUser.role !== UserRole.Admin ||
+                  row.original.role === UserRole.Invited
                 }
-                onClick={() => onDeactivate(row.original.id)}
+                onClick={() => onDeactivate(row.original)}
                 className="text-destructive cursor-pointer"
               >
                 <CircleMinusIcon />
@@ -85,16 +87,20 @@ export const generateColumns = ({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
-              disabled={connectedUser.role !== UserRole.Admin}
+              disabled={
+                connectedUser.role !== UserRole.Admin ||
+                row.original.role === UserRole.Invited
+              }
               className="cursor-pointer"
-              onClick={() => onResetPassword(row.original.id)}
+              onClick={() => onResetPassword(row.original)}
             >
               <KeyRoundIcon />
               <span>Reset password</span>
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={row.original.role === UserRole.Invited}
               className="cursor-pointer"
-              onClick={() => onDownloadPersonalData(row.original.id)}
+              onClick={() => onDownloadPersonalData(row.original)}
             >
               <DownloadIcon />
               <span>Download personal data</span>
@@ -105,7 +111,7 @@ export const generateColumns = ({
                 row.original.id === connectedUser.id ||
                 connectedUser.role !== UserRole.Admin
               }
-              onClick={() => onDelete(row.original.id)}
+              onClick={() => onDelete(row.original)}
               className="text-destructive cursor-pointer"
             >
               <TrashIcon />
@@ -131,14 +137,15 @@ export const generateColumns = ({
   ACTIVE: {
     accessorKey: "isActive",
     header: "Active",
-    cell: ({ row }) => (
-      <div>
-        {row.getValue("isActive") ? (
-          <CircleCheckIcon className="text-positive" />
-        ) : (
-          <CircleMinusIcon className="text-destructive" />
-        )}
-      </div>
-    ),
+    cell: ({ row }) =>
+      row.original.role === UserRole.Invited ? null : (
+        <div>
+          {row.getValue("isActive") ? (
+            <CircleCheckIcon className="text-positive" />
+          ) : (
+            <CircleMinusIcon className="text-destructive" />
+          )}
+        </div>
+      ),
   },
 });

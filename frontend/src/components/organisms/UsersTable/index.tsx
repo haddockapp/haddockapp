@@ -6,6 +6,7 @@ import {
   useGetSelfQuery,
   useLazyDownloadUserDataQuery,
   UserDto,
+  UserRole,
 } from "@/services/backendApi/users";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
@@ -23,6 +24,7 @@ import {
 
 import useDisclosure from "@/hooks/use-disclosure";
 import PasswordChangeForm from "@/components/organisms/PasswordChangeForm";
+import { useDeleteInvitationMutation } from "@/services/backendApi/invitations";
 
 type UsersTableProps = {
   users: UserDto[];
@@ -33,7 +35,8 @@ const UsersTable: FC<UsersTableProps> = ({ users }) => {
 
   const [triggerActivate] = useActivateUserMutation();
   const [triggerDeactivate] = useDisableUserMutation();
-  const [triggerDelete] = useDeleteUserMutation();
+  const [triggerDeleteUser] = useDeleteUserMutation();
+  const [triggerDeleteInvitation] = useDeleteInvitationMutation();
   const [triggerDownload] = useLazyDownloadUserDataQuery();
 
   const {
@@ -62,10 +65,10 @@ const UsersTable: FC<UsersTableProps> = ({ users }) => {
 
     const result = generateColumns({
       connectedUser: connectedUser!,
-      onResetPassword: (id: string) =>
-        onChangeOpenChangePaswordDialog(true, id),
-      onActivate: (id: string) =>
-        triggerActivate(id)
+      onResetPassword: (user: UserDto) =>
+        onChangeOpenChangePaswordDialog(true, user.id),
+      onActivate: (user: UserDto) =>
+        triggerActivate(user.id)
           .unwrap()
           .catch(() => {
             toast({
@@ -73,8 +76,8 @@ const UsersTable: FC<UsersTableProps> = ({ users }) => {
               variant: "destructive",
             });
           }),
-      onDeactivate: (id: string) =>
-        triggerDeactivate(id)
+      onDeactivate: (user: UserDto) =>
+        triggerDeactivate(user.id)
           .unwrap()
           .catch(() => {
             toast({
@@ -82,25 +85,34 @@ const UsersTable: FC<UsersTableProps> = ({ users }) => {
               variant: "destructive",
             });
           }),
-      onDownloadPersonalData: (id: string) =>
-        triggerDownload(id)
+      onDownloadPersonalData: (user: UserDto) =>
+        triggerDownload(user.id)
           .unwrap()
           .then((res) =>
             downloadFile({
               data: JSON.stringify(res),
-              fileName: `haddock-personal-data-${id}.json`,
+              fileName: `haddock-personal-data-${user.id}.json`,
               fileType: "text/json",
             })
           ),
-      onDelete: (id: string) =>
-        triggerDelete(id)
-          .unwrap()
-          .catch(() => {
-            toast({
-              title: "User could not be deleted",
-              variant: "destructive",
-            });
-          }),
+      onDelete: (user: UserDto) =>
+        user.role === UserRole.Invited
+          ? triggerDeleteInvitation(user.id)
+              .unwrap()
+              .catch(() => {
+                toast({
+                  title: "Invitation could not be deleted",
+                  variant: "destructive",
+                });
+              })
+          : triggerDeleteUser(user.id)
+              .unwrap()
+              .catch(() => {
+                toast({
+                  title: "User could not be deleted",
+                  variant: "destructive",
+                });
+              }),
     });
     return [
       result.ACTIONS,
@@ -114,7 +126,8 @@ const UsersTable: FC<UsersTableProps> = ({ users }) => {
     onChangeOpenChangePaswordDialog,
     triggerActivate,
     triggerDeactivate,
-    triggerDelete,
+    triggerDeleteUser,
+    triggerDeleteInvitation,
     triggerDownload,
   ]);
 

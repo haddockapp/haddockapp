@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,7 +19,9 @@ import { Button } from "@/components/ui/button";
 const formSchema = z.object({
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long" }),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, {
+      message: "Your password is too weak",
+    }),
 });
 
 type PasswordChangeFormProps = {
@@ -67,6 +70,14 @@ const PasswordChangeForm: FC<PasswordChangeFormProps> = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>New password</FormLabel>
+              <FormDescription>
+                <span>Password must contain at least</span>
+                <li>one uppercase letter</li>
+                <li>one lowercase letter</li>
+                <li>one number</li>
+                <li>one special character</li>
+                <li>be at least 8 characters long</li>
+              </FormDescription>
               <FormControl>
                 <Input {...field} type="password" />
               </FormControl>

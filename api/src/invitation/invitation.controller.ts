@@ -20,7 +20,7 @@ export class InvitationController {
     return await this.invitationService.createInvitation(body.email);
   }
 
-  @Delete(':/id')
+  @Delete(':id')
   @UseGuards(AdminGuard)
   async deleteInvitation(@Param('id') id: string) {
     await this.invitationService.deleteInvitationById(id);
