@@ -7,8 +7,14 @@ import {
 } from "@/components/ui/accordion";
 import Authorizations from "./Authorizations";
 import ChangeGithubApplication from "./ChangeGithubApplication";
+import UsersSettings from "./Users";
 
 const settings = [
+  {
+    key: "users",
+    name: "Users",
+    Component: UsersSettings,
+  },
   {
     key: "github-application",
     name: "GitHub Application",

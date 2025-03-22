@@ -29,7 +29,7 @@
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-    --positive: 140 100% 70%;
+    --positive: 140 90% 40%;
     --positive-foreground: 210 40% 38%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -77,8 +77,6 @@
   background: transparent; /* make scrollbar transparent */
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -87,4 +85,3 @@
     @apply bg-background text-foreground;
   }
 }
-
