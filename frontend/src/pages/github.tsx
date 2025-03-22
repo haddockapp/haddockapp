@@ -1,6 +1,6 @@
 import { HaddockLoader } from "@/components/atoms/spinner";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
+import { useAppDispatch } from "@/hooks/useStore";
 import { setToken } from "@/services/authSlice";
 import {
   GithubAuthReason,
@@ -14,8 +14,6 @@ import { FC, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const GithubCallback: FC = () => {
-  const { isSetupComplete } = useAppSelector((state) => state.auth);
-
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -46,9 +44,16 @@ const GithubCallback: FC = () => {
             .unwrap()
             .then(({ accessToken }) => {
               dispatch(setToken(accessToken));
+              navigate("/loading");
+            })
+            .catch(() => {
+              toast({
+                title: "Error",
+                variant: "destructive",
+                description: "Failed to login",
+              });
+              navigate("/");
             });
-          if (!isSetupComplete) navigate("/setup?step=domains");
-          else navigate("/dashboard");
           break;
         case GithubAuthReason.CREATE_AUTHORIZATION:
           triggerCreateAuthorization({
@@ -63,18 +68,12 @@ const GithubCallback: FC = () => {
                 description:
                   "You can now use this authorization to access your repositories.",
               });
+              navigate("/dashboard");
             });
-          navigate("/dashboard");
           break;
       }
     }
-  }, [
-    dispatch,
-    isSetupComplete,
-    navigate,
-    triggerCreateAuthorization,
-    triggerLoginGithub,
-  ]);
+  }, [dispatch, navigate, triggerCreateAuthorization, triggerLoginGithub]);
 
   return <HaddockLoader />;
 };

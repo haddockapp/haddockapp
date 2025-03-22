@@ -1,15 +1,10 @@
 import { useGetAllDomainsQuery } from "@/services/backendApi/domains";
-import { useAppDispatch, useAppSelector } from "./useStore";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
-import { setSetupCompletion } from "@/services/authSlice";
+import { useAppSelector } from "./useStore";
+import { useSearchParams } from "react-router-dom";
 
 const useSetup = () => {
-  const navigate = useNavigate();
   const [params] = useSearchParams();
   const step = params.get("step");
-
-  const dispatch = useAppDispatch();
 
   const { isAuth } = useAppSelector((state) => state.auth);
   const { data: domains, isFetching } = useGetAllDomainsQuery(undefined, {
@@ -27,18 +22,6 @@ const useSetup = () => {
     : isSetupComplete
     ? 2
     : 0;
-
-  useEffect(() => {
-    if (isFetching) return;
-    if (isSetupComplete) {
-      dispatch(setSetupCompletion(true));
-      if (!step) {
-        navigate("/dashboard");
-      }
-    } else if (isAuth && !!domains) {
-      dispatch(setSetupCompletion(false));
-    }
-  }, [dispatch, domains, isAuth, isFetching, isSetupComplete, navigate, step]);
 
   return {
     isAuthenticationStep: stepCount === 0,

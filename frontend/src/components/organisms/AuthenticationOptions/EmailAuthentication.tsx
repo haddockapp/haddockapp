@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
+import { useAppDispatch } from "@/hooks/useStore";
 import { setToken } from "@/services/authSlice";
 import {
   useSignInMutation,
@@ -29,13 +29,9 @@ const formSchema = z.object({
 });
 
 const EmailAuthentication: FC = () => {
-  const { isSetupComplete } = useAppSelector((state) => state.auth);
-
   const navigate = useNavigate();
 
-  const [type, setType] = useState<"log-in" | "sign-up">(
-    isSetupComplete ? "log-in" : "sign-up"
-  );
+  const [type, setType] = useState<"log-in" | "sign-up">("log-in");
 
   const dispatch = useAppDispatch();
 
@@ -69,8 +65,7 @@ const EmailAuthentication: FC = () => {
         .unwrap()
         .then(({ accessToken }) => {
           dispatch(setToken(accessToken));
-          if (!isSetupComplete) navigate("/setup?step=domains");
-          else navigate("/dashboard");
+          navigate("/loading");
         })
         .catch((e) =>
           toast({
@@ -80,15 +75,7 @@ const EmailAuthentication: FC = () => {
           })
         );
     },
-    [
-      dispatch,
-      form,
-      isSetupComplete,
-      navigate,
-      triggerLogin,
-      triggerSignUp,
-      type,
-    ]
+    [dispatch, form, navigate, triggerLogin, triggerSignUp, type]
   );
 
   return (

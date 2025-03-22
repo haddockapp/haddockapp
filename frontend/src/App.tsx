@@ -10,6 +10,7 @@ import useConfig from "./hooks/use-config";
 import Layout from "./components/wrappers/page-layout";
 import AuthenticatedGuard from "./components/wrappers/authenticated-guard";
 import Authentication from "./pages/authentication";
+import LoadingPage from "./pages/loading";
 
 function App() {
   useWebsockets();
@@ -20,6 +21,7 @@ function App() {
       <Toaster />
       <BrowserRouter>
         <Routes>
+          <Route path="/loading" element={<LoadingPage />} />
           <Route path="/github" element={<GithubCallback />} />
           <Route element={<Layout />}>
             <Route index element={<Authentication />} />
