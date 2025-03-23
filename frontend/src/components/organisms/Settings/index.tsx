@@ -13,22 +13,31 @@ import { logout } from "@/services/authSlice";
 import { LogOutIcon } from "lucide-react";
 import { useAppDispatch } from "@/hooks/useStore";
 import { useNavigate } from "react-router-dom";
+import useSetup from "@/hooks/use-setup";
 
-const settings = [
+const settings: {
+  key: string;
+  name: string;
+  Component: FC<{ onClose: () => void }>;
+  isAuthRequired: boolean;
+}[] = [
   {
     key: "users",
     name: "Users",
     Component: UsersSettings,
+    isAuthRequired: true,
   },
   {
     key: "github-application",
     name: "GitHub Application",
     Component: ChangeGithubApplication,
+    isAuthRequired: false,
   },
   {
     key: "authorizations",
     name: "Authorizations",
     Component: Authorizations,
+    isAuthRequired: true,
   },
 ];
 
@@ -38,10 +47,15 @@ const Settings: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const { isSetupComplete } = useSetup();
+
   return (
     <div className="space-y-4 h-full justify-between flex flex-col">
       <Accordion type="multiple" value={accordionOpen}>
-        {settings.map(({ key, name, Component }) => (
+        {(isSetupComplete
+          ? settings
+          : settings.filter((s) => !s.isAuthRequired)
+        ).map(({ key, name, Component }) => (
           <AccordionItem key={key} value={key}>
             <AccordionTrigger
               onClick={() =>
@@ -63,19 +77,21 @@ const Settings: FC = () => {
           </AccordionItem>
         ))}
       </Accordion>
-      <div className="flex justify-end p-4">
-        <Button
-          onClick={() => {
-            navigate("/");
-            dispatch(logout());
-          }}
-          variant="dark"
-          className="space-x-2"
-        >
-          <LogOutIcon size={20} />
-          <span>Logout</span>
-        </Button>
-      </div>
+      {isSetupComplete && (
+        <div className="flex justify-end p-4">
+          <Button
+            onClick={() => {
+              navigate("/");
+              dispatch(logout());
+            }}
+            variant="dark"
+            className="space-x-2"
+          >
+            <LogOutIcon size={20} />
+            <span>Logout</span>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import SimpleDrawer from "./SimpleDrawer";
 import Settings from "./Settings";
-import useSetup from "@/hooks/use-setup";
 
 const pathTranslations: Record<string, string> = {
   ["/"]: "/ authentication",
@@ -26,8 +25,6 @@ const Header: FC = () => {
     [projects, projectId]
   );
 
-  const { isSetupComplete } = useSetup();
-
   return (
     <div className="flex flex-row justify-between w-full pt-8 px-8 items-center">
       <div className="flex items-center">
@@ -43,20 +40,18 @@ const Header: FC = () => {
               window.location.pathname}
         </h3>
       </div>
-      {isSetupComplete && (
-        <SimpleDrawer
-          Content={Settings}
-          Trigger={({ onOpen }) => (
-            <Button onClick={onOpen} variant="ghost" className="group p-2">
-              <Menu
-                strokeWidth={3}
-                className="stroke-primary/70 group-hover:stroke-primary duration-1000"
-              />
-            </Button>
-          )}
-          title="Settings"
-        />
-      )}
+      <SimpleDrawer
+        Content={Settings}
+        Trigger={({ onOpen }) => (
+          <Button onClick={onOpen} variant="ghost" className="group p-2">
+            <Menu
+              strokeWidth={3}
+              className="stroke-primary/70 group-hover:stroke-primary duration-1000"
+            />
+          </Button>
+        )}
+        title="Settings"
+      />
     </div>
   );
 };
