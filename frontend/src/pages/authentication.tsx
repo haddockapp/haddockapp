@@ -5,10 +5,10 @@ import { FC } from "react";
 import { Navigate } from "react-router-dom";
 
 const Authentication: FC = () => {
-  const { isAuth, isSetupComplete } = useAppSelector((state) => state.auth);
+  const { isAuth } = useAppSelector((state) => state.auth);
 
-  if (!isSetupComplete) return <Navigate to="/setup" />;
-  if (isAuth) return <Navigate to="/dashboard" />;
+  if (isAuth) return <Navigate to="/loading" />;
+
   return (
     <div>
       <div className="justify-center py-8 text-center">

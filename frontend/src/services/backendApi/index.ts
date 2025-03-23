@@ -17,6 +17,7 @@ export enum QueryKeys {
   Redirections = "Redirections",
   Configurations = "Configurations",
   Authorizations = "Authorizations",
+  Users = "Users",
 }
 
 export const backendApi = createApi({

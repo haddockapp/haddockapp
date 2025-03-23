@@ -45,16 +45,14 @@ const Configuration: FC<ConfigurationProps> = ({
         .unwrap()
         .then(() => {
           toast({
-            title: "Configuration created successfully",
-            variant: "default",
+            title: "Configuration updated successfully",
           });
           onClose?.();
         })
-        .catch((e) => {
+        .catch(() => {
           toast({
             title: "Configuration could not be created",
-            description: e.error.message,
-            variant: "default",
+            variant: "destructive",
           });
         });
     },
