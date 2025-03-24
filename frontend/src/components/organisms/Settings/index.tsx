@@ -41,7 +41,7 @@ const settings: {
   },
 ];
 
-const Settings: FC = () => {
+const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
   const [accordionOpen, setAccordionOpen] = useState<string[]>([]);
 
   const navigate = useNavigate();
@@ -83,6 +83,7 @@ const Settings: FC = () => {
             onClick={() => {
               navigate("/");
               dispatch(logout());
+              onClose();
             }}
             variant="dark"
             className="space-x-2"
