@@ -1,5 +1,6 @@
 import { useGetSelfQuery } from "@/services/backendApi/users";
-import socket, {
+import {
+  getSocket,
   handleProjectSubcription,
   LogsSocketType,
   MetricsSocketType,
@@ -49,6 +50,8 @@ const MonitoringTab: FC = () => {
       }
     );
 
+    const socket = getSocket();
+    if (!socket) return;
     return () => {
       socket.off("metrics");
       socket.off("logs");

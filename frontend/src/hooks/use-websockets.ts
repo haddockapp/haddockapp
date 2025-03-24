@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./useStore";
 import { backendApi } from "@/services/backendApi";
 import { VmState } from "@/types/vm/vm";
-import socket from "@/services/websockets";
 import { toast } from "./use-toast";
 import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import { useGetSelfQuery } from "@/services/backendApi/users";
+import { connectSocket, getSocket } from "@/services/websockets";
 
 type SocketMessage = {
   event: string;
@@ -19,8 +19,15 @@ const useWebsockets = () => {
   const { isAuth } = useAppSelector((state) => state.auth);
   const { data: me } = useGetSelfQuery(undefined, { skip: !isAuth });
 
+  const { socketUrl } = useAppSelector((state) => state.config);
+
   useEffect(() => {
-    if (!me) return;
+    if (!me || !socketUrl) return;
+
+    connectSocket(socketUrl);
+
+    const socket = getSocket();
+    if (!socket) return;
 
     socket.connect();
 
@@ -55,7 +62,7 @@ const useWebsockets = () => {
       socket.disconnect();
       socket.off("message");
     };
-  }, [dispatch, me]);
+  }, [dispatch, me, socketUrl]);
 };
 
 export default useWebsockets;
