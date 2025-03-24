@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import "./styles.css";
 
@@ -10,7 +10,7 @@ const CustomNode: React.FC<NodeProps> = ({ data }) => {
         position={Position.Left}
         className="custom-handle"
       />
-      <span>{data.label}</span>
+      <span>{data.label as ReactNode}</span>
       <Handle
         type="source"
         position={Position.Right}
