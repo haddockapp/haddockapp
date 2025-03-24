@@ -2,7 +2,7 @@ import {
   ServiceDto,
   useGetServicesByProjectIdQuery,
 } from "@/services/backendApi/services";
-import { FC, useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { FC, useState, useCallback, useMemo } from "react";
 import {
   ReactFlow,
   Background,
