@@ -9,5 +9,4 @@ export interface ProjectEventDto {
   projectId: string;
   services: ServiceEnum[];
   subscribe: boolean;
-  data: any;
 }

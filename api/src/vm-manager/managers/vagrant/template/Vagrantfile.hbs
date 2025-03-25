@@ -74,7 +74,8 @@ $script = <<-'SCRIPT'
 
     cat <<EOF | sudo tee $CONFIG_FILE
 class Config:
-    PORT = 55000
+    WS_PORT = 55000
+    HTTP_PORT = 55001
     COMPOSE_PATH = "$DEPLOYMENT_DIR/{{compose_path}}"
 EOF
 

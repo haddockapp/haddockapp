@@ -71,11 +71,39 @@ export class WebSocketService {
     }
   }
 
+  private handleSubsriptions(client: MetricsClient, projectId: string) {
+    const project = this.projects[projectId];
+    const services = client.subscriptions;
+    const currentSubscriptions = project.subsciptions;
+
+    services.forEach((service) => {
+      if (currentSubscriptions[service] === 0) {
+        project.websocket.emit('subscribe', client.subscriptions);
+      }
+      project.subsciptions[service]++;
+    });
+  }
+
+  private handleUnsubscriptions(client: MetricsClient, projectId: string) {
+    const project = this.projects[projectId];
+    const services = client.subscriptions;
+    const currentSubscriptions = project.subsciptions;
+
+    services.forEach((service) => {
+      if (currentSubscriptions[service] === 1) {
+        project.websocket.emit('unsubscribe', client.subscriptions);
+      }
+      project.subsciptions[service]--;
+    });
+  }
+
   async handleUnsubscribe(client: Socket, eventData: ProjectEventDto) {
     if (this.projects[eventData.projectId]) {
       const subscribed: MetricsClient = this.projects[
         eventData.projectId
       ].clients.find((c) => c.client.userId === eventData.userId);
+
+      this.handleUnsubscriptions(subscribed, eventData.projectId);
 
       subscribed.subscriptions = subscribed.subscriptions.filter(
         (s) => !eventData.services.includes(s),
@@ -87,6 +115,7 @@ export class WebSocketService {
           `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
         );
       }
+
       this.logger.log(
         `Client ${eventData.userId} unsubscribed from services ${eventData.services} in project ${eventData.projectId}`,
       );
@@ -109,20 +138,26 @@ export class WebSocketService {
           ...eventData.services,
         ]),
       );
+
+      this.handleSubsriptions(clientAlreadySubscribed, eventData.projectId);
+
       this.logger.log(
         `Client ${eventData.userId} subscribed to project ${eventData.projectId} updated with services ${clientAlreadySubscribed.subscriptions}`,
       );
       return;
     }
 
-    this.projects[eventData.projectId].clients.push({
+    const newClient: MetricsClient = {
       client: {
         userId: eventData.userId,
         socket: client,
       },
       subscriptions: eventData.services,
-    });
+    };
 
+    this.projects[eventData.projectId].clients.push(newClient);
+
+    this.handleSubsriptions(newClient, eventData.projectId);
     this.logger.log(
       `Client ${eventData.userId} subscribed to project ${eventData.projectId} with services ${eventData.services}`,
     );
@@ -147,13 +182,14 @@ export class WebSocketService {
     this.projects[projectId] = {
       clients: [],
       websocket: io(`ws://${project.vm.ip}:55000`, { reconnection: false }),
+      subsciptions: {
+        [ServiceEnum.METRICS]: 0,
+        [ServiceEnum.LOGS]: 0,
+        [ServiceEnum.STATUS]: 0,
+      },
     };
 
     const ws = this.projects[projectId].websocket;
-
-    ws.on('connect', () => {
-      ws.emit('subscribe', ['metrics', 'logs', 'status']);
-    });
 
     ws.on('disconnect', () => {
       this.logger.error(`Websocket connection closed for project ${projectId}`);

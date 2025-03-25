@@ -11,4 +11,5 @@ export interface MetricsClient {
 export interface ProjectHandler {
     clients: MetricsClient[];
     websocket: Socket;
+    subsciptions: Record<ServiceEnum, number>;
 }

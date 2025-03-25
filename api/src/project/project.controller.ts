@@ -23,6 +23,7 @@ import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
 import { EnvironmentVar } from './dto/environmentVar';
+import { ServiceActionDto } from './dto/serviceAction.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -178,5 +179,16 @@ export class ProjectController {
     @Param('id') projectId: string,
   ): Promise<EnvironmentVar[]> {
     return await this.projectService.getEnvironmentVars(projectId);
+  }
+
+  @Post(':id/service')
+  async serviceAction(
+    @Param('id') projectId: string,
+    @Body() data: ServiceActionDto,
+  ) {
+    return await this.projectService.serviceAction(
+      projectId,
+      data
+    );
   }
 }
