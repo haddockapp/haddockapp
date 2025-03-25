@@ -8,6 +8,7 @@ import { writeFile } from 'fs/promises';
 import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
+import { EnvironmentVar } from 'src/project/dto/environmentVar';
 
 @Injectable()
 export class VagrantManager implements IVMManager {
@@ -33,15 +34,30 @@ export class VagrantManager implements IVMManager {
     return undefined;
   }
 
-  private async runSource(project: Project, source: Source): Promise<void> {
+  private getComposePath(source: Source): string {
     switch (source.type) {
       case 'github': {
         const settings = getSettings<GithubSourceSettingsDto>(source.settings);
         if (settings.composePath === undefined || !settings.composePath) {
           throw new Error('Compose path not set');
         }
+        return settings.composePath;
+      }
+      default:
+        throw new Error('Invalid source type');
+    }
+  }
+
+  private async runSource(project: Project, source: Source): Promise<void> {
+    switch (source.type) {
+      case 'github': {
+        const composePath = this.getComposePath(source);
+        const envArgs = project.environmentVars.flatMap(
+          (envVar: EnvironmentVar) => [`${envVar.key}="${envVar.value}"`],
+        ).join(' ');
+
         await execCommand(
-          `cd ${project.path} && vagrant ssh -c "cd service && docker-compose -f ${settings.composePath} up --build -d"`,
+          `cd ${project.path} && vagrant ssh -c 'cd service && ${envArgs} docker-compose -f ${composePath} up --build -d'`,
         );
         break;
       }
@@ -104,6 +120,8 @@ export class VagrantManager implements IVMManager {
 
   async restartVM(vm: PersistedVmDto): Promise<Vm> {
     const output = await execCommand(`cd ${vm.project.path} && vagrant reload`);
+
+    await this.runSource(vm.project, vm.project.source);
 
     const ip = this.getIpFromOutput(output);
 

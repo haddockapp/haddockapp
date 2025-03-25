@@ -53,6 +53,8 @@ model Project {
     vm                 Vm                  @relation(fields: [vmId], references: [id])
     vmId               String              @unique
     networkConnections NetworkConnection[]
+    services           Service[]
+    environmentVars  Json[]
 }
 
 model Vm {
@@ -94,4 +96,18 @@ model AppConfiguration {
 model Invitation {
     id    String @id @default(uuid())
     email String @unique
+}
+
+model Service {
+    name        String   @id
+    image       String
+    ports       String[]
+    networks    String[]
+    depends_on  String[]
+    environment String
+    user        String
+    deployment  String
+
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId String
 }

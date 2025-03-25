@@ -22,6 +22,7 @@ import ProjectServiceDto from './dto/ProjectService.dto';
 import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
+import { EnvironmentVar } from './dto/environmentVar';
 
 @Controller('project')
 export class ProjectController {
@@ -32,7 +33,7 @@ export class ProjectController {
     private readonly composeService: ComposeService,
     private readonly dockerService: DockerService,
     private readonly authorizationService: AuthorizationService,
-  ) { }
+  ) {}
 
   @Get()
   async findAllProjects() {
@@ -87,7 +88,9 @@ export class ProjectController {
       throw new NotFoundException('Project not found.');
     }
     if (data.authorization_id !== undefined) {
-      const { organization, repository } = getSettings<GithubSourceSettingsDto>(project.source.settings);
+      const { organization, repository } = getSettings<GithubSourceSettingsDto>(
+        project.source.settings,
+      );
       const canReadSource = await this.authorizationService.canReadSource(
         data.authorization_id,
         organization,
@@ -110,42 +113,17 @@ export class ProjectController {
   }
 
   @Get(':id/service')
-  async getProjectServices(@Param('id') projectId: string) {
+  async getProjectServices(
+    @Param('id') projectId: string,
+  ): Promise<ProjectServiceDto[]> {
     const project = await this.projectRepository.findProjectById(projectId);
     if (!project) {
       throw new NotFoundException('Project not found.');
     }
 
-    const settings = getSettings<GithubSourceSettingsDto>(
-      project?.source.settings,
-    );
-    const rawCompose = this.composeService.readComposeFile(
-      project.id,
-      settings.composePath,
-    );
-    if (!rawCompose) {
-      return [];
-    }
-
-    const services = this.composeService.parseServices(rawCompose.toString());
     return await Promise.all(
-      services.map(async (service) => {
-        const result: ProjectServiceDto = {
-          icon: 'https://i.imgur.com/ZMxf3Iy.png',
-          ...service,
-        };
-
-        const serviceName = service.image.split(':')[0];
-        const serviceImage = serviceName.includes('/')
-          ? serviceName.replace('/', '%2F')
-          : `library%2F${serviceName}`;
-        this.dockerService
-          .getImageLogo(serviceImage)
-          .then((icon) => {
-            result.icon = icon;
-          })
-          .catch((e) => { });
-        return result;
+      project.services.map(async (service) => {
+        return this.projectService.serviceEntityToDto(service);
       }),
     );
   }
@@ -154,28 +132,51 @@ export class ProjectController {
   async getProjectServiceInformations(
     @Param('id') projectId: string,
     @Param('name') serviceName: string,
-  ) {
+  ): Promise<ProjectServiceDto> {
     const project = await this.projectRepository.findProjectById(projectId);
     if (!project) {
       throw new NotFoundException('Project not found');
     }
 
-    const settings = getSettings<GithubSourceSettingsDto>(
-      project?.source.settings,
+    const service = project.services.find(
+      (service) => service.name === serviceName,
     );
-    const rawCompose = this.composeService.readComposeFile(
-      project.id,
-      settings.composePath,
-    );
-    if (!rawCompose) {
-      throw new NotFoundException('Service not found');
-    }
-
-    const services = this.composeService.parseServices(rawCompose);
-    const service = services.find((service) => service.name === serviceName);
     if (!service) {
       throw new NotFoundException('Service not found');
     }
-    return service;
+    return this.projectService.serviceEntityToDto(service);
+  }
+
+  @Post(':id/environment')
+  @HttpCode(HttpStatus.CREATED)
+  async createEnvironment(
+    @Param('id') projectId: string,
+    @Body() data: EnvironmentVar,
+  ) {
+    return await this.projectService.createEnvironment(projectId, data);
+  }
+
+  @Patch(':id/environment/:key')
+  async updateEnvironment(
+    @Param('id') projectId: string,
+    @Param('key') key: string,
+    @Body() data: EnvironmentVar,
+  ) {
+    return await this.projectService.updateEnvironment(projectId, key, data);
+  }
+
+  @Delete(':id/environment/:key')
+  async deleteEnvironment(
+    @Param('id') projectId: string,
+    @Param('key') key: string,
+  ) {
+    await this.projectService.deleteEnvironment(projectId, key);
+  }
+
+  @Get(':id/environment')
+  async getEnvironmentVars(
+    @Param('id') projectId: string,
+  ): Promise<EnvironmentVar[]> {
+    return await this.projectService.getEnvironmentVars(projectId);
   }
 }

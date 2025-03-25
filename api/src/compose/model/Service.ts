@@ -1,7 +1,7 @@
 import { ServiceDeployment } from './ServiceDeployment';
 import { ServiceUser } from './ServiceUser';
 
-export default interface Service {
+export interface ServiceDto {
   name: string;
   image: string;
   ports: string[];
