@@ -1,10 +1,11 @@
 import { useAppDispatch } from "@/hooks/useStore";
-import { setBackendUrl } from "@/services/configSlice";
+import { setBackendUrl, setSocketUrl } from "@/services/configSlice";
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
 
 export interface Config {
   backendUrl: string;
+  socketUrl: string;
 }
 
 export interface ConfigContextProps {
@@ -30,6 +31,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await axios.get<Config>("/config.json");
         setConfig(response.data);
         dispatch(setBackendUrl(response.data.backendUrl));
+        dispatch(setSocketUrl(response.data.socketUrl));
       } catch (err) {
         setError(err as Error);
         console.error("Failed to load config:", err);
