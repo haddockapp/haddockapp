@@ -217,6 +217,7 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
                     <TableCell className="flex justify-center">
                       <Checkbox
                         checked={edited.isSecret ?? variable.isSecret}
+                        disabled={variable.isSecret}
                         onCheckedChange={(checked) =>
                           updateEditedVariable(variable.key, {
                             isSecret: checked === true,
