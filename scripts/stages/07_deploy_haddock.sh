@@ -75,14 +75,18 @@ section_progress "Configuring frontend"
 ##############################################
 
 # Setup frontend configuration
-if [ ! -f /opt/haddock/frontend/.env ]; then
-    output "Generating frontend configuration..."
-    sudo tee /opt/haddock/frontend/.env >/dev/null << EOF
-VITE_API_URL=http://$IP:3000
-VITE_SOCKET_URL=http://$IP:3001
-VITE_GITHUB_CLIENT_ID=***REMOVED***
-EOF
+if [ -f /opt/haddock/frontend/public/config.json ]; then
+    output "Overwriting frontend configuration..."
+    sudo rm -f /opt/haddock/frontend/public/config.json
 fi
+
+output "Generating frontend configuration..."
+sudo tee /opt/haddock/frontend/public/config.json << EOF
+{
+  "backendUrl": "http://$IP:3000",
+  "socketUrl": "http://$IP:3001"
+}
+EOF
 
 # Build frontend
 cd /opt/haddock/frontend
