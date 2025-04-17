@@ -6,6 +6,7 @@ import {
 } from "@/services/backendApi/projects";
 import DeleteProjectDialog from "./DeleteProjectDialog";
 import EditProjectDialog from "./EditProjectDialog";
+import Variables from "./Variables";
 
 type SettingsTabActionProps = {
   title: string;
@@ -18,7 +19,7 @@ const SettingsTabAction: FC<PropsWithChildren<SettingsTabActionProps>> = ({
   children,
 }) => {
   return (
-    <div className="flex flex-row justify-between items-center border-b pb-4 mt-4">
+    <div className="flex flex-row justify-between items-center border-b pb-4 mt-4 px-4">
       <div className="flex flex-col space-y-2">
         <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
         <p className="text-sm text-gray-600">{description}</p>
@@ -40,7 +41,7 @@ const SettingsTab: FC = () => {
     navigate("/dashboard");
   };
   return (
-    <div>
+    <div className="ml-8 mr-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Settings</h1>
       <SettingsTabAction
         title="Edit this project"
@@ -55,6 +56,7 @@ const SettingsTab: FC = () => {
       >
         <DeleteProjectDialog onDelete={handleDeleteProject} />
       </SettingsTabAction>
+      <Variables projectId={projectId ?? ""} />
     </div>
   );
 };

@@ -18,6 +18,7 @@ export enum QueryKeys {
   Configurations = "Configurations",
   Authorizations = "Authorizations",
   Users = "Users",
+  EnvironmentVariables = "EnvironmentVariables",
 }
 
 export const backendApi = createApi({

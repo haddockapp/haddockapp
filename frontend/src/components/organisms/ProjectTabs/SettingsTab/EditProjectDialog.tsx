@@ -113,8 +113,8 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogTrigger asChild>
-        <Button variant="default" className="w-40 font-bold mt-4">
-          <Pencil className="mr-2" />
+        <Button variant="default" className="font-bold mt-4">
+          <Pencil className="mr-2" size={15} />
           Edit this project
         </Button>
       </DialogTrigger>
