@@ -30,8 +30,8 @@ section_progress "Configuring backend"
 
 # Setup backend files
 run_command "Setting up backend configuration..." bash -c '
-    sudo touch /opt/haddock/api/services.caddy
-    sudo touch /opt/haddock/api/app.caddy
+    sudo touch /etc/caddy/services.caddy
+    sudo touch /etc/caddy/app.caddy
 '
 
 # Generate .env file if needed
