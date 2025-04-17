@@ -178,10 +178,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
         )}
         <Dialog open={isCreateModalOpen} onOpenChange={onCreateModalToggle}>
           <DialogTrigger asChild>
-            <Button
-              className="w-auto"
-              onClick={() => console.log("Create redirection")}
-            >
+            <Button className="w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add redirection
             </Button>
