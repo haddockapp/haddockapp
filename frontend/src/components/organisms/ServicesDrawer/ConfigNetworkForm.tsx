@@ -2,13 +2,13 @@ import { FC, useMemo } from "react";
 import { ConfigNetworkFormType } from "./type.ts";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ServiceInformationDto } from "@/services/backendApi/services.ts";
-import { useGetDomainsQuery } from "@/services/domain.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Autocomplete } from "@/components/molecules/autocomplete.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { useCreateNetworkConnectionMutation } from "@/services/backendApi/networks/networks.service.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { useToast } from "@/hooks/use-toast.ts";
+import { useGetAllDomainsQuery } from "@/services/backendApi/domains/domains.service.ts";
 
 interface ConfigNetworkFormProps {
   serviceInformations: ServiceInformationDto;
@@ -37,7 +37,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
     watch,
     formState: { errors },
   } = methods;
-  const { data: domains } = useGetDomainsQuery();
+  const { data: domains } = useGetAllDomainsQuery();
   const [createRedirection] = useCreateNetworkConnectionMutation();
 
   const portOptions = useMemo(
@@ -52,8 +52,8 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   const domainOptions = useMemo(
     () =>
       domains?.map((domain) => ({
-        label: domain,
-        value: domain,
+        label: domain.domain,
+        value: domain.domain,
       })) ?? [],
     [domains]
   );
