@@ -16,7 +16,9 @@ const DEFAULT_DNS_SERVERS = [
 export class DnsService {
   constructor(
     private readonly bindingService: BindingService,
-  ) { }
+  ) {
+    dns.setServers(DEFAULT_DNS_SERVERS);
+  }
 
 
   private async resolveNsIp(ns: string): Promise<string | null> {
