@@ -68,7 +68,6 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
       port: parseInt(data.port),
       domain: `${subdomainValue}.${domainValue}`,
     });
-    console.log(data);
     onClose();
   };
 
