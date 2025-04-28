@@ -15,9 +15,9 @@ def parse_docker_status(status):
     return containers
 
 
-def get_docker_status():
+async def get_docker_status():
     try:
-        status = subprocess.check_output(['docker-compose', '-f', Config.COMPOSE_PATH, 'ps', '-a', '--format={{json .}}'], stderr=subprocess.PIPE).decode('utf-8')
+        status = subprocess.check_output(['docker-compose', '-f', Config.COMPOSE_PATH, 'ps', '-a', '--format={{json.}}'], stderr=subprocess.PIPE).decode('utf-8')
         return parse_docker_status(status)
     except subprocess.CalledProcessError:
         return None
