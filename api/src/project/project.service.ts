@@ -17,6 +17,8 @@ import { WebSocketService } from 'src/websockets/websocket.service';
 import ProjectServiceDto from './dto/ProjectService.dto';
 import { DockerService } from 'src/docker/docker.service';
 import { EnvironmentVar } from './dto/environmentVar';
+import axios from 'axios';
+import { ServiceAction, ServiceActionDto } from './dto/serviceAction.dto';
 
 @Injectable()
 export class ProjectService {
@@ -270,5 +272,66 @@ export class ProjectService {
       project.environmentVars as EnvironmentVar[];
 
     return obfuscatedEnvironmentVars.map(this.obfuscateEnvironmentVar);
+  }
+
+  private async sendServiceAction(
+    ip: string,
+    service: string,
+    action: ServiceAction,
+  ) {
+    try {
+      const response = await axios.post(`http://${ip}:55001/action`, {
+        service,
+        action,
+      });
+
+      if (response.status !== 200) {
+        throw new BadRequestException('Failed to send action');
+      }
+
+      if (!response.data.status || response.data.status !== "ok") {
+        throw new BadRequestException(response.data);
+      }
+      return response.data;
+    } catch (e) {
+      throw new BadRequestException('Failed to send action');
+    }
+  }
+
+  async serviceAction(projectId: string, data: ServiceActionDto) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    const service = project.services.find(
+      (service) => service.name === data.service,
+    );
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    switch (data.action) {
+      case ServiceAction.START:
+        return this.sendServiceAction(
+          project.vm.ip,
+          data.service,
+          ServiceAction.START,
+        );
+      case ServiceAction.STOP:
+        return this.sendServiceAction(
+          project.vm.ip,
+          data.service,
+          ServiceAction.STOP,
+        );
+      case ServiceAction.RESTART:
+        return this.sendServiceAction(
+          project.vm.ip,
+          data.service,
+          ServiceAction.RESTART,
+        );
+      default:
+        throw new BadRequestException('Invalid action');
+    }
   }
 }

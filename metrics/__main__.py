@@ -1,5 +1,5 @@
-from server import SocketServer
+from servers.server import Server
 
 if __name__ == '__main__':
-    server = SocketServer()
+    server = Server()
     server.start()

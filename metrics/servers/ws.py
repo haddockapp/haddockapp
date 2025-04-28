@@ -1,7 +1,6 @@
 import asyncio
 import socketio
 from config import Config
-from collector import collector
 from project_types import CollectorEnum
 
 from collector import Collector, get_system_metrics, get_docker_logs, get_docker_status
@@ -9,7 +8,7 @@ from project_types import CollectorEnum
 
 
 class SocketServer:
-    def __init__(self, host='0.0.0.0', port=Config.PORT):
+    def __init__(self, host='0.0.0.0', port=Config.WS_PORT):
         self.sio = socketio.AsyncServer(async_mode='asgi')
         self.app = socketio.ASGIApp(self.sio)
         self.host = host
@@ -44,7 +43,7 @@ class SocketServer:
         async def unsubscribe(sid, data):
             print(f'Client {sid} unsubscribed')
             self.subscriptions.pop(sid, None)
-    
+
     def get_data_to_collect(self):
         to_collect = set()
         for _, subscriptions in self.subscriptions.items():
@@ -56,7 +55,7 @@ class SocketServer:
             to_collect = self.get_data_to_collect()
             await self.collector.run(to_collect)
             await asyncio.sleep(3)
-    
+
     async def send_data(self):
         for sid, subscriptions in self.subscriptions.items():
             try:
@@ -67,7 +66,7 @@ class SocketServer:
             except (socketio.exceptions.BadNamespaceError, socketio.exceptions.ConnectionError) as e:
                 print(f'Error sending to {sid}: {e}')
                 self.subscriptions.pop(sid, None)
-        
+
 
     async def _emit_metrics(self):
         while True:

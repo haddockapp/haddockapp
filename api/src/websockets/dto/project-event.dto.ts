@@ -1,11 +1,12 @@
-import { ProjectHandlers } from '../types/project-handlers';
-
-export type services = keyof ProjectHandlers;
+export enum ServiceEnum {
+    METRICS = 'metrics',
+    LOGS = 'logs',
+    STATUS = 'status'
+}
 
 export interface ProjectEventDto {
   userId: string;
   projectId: string;
-  service: services;
+  services: ServiceEnum[];
   subscribe: boolean;
-  data: any;
 }

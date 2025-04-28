@@ -41,6 +41,65 @@ $script = <<-'SCRIPT'
 
     # Create a symbolic link to /usr/bin (optional)
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+
+    # Setting up the metrics service
+
+    sudo apt-get install -y python3-venv
+
+    SOURCE_DIR="/home/vagrant/metrics"
+    SERVICE_NAME="metrics"
+    SERVICE_DIR="/opt/$SERVICE_NAME"
+    PYTHON_SCRIPT="__main__.py"
+    VENV_DIR="$SERVICE_DIR/venv"
+    SYSTEMD_SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+    CONFIG_FILE="$SERVICE_DIR/config.py"
+    DEPLOYMENT_DIR="/home/vagrant/service"
+
+    sudo mv $SOURCE_DIR $SERVICE_DIR
+
+    cd $SERVICE_DIR
+
+    python3 -m venv $VENV_DIR
+
+    if [[ -f "$SERVICE_DIR/requirements.txt" ]]; then
+        echo "Installing dependencies..."
+        source $VENV_DIR/bin/activate
+        pip install -r $SERVICE_DIR/requirements.txt
+        deactivate
+    fi
+
+    # Create the config.py file with handlebars variable {{compose_path}}
+    echo "Writing config.py to $CONFIG_FILE..."
+
+    cat <<EOF | sudo tee $CONFIG_FILE
+class Config:
+    WS_PORT = 55000
+    HTTP_PORT = 55001
+    COMPOSE_PATH = "$DEPLOYMENT_DIR/{{compose_path}}"
+EOF
+
+    echo "Creating systemd service file at $SYSTEMD_SERVICE_FILE..."
+
+    cat <<EOF | sudo tee $SYSTEMD_SERVICE_FILE
+[Unit]
+Description=Metrics Service
+After=network.target
+
+[Service]
+WorkingDirectory=$SERVICE_DIR
+ExecStart=$VENV_DIR/bin/python $SERVICE_DIR/$PYTHON_SCRIPT
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    sudo systemctl daemon-reload
+
+    sudo systemctl enable $SERVICE_NAME --now
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -49,6 +108,7 @@ Vagrant.configure("2") do |config|
 
     vm_name.vm.network "private_network", type: "dhcp"
     vm_name.vm.synced_folder "./", "/home/vagrant/service"
+    vm_name.vm.provision "file", source: "../../metrics", destination: "$HOME/"
 
     {{#eq provider "libvirt"}}
     vm_name.vm.provider "libvirt" do |libvirt|

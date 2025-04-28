@@ -19,7 +19,6 @@ import { tmpdir } from 'os';
 import { ProjectRepository } from 'src/project/project.repository';
 import { VmRepository } from 'src/vm/vm.repository';
 import { PersistedVmDto } from 'src/vm/dto/vm.dto';
-import { WebSocketService } from 'src/websockets/websocket.service';
 import { ComposeService } from 'src/compose/compose.service';
 import { ServiceDto } from 'src/compose/model/Service';
 
@@ -32,7 +31,6 @@ export class DeployConsumer {
     private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
-    private readonly websocketService: WebSocketService,
     private readonly composeService: ComposeService,
   ) {}
 
