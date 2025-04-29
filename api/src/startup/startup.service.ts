@@ -44,7 +44,8 @@ export class StartupService implements OnApplicationBootstrap {
 
       if (
         project.vm.status === VmState.Stopped ||
-        project.vm.status === VmState.Error
+        project.vm.status === VmState.Error ||
+        project.vm.status === VmState.Stopping
       ) {
         this.logger.log(`Stopping VM for project ${project.id}`);
         await this.vmService.downVm(project.vmId, true);

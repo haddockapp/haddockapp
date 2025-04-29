@@ -76,6 +76,8 @@ export class VmService {
       throw new Error('VM is already stopped');
     }
 
+    await this.changeVmStatus(vm.id, VmState.Stopping);
+
     await this.vmManager.stopVM(vm);
 
     await this.changeVmStatus(vm.id, VmState.Stopped);
