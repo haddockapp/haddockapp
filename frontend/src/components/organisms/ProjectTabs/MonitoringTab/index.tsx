@@ -12,16 +12,30 @@ import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 import Histograms from "./Histograms";
 
-export type MetricData = {
+export type CpuUsage = {
+  user: number;
+  system: number;
+  idle: number;
   percent: number;
+
   timestamp: Date;
-  used?: number;
-  total?: number;
-  free?: number;
-  idle?: number;
-  system?: number;
-  user?: number;
-  available?: number;
+};
+
+export type MemoryUsage = {
+  total: number;
+  available: number;
+  percent: number;
+
+  timestamp: Date;
+};
+
+export type DiskUsage = {
+  total: number;
+  percent: number;
+  used: number;
+  free: number;
+
+  timestamp: Date;
 };
 
 const MonitoringTab: FC = () => {
@@ -29,9 +43,9 @@ const MonitoringTab: FC = () => {
 
   const { data: me } = useGetSelfQuery();
 
-  const [cpuUsage, setCpuUsage] = useState<MetricData[]>([]);
-  const [diskUsage, setDiskUsage] = useState<MetricData[]>([]);
-  const [memoryUsage, setMemoryUsage] = useState<MetricData[]>([]);
+  const [cpuUsage, setCpuUsage] = useState<CpuUsage[]>([]);
+  const [diskUsage, setDiskUsage] = useState<DiskUsage[]>([]);
+  const [memoryUsage, setMemoryUsage] = useState<MemoryUsage[]>([]);
 
   const [logs, setLogs] = useState<string[]>([]);
 
@@ -93,12 +107,10 @@ const MonitoringTab: FC = () => {
     };
   }, [cpuUsage, diskUsage, me, memoryUsage, projectId]);
 
-  console.log(cpuUsage, diskUsage, memoryUsage);
-
   return (
-    <div className="px-8">
+    <div className="px-8 space-y-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
-      <div className="grid grid-cols-3 justify-items-center">
+      <div className="grid grid-cols-3 w-fit mx-auto justify-items-center gap-x-12">
         <UsageCharts
           cpuUsage={cpuUsage[-1]?.percent}
           memoryUsage={memoryUsage[-1]?.percent}
