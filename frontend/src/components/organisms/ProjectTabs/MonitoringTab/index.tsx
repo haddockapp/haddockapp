@@ -71,9 +71,15 @@ const MonitoringTab: FC = () => {
       ({ data }) => {
         const timestamp = new Date();
         if (data) {
-          setCpuUsage((p) => [...p, { ...data.cpu_usage, timestamp }]);
-          setMemoryUsage((p) => [...p, { ...data.memory_usage, timestamp }]);
-          setDiskUsage((p) => [...p, { ...data.disk_usage, timestamp }]);
+          setCpuUsage((p) =>
+            [...p, { ...data.cpu_usage, timestamp }].slice(-50)
+          );
+          setMemoryUsage((p) =>
+            [...p, { ...data.memory_usage, timestamp }].slice(-50)
+          );
+          setDiskUsage((p) =>
+            [...p, { ...data.disk_usage, timestamp }].slice(-50)
+          );
         }
       }
     );
@@ -130,9 +136,9 @@ const MonitoringTab: FC = () => {
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
       <div className="grid grid-cols-3 w-fit mx-auto justify-items-center gap-x-12">
         <UsageCharts
-          cpuUsage={cpuUsage[-1]?.percent}
-          memoryUsage={memoryUsage[-1]?.percent}
-          diskUsage={diskUsage[-1]?.percent}
+          cpuUsage={cpuUsage.at(-1)?.percent ?? 0}
+          memoryUsage={memoryUsage.at(-1)?.percent ?? 0}
+          diskUsage={diskUsage.at(-1)?.percent ?? 0}
         />
         <Histograms
           cpuData={cpuUsage}
