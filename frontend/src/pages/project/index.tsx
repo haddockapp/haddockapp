@@ -18,7 +18,7 @@ const ProjectDetails: FC = () => {
 
   return (
     <Tabs defaultValue="topology">
-      <div className="w-full text-right">
+      <div className="w-full text-right px-8">
         <TabsList>
           <TabsTrigger
             value={TabsValue.Topology}

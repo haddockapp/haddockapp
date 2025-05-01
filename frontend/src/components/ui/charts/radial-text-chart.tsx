@@ -9,42 +9,38 @@ import {
 } from "recharts";
 
 import { CardContent } from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
+import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { FC, useMemo } from "react";
+import { CategoricalChartProps } from "recharts/types/chart/generateCategoricalChart";
 
 interface RadialTextChartProps {
   label?: string;
   value: number;
   valueText?: string;
   max?: number;
+  color?: string;
 }
 const RadialTextChart: FC<RadialTextChartProps> = ({
   label,
   value,
   valueText = value,
   max = 100,
+  color = "hsl(var(--primary))",
 }) => {
-  const chartData = useMemo(
+  const chartData = useMemo<CategoricalChartProps["data"]>(
     () => [
       {
         value,
-        fill: "var(--color-safari)",
+        fill: color,
       },
     ],
-    [value]
+    [color, value]
   );
-  const chartConfig = useMemo(
-    () => ({
-      value: {
-        label: "Value",
-      },
-      safari: {
-        label: "Safari",
-        color: "hsl(var(--primary))",
-      },
-    }),
-    []
-  );
+  const chartConfig: ChartConfig = {
+    value: {
+      label: "Value",
+    },
+  };
 
   return (
     <CardContent className="flex-1 pb-0">
