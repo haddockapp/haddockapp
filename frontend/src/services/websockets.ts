@@ -33,6 +33,14 @@ export type LogsSocketType = {
   logs: string[];
 };
 
+export type StatusSocketType = {
+  ID: string;
+  Name: string;
+  Image: string;
+  Status: string;
+  State: string;
+}[];
+
 interface ProjectEventDto {
   userId: string;
   projectId: string;
@@ -55,10 +63,9 @@ export function getSocket() {
   return socket;
 }
 
-function handleProjectSubcription<T extends MetricsSocketType | LogsSocketType>(
-  data: ProjectEventDto,
-  onListen: (res: T) => void
-) {
+function handleProjectSubcription<
+  T extends MetricsSocketType | LogsSocketType | StatusSocketType
+>(data: ProjectEventDto, onListen: (res: T) => void) {
   const socket = getSocket();
   if (!socket) return;
 

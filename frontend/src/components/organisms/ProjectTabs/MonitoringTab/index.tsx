@@ -4,6 +4,7 @@ import {
   handleProjectSubcription,
   LogsSocketType,
   MetricsSocketType,
+  StatusSocketType,
   WebsocketService,
 } from "@/services/websockets";
 import { FC, useEffect, useState } from "react";
@@ -11,6 +12,9 @@ import { useParams } from "react-router-dom";
 import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 import Histograms from "./Histograms";
+import { useAppDispatch } from "@/hooks/useStore";
+import { backendApi } from "@/services/backendApi";
+import { ServiceDto } from "@/services/backendApi/services";
 
 export type CpuUsage = {
   user: number;
@@ -39,6 +43,8 @@ export type DiskUsage = {
 };
 
 const MonitoringTab: FC = () => {
+  const dispatch = useAppDispatch();
+
   const { projectId } = useParams();
 
   const { data: me } = useGetSelfQuery();
@@ -87,7 +93,7 @@ const MonitoringTab: FC = () => {
       }
     );
 
-    handleProjectSubcription(
+    handleProjectSubcription<StatusSocketType>(
       {
         projectId,
         service: WebsocketService.STATUS,
@@ -96,7 +102,19 @@ const MonitoringTab: FC = () => {
         data: {},
       },
       (data) => {
-        console.log(data);
+        dispatch(
+          backendApi.util.updateQueryData(
+            "getServicesByProjectId" as never,
+            undefined as never,
+            (draftPosts) => {
+              (draftPosts as unknown as ServiceDto[]).map((service) => {
+                const serviceUpdate = data.find((s) => s.Name === service.name);
+                if (serviceUpdate) service.status = serviceUpdate.State;
+                return service;
+              });
+            }
+          )
+        );
       }
     );
 
@@ -105,7 +123,7 @@ const MonitoringTab: FC = () => {
       socket.off(WebsocketService.LOGS);
       socket.off(WebsocketService.STATUS);
     };
-  }, [cpuUsage, diskUsage, me, memoryUsage, projectId]);
+  }, [cpuUsage, diskUsage, dispatch, me, memoryUsage, projectId]);
 
   return (
     <div className="px-8 space-y-8">

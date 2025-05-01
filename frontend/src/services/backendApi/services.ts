@@ -1,4 +1,4 @@
-import { backendApi } from ".";
+import { backendApi, QueryKeys } from ".";
 
 export interface ServiceUser {
   uid: string;
@@ -19,6 +19,7 @@ export interface ServiceInformationDto {
   environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
+  status?: string;
 }
 
 export interface ServiceDto extends ServiceInformationDto {
@@ -32,6 +33,7 @@ const servicesApi = backendApi.injectEndpoints({
         url: `/project/${projectId}/service`,
         method: "GET",
       }),
+      providesTags: [QueryKeys.Projects],
     }),
     getServiceInformations: builder.query<
       ServiceInformationDto,
@@ -41,6 +43,7 @@ const servicesApi = backendApi.injectEndpoints({
         url: `/project/${projectId}/service/${serviceName}`,
         method: "GET",
       }),
+      providesTags: [QueryKeys.Projects],
     }),
   }),
 });
