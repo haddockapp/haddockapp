@@ -12,7 +12,17 @@ import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 import Histograms from "./Histograms";
 
-export type MetricData = { value: number; timestamp: Date };
+export type MetricData = {
+  percent: number;
+  timestamp: Date;
+  used?: number;
+  total?: number;
+  free?: number;
+  idle?: number;
+  system?: number;
+  user?: number;
+  available?: number;
+};
 
 const MonitoringTab: FC = () => {
   const { projectId } = useParams();
@@ -41,18 +51,9 @@ const MonitoringTab: FC = () => {
       ({ data }) => {
         const timestamp = new Date();
         if (data) {
-          setCpuUsage((p) => [
-            ...p,
-            { value: data.cpu_usage.percent, timestamp },
-          ]);
-          setMemoryUsage((p) => [
-            ...p,
-            { value: data.memory_usage.percent, timestamp },
-          ]);
-          setDiskUsage((p) => [
-            ...p,
-            { value: data.disk_usage.percent, timestamp },
-          ]);
+          setCpuUsage((p) => [...p, { ...data.cpu_usage, timestamp }]);
+          setMemoryUsage((p) => [...p, { ...data.memory_usage, timestamp }]);
+          setDiskUsage((p) => [...p, { ...data.disk_usage, timestamp }]);
         }
       }
     );
@@ -92,14 +93,16 @@ const MonitoringTab: FC = () => {
     };
   }, [cpuUsage, diskUsage, me, memoryUsage, projectId]);
 
+  console.log(cpuUsage, diskUsage, memoryUsage);
+
   return (
     <div className="px-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
       <div className="grid grid-cols-3 justify-items-center">
         <UsageCharts
-          cpuUsage={cpuUsage[-1]?.value}
-          memoryUsage={memoryUsage[-1]?.value}
-          diskUsage={diskUsage[-1]?.value}
+          cpuUsage={cpuUsage[-1]?.percent}
+          memoryUsage={memoryUsage[-1]?.percent}
+          diskUsage={diskUsage[-1]?.percent}
         />
         <Histograms
           cpuData={cpuUsage}
