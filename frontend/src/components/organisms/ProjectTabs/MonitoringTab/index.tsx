@@ -18,6 +18,7 @@ const MonitoringTab: FC = () => {
 
   const [cpuUsage, setCpuUsage] = useState<number>(0);
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
+  const [diskUsage, setDiskUsage] = useState<number>(0);
   const [logs, setLogs] = useState<string[]>([]);
 
   useEffect(() => {
@@ -26,21 +27,22 @@ const MonitoringTab: FC = () => {
     handleProjectSubcription<MetricsSocketType>(
       {
         projectId,
-        service: WebsocketService.Metrics,
+        service: WebsocketService.METRICS,
         subscribe: true,
         userId: me.id,
         data: {},
       },
-      ({ cpuUsage, memoryUsage }) => {
-        if (cpuUsage) setCpuUsage(cpuUsage);
-        if (memoryUsage) setMemoryUsage(memoryUsage);
+      ({ cpu_usage, disk_usage, memory_usage }) => {
+        if (cpuUsage) setCpuUsage(cpu_usage.percent);
+        if (memoryUsage) setMemoryUsage(memory_usage.percent);
+        if (diskUsage) setDiskUsage(disk_usage.percent);
       }
     );
 
     handleProjectSubcription<LogsSocketType>(
       {
         projectId,
-        service: WebsocketService.Logs,
+        service: WebsocketService.LOGS,
         subscribe: true,
         userId: me.id,
         data: {},
@@ -56,7 +58,7 @@ const MonitoringTab: FC = () => {
       socket.off("metrics");
       socket.off("logs");
     };
-  }, [me, projectId]);
+  }, [cpuUsage, diskUsage, me, memoryUsage, projectId]);
 
   return (
     <div>

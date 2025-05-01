@@ -2,13 +2,29 @@ import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { io, Socket } from "socket.io-client";
 
 export enum WebsocketService {
-  Metrics = "metrics",
-  Logs = "logs",
+  METRICS = "metrics",
+  LOGS = "logs",
+  STATUS = "status",
 }
 
 export type MetricsSocketType = {
-  cpuUsage: number;
-  memoryUsage: number;
+  cpu_usage: {
+    user: number;
+    system: number;
+    idle: number;
+    percent: number;
+  };
+  memory_usage: {
+    total: number;
+    available: number;
+    percent: number;
+  };
+  disk_usage: {
+    total: number;
+    used: number;
+    free: number;
+    percent: number;
+  };
 };
 
 export type LogsSocketType = {
