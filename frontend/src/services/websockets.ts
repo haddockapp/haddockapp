@@ -8,22 +8,24 @@ export enum WebsocketService {
 }
 
 export type MetricsSocketType = {
-  cpu_usage: {
-    user: number;
-    system: number;
-    idle: number;
-    percent: number;
-  };
-  memory_usage: {
-    total: number;
-    available: number;
-    percent: number;
-  };
-  disk_usage: {
-    total: number;
-    used: number;
-    free: number;
-    percent: number;
+  data: {
+    cpu_usage: {
+      user: number;
+      system: number;
+      idle: number;
+      percent: number;
+    };
+    memory_usage: {
+      total: number;
+      available: number;
+      percent: number;
+    };
+    disk_usage: {
+      total: number;
+      used: number;
+      free: number;
+      percent: number;
+    };
   };
 };
 
@@ -57,6 +59,9 @@ function handleProjectSubcription<T extends MetricsSocketType | LogsSocketType>(
   data: ProjectEventDto,
   onListen: (res: T) => void
 ) {
+  const socket = getSocket();
+  if (!socket) return;
+
   socket.emit("project", {
     ...data,
     services: [data.service],

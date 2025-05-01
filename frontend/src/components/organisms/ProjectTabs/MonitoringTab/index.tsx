@@ -23,6 +23,8 @@ const MonitoringTab: FC = () => {
 
   useEffect(() => {
     if (!projectId || !me) return;
+    const socket = getSocket();
+    if (!socket) return;
 
     handleProjectSubcription<MetricsSocketType>(
       {
@@ -32,10 +34,12 @@ const MonitoringTab: FC = () => {
         userId: me.id,
         data: {},
       },
-      ({ cpu_usage, disk_usage, memory_usage }) => {
-        if (cpuUsage) setCpuUsage(cpu_usage.percent);
-        if (memoryUsage) setMemoryUsage(memory_usage.percent);
-        if (diskUsage) setDiskUsage(disk_usage.percent);
+      ({ data }) => {
+        if (data) {
+          setCpuUsage(data.cpu_usage.percent);
+          setMemoryUsage(data.memory_usage.percent);
+          setDiskUsage(data.disk_usage.percent);
+        }
       }
     );
 
@@ -48,15 +52,29 @@ const MonitoringTab: FC = () => {
         data: {},
       },
       ({ logs }) => {
-        if (logs) setLogs(logs);
+        if (logs) {
+          setLogs(logs);
+        }
       }
     );
 
-    const socket = getSocket();
-    if (!socket) return;
+    handleProjectSubcription(
+      {
+        projectId,
+        service: WebsocketService.STATUS,
+        subscribe: true,
+        userId: me.id,
+        data: {},
+      },
+      (data) => {
+        console.log(data);
+      }
+    );
+
     return () => {
-      socket.off("metrics");
-      socket.off("logs");
+      socket.off(WebsocketService.METRICS);
+      socket.off(WebsocketService.LOGS);
+      socket.off(WebsocketService.STATUS);
     };
   }, [cpuUsage, diskUsage, me, memoryUsage, projectId]);
 
@@ -64,7 +82,11 @@ const MonitoringTab: FC = () => {
     <div>
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
       <div className="flex flex-col space-y-4">
-        <UsageCharts cpuUsage={cpuUsage} memoryUsage={memoryUsage} />
+        <UsageCharts
+          cpuUsage={cpuUsage}
+          memoryUsage={memoryUsage}
+          diskUsage={diskUsage}
+        />
         <LogsSection lines={logs} />
       </div>
     </div>
