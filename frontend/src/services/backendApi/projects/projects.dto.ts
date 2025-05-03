@@ -28,3 +28,9 @@ export type UpdateProjectDto = {
   description?: string;
   authorization_id?: string;
 };
+
+export type EnvironmentVariableDto = {
+  key: string;
+  value: string;
+  isSecret: boolean;
+};

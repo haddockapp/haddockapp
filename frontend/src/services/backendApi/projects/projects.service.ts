@@ -1,5 +1,10 @@
 import { backendApi, QueryKeys } from "..";
-import { CreateProjectDto, ProjectDto, UpdateProjectDto } from "./projects.dto";
+import {
+  CreateProjectDto,
+  EnvironmentVariableDto,
+  ProjectDto,
+  UpdateProjectDto,
+} from "./projects.dto";
 
 const projectsApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -35,6 +40,44 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
+    getEnvironmentVariables: builder.query<EnvironmentVariableDto[], string>({
+      query: (projectId) => ({
+        url: `/project/${projectId}/environment`,
+      }),
+      providesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+    }),
+    createEnvironmentVariable: builder.mutation<
+      EnvironmentVariableDto,
+      { projectId: string; body: EnvironmentVariableDto }
+    >({
+      query: ({ projectId, body }) => ({
+        url: `/project/${projectId}/environment`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+    }),
+    updateEnvironmentVariable: builder.mutation<
+      EnvironmentVariableDto,
+      { projectId: string; key: string; body: EnvironmentVariableDto }
+    >({
+      query: ({ projectId, key, body }) => ({
+        url: `/project/${projectId}/environment/${key}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+    }),
+    deleteEnvironmentVariable: builder.mutation<
+      void,
+      { projectId: string; key: string }
+    >({
+      query: ({ projectId, key }) => ({
+        url: `/project/${projectId}/environment/${key}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+    }),
   }),
 });
 
@@ -43,4 +86,8 @@ export const {
   useGetProjectsQuery,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useGetEnvironmentVariablesQuery,
+  useCreateEnvironmentVariableMutation,
+  useUpdateEnvironmentVariableMutation,
+  useDeleteEnvironmentVariableMutation,
 } = projectsApi;
