@@ -48,9 +48,9 @@ const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="w-40 text-red-500 font-bold border-red-500 hover:bg-red-100 mt-4"
+          className="text-red-500 font-bold border-red-500 hover:bg-red-100 mt-4"
         >
-          <Trash className="mr-2" />
+          <Trash className="mr-2" size={15} />
           Delete Project
         </Button>
       </DialogTrigger>
