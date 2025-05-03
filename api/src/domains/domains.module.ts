@@ -8,9 +8,10 @@ import { DomainsController } from './domains.controller';
 import { DomainRepository } from './domains.repository';
 import { DomainsService } from './domains.service';
 import { ConfigurationModule } from 'src/configuration/configuration.module';
+import { AutologinsModule } from '../autologins/autologins.module';
 
 @Module({
-  imports: [PrismaModule, FrontendModule, CaddyModule, ConfigurationModule],
+  imports: [PrismaModule, FrontendModule, CaddyModule, ConfigurationModule, AutologinsModule],
   controllers: [DomainsController],
   providers: [
     DomainsService,

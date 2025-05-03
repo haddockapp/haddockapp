@@ -1,4 +1,1 @@
-{
-  "backendUrl": "http://localhost:4000",
-  "socketUrl": "http://localhost:3001"
-}
+{"backendUrl":"https://api.haddock.ovh","socketUrl":"http://localhost:3001"}

@@ -41,6 +41,6 @@ import { AccessGuard } from './guard/access.guard';
     { provide: APP_GUARD, useClass: AccessGuard },
   ],
   controllers: [AuthController],
-  exports: [],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -17,9 +17,12 @@ import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { VMManagerModule } from './vm-manager/vm.manager.module';
 import { InvitationModule } from './invitation/invitation.module';
+import { AutologinsModule } from './autologins/autologins.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register({ isGlobal: true }),
     ConfigModule.forRoot(),
     BullModule.forRoot({
       redis: {
@@ -41,6 +44,7 @@ import { InvitationModule } from './invitation/invitation.module';
     HealthModule,
     VMManagerModule,
     InvitationModule,
+    AutologinsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
