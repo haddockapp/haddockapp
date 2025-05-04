@@ -28,12 +28,10 @@ const StatusTab: FC<StatusTabProps> = ({
   onRestart,
   onStop,
 }) => {
-  // Determine if actions should be disabled based on current status
   const isRunning = status === ServiceState.Running;
   const isStopped = status === ServiceState.Stopped;
   const isStarting = status === ServiceState.Starting;
 
-  // Get status indicator styles
   const getStatusInfo = () => {
     switch (status) {
       case ServiceState.Running:
@@ -64,7 +62,6 @@ const StatusTab: FC<StatusTabProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Status card */}
       <Card
         className={cn(
           "border",
@@ -90,7 +87,6 @@ const StatusTab: FC<StatusTabProps> = ({
               </div>
             </div>
 
-            {/* Actions dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -142,7 +138,6 @@ const StatusTab: FC<StatusTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Image information */}
       <Card>
         <CardContent className="p-6">
           <h3 className="font-medium text-gray-900 mb-3">Image Information</h3>
