@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 import { EllipsisVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -13,8 +13,8 @@ interface StatusTabProps {
   status: string;
   image: string;
   onStart: () => void;
-  onStop: () => void;
   onRestart: () => void;
+  onStop: () => void;
 }
 
 const StatusTab: FC<StatusTabProps> = ({
@@ -24,10 +24,12 @@ const StatusTab: FC<StatusTabProps> = ({
   onRestart,
   onStop,
 }) => {
+  // Determine if actions should be disabled based on current status
   const isRunning = status === ServiceState.Running;
   const isStopped = status === ServiceState.Stopped;
   const isStarting = status === ServiceState.Starting;
 
+  // Get status indicator styles
   const getStatusStyles = () => {
     switch (status) {
       case ServiceState.Running:
@@ -55,6 +57,7 @@ const StatusTab: FC<StatusTabProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Status section */}
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-gray-700">Current status</h3>
@@ -65,6 +68,8 @@ const StatusTab: FC<StatusTabProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Actions dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none">
             <EllipsisVertical className="h-5 w-5" />

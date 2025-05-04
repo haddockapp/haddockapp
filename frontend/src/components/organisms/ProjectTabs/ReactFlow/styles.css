@@ -1,37 +1,85 @@
 .react-flow__background {
-  fill: white;
+  fill: #f9fafb;
 }
 
-@keyframes rotateGradient {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
+/* Node styling */
 .custom-node {
   position: relative;
   background: white;
-  padding: 12px 16px;
+  padding: 16px;
   text-align: center;
-  font-weight: bold;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid transparent;
-  animation: rotateGradient 5s linear infinite;
-  background-size: 300% 300%;
+  border-radius: 8px;
+  min-width: 120px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
 }
 
+.custom-node.selected {
+  box-shadow: 0 0 0 2px #6366f1, 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.custom-node:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Status indicator */
+.status-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.running .status-dot {
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.starting .status-dot {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  animation: blink 1.5s infinite;
+}
+
+.status-indicator.stopped .status-dot {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* Service icon */
+.service-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Service name */
+.service-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  word-break: break-word;
 .custom-node.running {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #16A34A, #22C55E, #86EFAC, #22C55E, #16A34A);
@@ -39,6 +87,12 @@
     background-clip: padding-box, border-box;
 }
 
+/* Handle styling */
+.custom-handle {
+  width: 8px;
+  height: 8px;
+  background-color: #6366f1;
+  border: 2px solid white;
 .custom-node.starting {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #FACC15, #F59E0B, #FDE047, #F59E0B, #FACC15);
@@ -46,6 +100,11 @@
     background-clip: padding-box, border-box;
 }
 
+/* Edge styling */
+.react-flow__edge path {
+  stroke: #9ca3af;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
 .custom-node.stopped {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #DC2626, #EF4444, #F87171, #EF4444, #DC2626);
@@ -53,39 +112,36 @@
     background-clip: padding-box, border-box;
 }
 
-@keyframes runningPulse {
+.react-flow__edge.selected path,
+.react-flow__edge:hover path {
+  stroke: #6366f1;
+  stroke-width: 3;
+}
 
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
   }
 
-  50% {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.9);
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 
-@keyframes startingPulse {
+@keyframes blink {
 
   0%,
   100% {
-    box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+    opacity: 1;
   }
 
   50% {
-    box-shadow: 0 0 20px rgba(234, 179, 8, 0.9);
-  }
-}
-
-@keyframes stoppedPulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-  }
-
-  50% {
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
+    opacity: 0.5;
   }
 }
 
@@ -94,19 +150,27 @@
     transform: scale(1.03);
 }
 
+/* Service drawer styling */
+.service-drawer {
+  width: 350px;
+  background-color: white;
+  border-left: 1px solid #e5e7eb;
+  height: 100%;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
 .custom-node.starting:hover {
   animation: startingPulse 1.2s infinite;
   transform: scale(1.03);
 }
 
+.service-drawer-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
 .custom-node.stopped:hover {
   animation: stoppedPulse 1.2s infinite;
     transform: scale(1.03);
 }
 
-/* Style des connexions (edges) */
-.react-flow__edge path {
-  stroke: #000000 !important;
-  stroke-width: 3;
-  stroke-dasharray: 5 5;
+.service-drawer-content {
+  padding: 16px;
 }
