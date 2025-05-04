@@ -1,5 +1,5 @@
 import { AuthResponse, GithubOAuthDto, LoginDto, SignupDto } from ".";
-import { backendApi } from "..";
+import { backendApi, QueryKeys } from "..";
 
 const authApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,6 +9,7 @@ const authApi = backendApi.injectEndpoints({
         method: "POST",
         body,
       }),
+      invalidatesTags: [QueryKeys.Users],
     }),
     signIn: builder.mutation<AuthResponse, LoginDto>({
       query: (body) => ({

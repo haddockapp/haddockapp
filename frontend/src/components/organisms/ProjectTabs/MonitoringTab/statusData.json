@@ -1,0 +1,29 @@
+[
+  {
+    "ID": "9c14291d506dcd14177c52c16648088fd1302bfa61bd02cb88409291a8819313",
+    "Name": "service-db-1",
+    "Image": "mysql:latest",
+    "Command": "docker-entrypoint.sh mysqld",
+    "Project": "service",
+    "Service": "db",
+    "Created": 1746111549,
+    "State": "running",
+    "Status": "Up 11 minutes",
+    "Health": "",
+    "ExitCode": 0,
+    "Publishers": [
+      {
+        "URL": "0.0.0.0",
+        "TargetPort": 3306,
+        "PublishedPort": 3306,
+        "Protocol": "tcp"
+      },
+      {
+        "URL": "",
+        "TargetPort": 33060,
+        "PublishedPort": 0,
+        "Protocol": "tcp"
+      }
+    ]
+  }
+]

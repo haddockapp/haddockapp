@@ -2,18 +2,44 @@ import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { io, Socket } from "socket.io-client";
 
 export enum WebsocketService {
-  Metrics = "metrics",
-  Logs = "logs",
+  METRICS = "metrics",
+  LOGS = "logs",
+  STATUS = "status",
 }
 
 export type MetricsSocketType = {
-  cpuUsage: number;
-  memoryUsage: number;
+  data: {
+    cpu_usage: {
+      user: number;
+      system: number;
+      idle: number;
+      percent: number;
+    };
+    memory_usage: {
+      total: number;
+      available: number;
+      percent: number;
+    };
+    disk_usage: {
+      total: number;
+      used: number;
+      free: number;
+      percent: number;
+    };
+  };
 };
 
 export type LogsSocketType = {
   logs: string[];
 };
+
+export type StatusSocketType = {
+  ID: string;
+  Name: string;
+  Image: string;
+  Status: string;
+  State: string;
+}[];
 
 interface ProjectEventDto {
   userId: string;
@@ -37,10 +63,12 @@ export function getSocket() {
   return socket;
 }
 
-function handleProjectSubcription<T extends MetricsSocketType | LogsSocketType>(
-  data: ProjectEventDto,
-  onListen: (res: T) => void
-) {
+function handleProjectSubcription<
+  T extends MetricsSocketType | LogsSocketType | StatusSocketType
+>(data: ProjectEventDto, onListen: (res: T) => void) {
+  const socket = getSocket();
+  if (!socket) return;
+
   socket.emit("project", {
     ...data,
     services: [data.service],

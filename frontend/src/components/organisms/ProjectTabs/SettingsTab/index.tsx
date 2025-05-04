@@ -41,7 +41,7 @@ const SettingsTab: FC = () => {
     navigate("/dashboard");
   };
   return (
-    <div className="ml-8 mr-8">
+    <div className="px-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Settings</h1>
       <SettingsTabAction
         title="Edit this project"

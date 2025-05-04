@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./useStore";
 import { backendApi } from "@/services/backendApi";
 import { VmState } from "@/types/vm/vm";
-import { toast } from "./use-toast";
 import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import { useGetSelfQuery } from "@/services/backendApi/users";
 import { connectSocket, getSocket } from "@/services/websockets";
@@ -34,11 +33,6 @@ const useWebsockets = () => {
     socket.emit("join", { userId: me.id });
 
     socket.on("message", (msg: SocketMessage) => {
-      toast({
-        title: "Websocket message",
-        description: JSON.stringify(msg),
-      });
-
       dispatch(
         backendApi.util.updateQueryData(
           "getProjects" as never,
