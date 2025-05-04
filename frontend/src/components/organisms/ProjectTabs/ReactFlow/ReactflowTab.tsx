@@ -19,7 +19,7 @@ import {
   mockServiceStates,
 } from "./utils";
 import CustomNode from "./CustomNode";
-import CheckBoxWithText from "@/components/molecules/text-checkbox";
+import SwitchWithText from "@/components/molecules/text-switch";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import ServiceDrawer from "../../ServicesDrawer/ServiceDrawer";
@@ -177,7 +177,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               className="bg-white p-2 rounded-md shadow-md m-2"
             >
               <div className="flex flex-col gap-2">
-                <CheckBoxWithText
+                <SwitchWithText
                   id="showEdges"
                   text="Show Connections"
                   checked={showEdges}

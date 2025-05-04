@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Checkbox } from "../ui/checkbox";
+import { Switch } from "../ui/switch";
 
 interface CheckBoxWithTextProps {
   id: string;
@@ -9,7 +9,7 @@ interface CheckBoxWithTextProps {
   containerClassName?: string;
 }
 
-const CheckBoxWithText: FC<CheckBoxWithTextProps> = ({
+const SwitchWithText: FC<CheckBoxWithTextProps> = ({
   id,
   text,
   checked,
@@ -20,7 +20,7 @@ const CheckBoxWithText: FC<CheckBoxWithTextProps> = ({
     <div
       className={`items-center flex space-x-2 align-middle ${containerClassName}`}
     >
-      <Checkbox id={id} checked={checked} onCheckedChange={onCheckedChange} />
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
       <label htmlFor={id} className="text-sm font-medium">
         {text}
       </label>
@@ -28,4 +28,4 @@ const CheckBoxWithText: FC<CheckBoxWithTextProps> = ({
   );
 };
 
-export default CheckBoxWithText;
+export default SwitchWithText;
