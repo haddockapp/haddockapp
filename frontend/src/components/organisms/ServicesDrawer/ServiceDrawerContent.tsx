@@ -6,6 +6,7 @@ import StatusTab from "./StatusTab";
 import { ServiceDto } from "@/services/backendApi/services";
 import ConfigTab from "./ConfigTab";
 import NetworksTab from "./NetworksTab";
+import { ServiceState } from "@/types/services/services";
 
 enum TabsValue {
   Status = "status",
@@ -46,7 +47,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               defaultValue={TabsValue.Status}
               className="mt-8 items-center w-full"
             >
-              <TabsList className="absolute top-8 right-8">
+              <TabsList className="mb-4">
                 <TabsTrigger value={TabsValue.Status}>
                   <Button
                     variant="link"
@@ -87,11 +88,14 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                   </Button>
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="status" className="mt-4">
+              <TabsContent value="status" className="p-4 border rounded-md">
                 {service && (
                   <StatusTab
                     status={service.status?.State ?? "unknown"}
                     image={service.image}
+                    onStart={() => console.log("Start")}
+                    onRestart={() => console.log("Restart")}
+                    onStop={() => console.log("Stop")}
                   />
                 )}
               </TabsContent>

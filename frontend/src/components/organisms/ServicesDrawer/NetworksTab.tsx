@@ -1,12 +1,6 @@
-import { ServiceInformationDto } from "@/services/backendApi/services";
 import { FC, useMemo } from "react";
-import ConfigNetworkForm from "./ConfigNetworkForm";
-import {
-  useDeleteNetworkConnectionMutation,
-  useGetNetworksConnectionQuery,
-} from "@/services/backendApi/networks/networks.service";
-import { Button } from "@/components/ui/button";
 import { Trash, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogTrigger,
@@ -16,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import useDisclosure from "@/hooks/use-disclosure";
 import {
   Table,
   TableBody,
@@ -26,6 +19,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import useDisclosure from "@/hooks/use-disclosure";
+import { ServiceInformationDto } from "@/services/backendApi/services";
+import ConfigNetworkForm from "./ConfigNetworkForm";
+import {
+  useDeleteNetworkConnectionMutation,
+  useGetNetworksConnectionQuery,
+} from "@/services/backendApi/networks/networks.service";
 
 interface NetworksTabProps {
   serviceInformations: ServiceInformationDto;
@@ -39,16 +39,19 @@ const NetworksTab: FC<NetworksTabProps> = ({
   const { toast } = useToast();
   const { data: redirections } = useGetNetworksConnectionQuery(projectId);
   const [deleteRedirection] = useDeleteNetworkConnectionMutation();
+
   const {
     isOpen: isCreateModalOpen,
     onToggle: onCreateModalToggle,
     onClose: onCreateModalClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeleteModalOpen,
     onToggle: onDeleteModalToggle,
     onClose: onDeleteModalClose,
   } = useDisclosure();
+
   const serviceRedirections = useMemo(() => {
     return redirections
       ? redirections.filter(
@@ -67,137 +70,177 @@ const NetworksTab: FC<NetworksTabProps> = ({
     });
   };
 
+  const renderSection = (
+    title: string,
+    isEmpty: boolean,
+    emptyMessage: string,
+    content: React.ReactNode
+  ) => (
+    <section className="space-y-3">
+      <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+      {isEmpty ? (
+        <p className="text-sm text-gray-500 italic">{emptyMessage}</p>
+      ) : (
+        content
+      )}
+    </section>
+  );
+
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <p className="mb-2 text-lg">Ports</p>
-        {serviceInformations.ports.length === 0 ? (
-          <p className="ml-2 text-md">No ports</p>
-        ) : (
+    <div className="space-y-8">
+      {renderSection(
+        "Ports",
+        serviceInformations.ports.length === 0,
+        "No ports configured",
+        <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Port Value</TableHead>
+              <TableRow className="bg-gray-50">
+                <TableHead className="font-medium">Port Value</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {serviceInformations.ports.map((port) => (
-                <TableRow key={port}>
+                <TableRow key={port} className="hover:bg-gray-50">
                   <TableCell>{port}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        )}
-      </div>
-      <div>
-        <p className="mb-2 text-lg">Networks</p>
-        {serviceInformations.networks.length === 0 ? (
-          <p className="ml-2 text-md">No networks</p>
-        ) : (
+        </div>
+      )}
+
+      {renderSection(
+        "Networks",
+        serviceInformations.networks.length === 0,
+        "No networks configured",
+        <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Network name</TableHead>
+              <TableRow className="bg-gray-50">
+                <TableHead className="font-medium">Network name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {serviceInformations.networks.map((network) => (
-                <TableRow key={network}>
+                <TableRow key={network} className="hover:bg-gray-50">
                   <TableCell>{network}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        <p className="mb-2 text-lg">Redirections</p>
+        </div>
+      )}
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-gray-700">Redirections</h3>
+          <Dialog open={isCreateModalOpen} onOpenChange={onCreateModalToggle}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Add redirection
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create a new redirection</DialogTitle>
+                <DialogDescription className="text-sm text-gray-500">
+                  Fill the form below to create a new redirection for your
+                  service
+                </DialogDescription>
+              </DialogHeader>
+              <ConfigNetworkForm
+                serviceInformations={serviceInformations}
+                projectId={projectId}
+                onClose={onCreateModalClose}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
         {serviceRedirections.length === 0 ? (
-          <p className="ml-2 text-md">No redirections</p>
+          <p className="text-sm text-gray-500 italic">
+            No redirections configured
+          </p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Port</TableHead>
-                <TableHead>Domain</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {serviceRedirections.map((redirection) => (
-                <TableRow key={redirection.id}>
-                  <TableCell>{redirection.port}</TableCell>
-                  <TableCell>{redirection.domain}</TableCell>
-                  <TableCell className="flex justify-self-end">
-                    <Dialog
-                      open={isDeleteModalOpen}
-                      onOpenChange={onDeleteModalToggle}
-                    >
-                      <DialogTrigger asChild>
-                        <Button variant="destructive">
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle className="self-center mb-2 text-red-600">
-                            Are you sure you want to delete this redirection?
-                          </DialogTitle>
-                          <DialogDescription className="text-sm text-gray-700 self-center">
-                            This action is irreversible, so please proceed with
-                            caution.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="justify-between">
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            className="w-36"
-                            onClick={onDeleteModalClose}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            type="submit"
-                            variant="destructive"
-                            onClick={() =>
-                              handleDeleteRedirection(redirection.id)
-                            }
-                            className="w-36"
-                          >
-                            Delete Redirection
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="w-1/4 font-medium">Port</TableHead>
+                  <TableHead className="font-medium">Domain</TableHead>
+                  <TableHead className="w-24"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {serviceRedirections.map((redirection) => (
+                  <TableRow key={redirection.id} className="hover:bg-gray-50">
+                    <TableCell>{redirection.port}</TableCell>
+                    <TableCell className="font-medium">
+                      {redirection.domain}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={onDeleteModalToggle}
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+
+                      <Dialog
+                        open={isDeleteModalOpen}
+                        onOpenChange={onDeleteModalToggle}
+                      >
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="text-center text-red-600">
+                              Delete Redirection
+                            </DialogTitle>
+                            <DialogDescription className="text-center">
+                              Are you sure you want to delete this redirection?
+                              <p className="mt-2 font-medium text-gray-900">
+                                {redirection.domain}
+                              </p>
+                              <p className="mt-1 text-sm text-gray-500">
+                                This action is irreversible and will immediately
+                                remove the redirection.
+                              </p>
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter className="sm:justify-center gap-2 sm:gap-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={onDeleteModalClose}
+                              className="sm:w-32"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              onClick={() =>
+                                handleDeleteRedirection(redirection.id)
+                              }
+                              className="sm:w-32"
+                            >
+                              Delete
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
-        <Dialog open={isCreateModalOpen} onOpenChange={onCreateModalToggle}>
-          <DialogTrigger asChild>
-            <Button className="w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Add redirection
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create a new redirection</DialogTitle>
-              <DialogDescription>
-                Fill the form below to create a new redirection
-              </DialogDescription>
-            </DialogHeader>
-            <ConfigNetworkForm
-              serviceInformations={serviceInformations}
-              projectId={projectId}
-              onClose={onCreateModalClose}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+      </section>
     </div>
   );
 };
