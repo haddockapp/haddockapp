@@ -81,12 +81,12 @@ const projectsApi = backendApi.injectEndpoints({
     }),
     changeServiceStatus: builder.mutation<
       void,
-      { projectId: string; serviceName: string; status: ServiceAction }
+      { projectId: string; serviceName: string; action: ServiceAction }
     >({
-      query: ({ projectId, serviceName, status }) => ({
-        url: `/project/${projectId}/service}`,
+      query: ({ projectId, serviceName, action }) => ({
+        url: `/project/${projectId}/service`,
         method: "POST",
-        body: { service: serviceName, status },
+        body: { service: serviceName, action },
       }),
     }),
   }),

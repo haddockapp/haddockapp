@@ -6,7 +6,10 @@ import StatusTab from "./StatusTab";
 import { ServiceDto } from "@/services/backendApi/services";
 import ConfigTab from "./ConfigTab";
 import NetworksTab from "./NetworksTab";
-import { ServiceState } from "@/types/services/services";
+import {
+  ServiceAction,
+  useChangeServiceStatusMutation,
+} from "@/services/backendApi/projects";
 
 enum TabsValue {
   Status = "status",
@@ -24,6 +27,15 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
   projectId,
 }) => {
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Status);
+  const [changeServiceStatus] = useChangeServiceStatusMutation();
+  const handleStatusChange = (action: ServiceAction) => {
+    if (!service) return;
+    changeServiceStatus({
+      projectId,
+      serviceName: service.name,
+      action,
+    });
+  };
   return (
     <div className="bg-zinc-50 rounded-[16px] w-[310px] grow mt-2 mr-2 mb-2 p-5 flex flex-col">
       {service === null && <div className="text-center">No service found</div>}
@@ -93,9 +105,9 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                   <StatusTab
                     status={service.status?.State ?? "unknown"}
                     image={service.image}
-                    onStart={() => console.log("Start")}
-                    onRestart={() => console.log("Restart")}
-                    onStop={() => console.log("Stop")}
+                    onStart={() => handleStatusChange(ServiceAction.START)}
+                    onRestart={() => handleStatusChange(ServiceAction.RESTART)}
+                    onStop={() => handleStatusChange(ServiceAction.STOP)}
                   />
                 )}
               </TabsContent>
