@@ -6,6 +6,7 @@ import StatusTab from "./StatusTab";
 import { ServiceDto } from "@/services/backendApi/services";
 import ConfigTab from "./ConfigTab";
 import NetworksTab from "./NetworksTab";
+import { ServiceState } from "@/types/services/services";
 import {
   ServiceAction,
   useChangeServiceStatusMutation,

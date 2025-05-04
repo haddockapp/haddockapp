@@ -34,7 +34,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
   // Get status indicator styles
   const getStatusStyles = () => {
-    switch (service?.status ?? ServiceState.Stopped) {
+    switch (service?.status || ServiceState.Stopped) {
       case ServiceState.Running:
         return {
           color: "text-emerald-600",
@@ -62,7 +62,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   return (
     <div
       className={cn(
-        "w-[350px] border-l border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out",
+        "w-[500px] border-l border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
@@ -86,7 +86,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                       className={cn("h-2 w-2 rounded-full", statusStyles.bg)}
                     />
                     <span className={statusStyles.color}>
-                      {service.status ?? ServiceState.Stopped}
+                      {service.status || ServiceState.Stopped}
                     </span>
                   </div>
                 </div>
@@ -113,33 +113,69 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               onValueChange={(value) => setSelectedTab(value as TabsValue)}
               className="p-4"
             >
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value={TabsValue.Status}>Status</TabsTrigger>
-                <TabsTrigger value={TabsValue.Config}>
+              <TabsList className="w-full grid grid-cols-3 mb-6 bg-gray-50 p-1 rounded-lg">
+                <TabsTrigger
+                  value={TabsValue.Status}
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                >
+                  Status
+                </TabsTrigger>
+                <TabsTrigger
+                  value={TabsValue.Config}
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                >
                   Configuration
                 </TabsTrigger>
-                <TabsTrigger value={TabsValue.Networks}>Networks</TabsTrigger>
+                <TabsTrigger
+                  value={TabsValue.Networks}
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                >
+                  Networks
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value={TabsValue.Status} className="p-2">
-                <StatusTab
-                  status={service.status ?? ServiceState.Stopped}
-                  image={service.image}
-                  onStart={() => console.log("Start")}
-                  onRestart={() => console.log("Restart")}
-                  onStop={() => console.log("Stop")}
-                />
+              <TabsContent
+                value={TabsValue.Status}
+                className="p-4 border rounded-md bg-white"
+              >
+                {service && (
+                  <StatusTab
+                    status={service.status || ServiceState.Stopped}
+                    image={service.image}
+                    onStart={() => console.log("Start")}
+                    onRestart={() => console.log("Restart")}
+                    onStop={() => console.log("Stop")}
+                  />
+                )}
               </TabsContent>
 
-              <TabsContent value={TabsValue.Config} className="p-2">
-                <ConfigTab serviceInformations={service} />
+              <TabsContent
+                value={TabsValue.Config}
+                className="p-4 border rounded-md bg-white"
+              >
+                {service ? (
+                  <ConfigTab serviceInformations={service} />
+                ) : (
+                  <div className="flex items-center justify-center h-32 text-gray-500">
+                    No configuration found
+                  </div>
+                )}
               </TabsContent>
 
-              <TabsContent value={TabsValue.Networks} className="p-2">
-                <NetworksTab
-                  serviceInformations={service}
-                  projectId={projectId}
-                />
+              <TabsContent
+                value={TabsValue.Networks}
+                className="p-4 border rounded-md bg-white"
+              >
+                {service ? (
+                  <NetworksTab
+                    serviceInformations={service}
+                    projectId={projectId}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-32 text-gray-500">
+                    No networks found
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>

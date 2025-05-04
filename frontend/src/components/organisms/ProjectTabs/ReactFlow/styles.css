@@ -158,19 +158,34 @@
   height: 100%;
   overflow-y: auto;
   transition: transform 0.3s ease;
-.custom-node.starting:hover {
-  animation: startingPulse 1.2s infinite;
-  transform: scale(1.03);
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
 }
 
 .service-drawer-header {
   padding: 16px;
   border-bottom: 1px solid #e5e7eb;
-.custom-node.stopped:hover {
-  animation: stoppedPulse 1.2s infinite;
-    transform: scale(1.03);
 }
 
 .service-drawer-content {
   padding: 16px;
+}
+
+/* Add tab-specific styling */
+.service-tab-content {
+  transition: opacity 0.2s ease;
+}
+
+.service-tab-trigger {
+  position: relative;
+}
+
+.service-tab-trigger[data-state="active"]::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
 }
