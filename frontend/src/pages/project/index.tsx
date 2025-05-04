@@ -94,16 +94,17 @@ const ProjectDetails: FC = () => {
         userId: me.id,
         data: {},
       },
-      (data) => {
+      ({ status }) => {
         dispatch(
           backendApi.util.updateQueryData(
             "getServicesByProjectId" as never,
-            undefined as never,
+            projectId as never,
             (draftPosts) => {
               (draftPosts as unknown as ServiceDto[]).map((service) => {
-                const serviceUpdate = data.find((s) => s.Name === service.name);
-                if (serviceUpdate) service.status = serviceUpdate.State;
-                return service;
+                const serviceUpdate = status.find(
+                  (s) => s.Service === service.name
+                );
+                if (serviceUpdate) service.status = serviceUpdate;
               });
             }
           )

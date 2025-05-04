@@ -90,7 +90,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               <TabsContent value="status" className="mt-4">
                 {service && (
                   <StatusTab
-                    status={service.status ?? "unknown"}
+                    status={service.status.State ?? "unknown"}
                     image={service.image}
                   />
                 )}

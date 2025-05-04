@@ -34,12 +34,15 @@ export type LogsSocketType = {
 };
 
 export type StatusSocketType = {
-  ID: string;
-  Name: string;
-  Image: string;
-  Status: string;
-  State: string;
-}[];
+  status: {
+    ID: string;
+    Name: string;
+    Image: string;
+    Status: string;
+    State: string;
+    Service: string;
+  }[];
+};
 
 interface ProjectEventDto {
   userId: string;
