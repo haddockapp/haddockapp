@@ -61,7 +61,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     []
   );
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedServiceId(node.id || null);
+    setSelectedServiceId(node.id);
   };
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -101,7 +101,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
 
   const selectedService = useMemo(
     () => services?.find((s) => s.name === selectedServiceId) ?? null,
-    [services]
+    [services, selectedServiceId]
   );
 
   return (

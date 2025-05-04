@@ -1,6 +1,7 @@
 import authSlice from "@/services/authSlice";
 import { backendApi } from "@/services/backendApi";
 import configSlice from "@/services/configSlice";
+import metricSlice from "@/services/metricSlice";
 import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({
@@ -8,6 +9,7 @@ export const store = configureStore({
     [backendApi.reducerPath]: backendApi.reducer,
     auth: authSlice.reducer,
     config: configSlice.reducer,
+    metrics: metricSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(backendApi.middleware),
