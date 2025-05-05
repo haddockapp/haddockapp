@@ -1,7 +1,4 @@
-import {
-  ServiceDto,
-  useGetServicesByProjectIdQuery,
-} from "@/services/backendApi/services";
+import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
 import { FC, useState, useCallback, useMemo } from "react";
 import {
   ReactFlow,
@@ -42,7 +39,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [showEdges, setShowEdges] = useState(true);
-  const [selectedService, setSelectedService] = useState<ServiceDto | null>(
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null
   );
 
@@ -64,9 +61,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     []
   );
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedService(
-      services?.find((service) => service.name === node.id) || null
-    );
+    setSelectedServiceId(node.id);
   };
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -101,8 +96,13 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   };
 
   const handlePaneClick = () => {
-    setSelectedService(null);
+    setSelectedServiceId(null);
   };
+
+  const selectedService = useMemo(
+    () => services?.find((s) => s.name === selectedServiceId) ?? null,
+    [services, selectedServiceId]
+  );
 
   return (
     <div className="mt-2 h-[75vh] px-8">

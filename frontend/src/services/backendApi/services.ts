@@ -19,7 +19,7 @@ export interface ServiceInformationDto {
   environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
-  status?: string;
+  status?: any;
 }
 
 export interface ServiceDto extends ServiceInformationDto {
