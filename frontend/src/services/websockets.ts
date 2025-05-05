@@ -66,13 +66,21 @@ export function getSocket() {
   return socket;
 }
 
-function handleProjectSubcription<
+async function emit(socket: Socket, event: string, data: any) {
+  return new Promise((resolve) => {
+    socket.emit(event, data, (response: any) => {
+      resolve(response);
+    });
+  });
+}
+
+async function handleProjectSubcription<
   T extends MetricsSocketType | LogsSocketType | StatusSocketType
 >(data: ProjectEventDto, onListen: (res: T) => void) {
   const socket = getSocket();
   if (!socket) return;
 
-  socket.emit("project", {
+  await emit(socket, "project", {
     ...data,
     services: [data.service],
   });

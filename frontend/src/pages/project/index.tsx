@@ -24,6 +24,10 @@ const ProjectDetails: FC = () => {
   useEffect(() => {
     if (!projectId) return;
     dispatch(setProjectId(projectId));
+
+    return () => {
+      dispatch(setProjectId(null));
+    };
   }, [dispatch, projectId]);
 
   return (
