@@ -85,12 +85,45 @@ export class ProjectService {
     this.logger.log(`Project ${projectId} deleted`);
   }
 
+  async stopProject(projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundException('Project not found.');
+    }
+    this.logger.log(`Stopping project ${project.id}`);
+    try {
+      await this.vmService.downVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to stop vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+    }
+  }
+
+  async startProject(projectId: string) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundException('Project not found.');
+    }
+    this.logger.log(`Starting project ${project.id}`);
+    try {
+      await this.vmService.upVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to start vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+    }
+  }
+
   async deployProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);
 
     if (
       project.vm.status === VmState.Running ||
-      project.vm.status === VmState.Starting
+      project.vm.status === VmState.Starting ||
+      project.vm.status === VmState.Stopping
     ) {
       throw new BadRequestException('Project is already running');
     }
@@ -100,12 +133,13 @@ export class ProjectService {
     await this.sourceService.deploySource(project.sourceId);
   }
 
-  async rebuildProject(projectId: string) {
+  async recreateProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);
 
     if (
       project.vm.status === VmState.Running ||
-      project.vm.status === VmState.Starting
+      project.vm.status === VmState.Starting ||
+      project.vm.status === VmState.Stopping
     ) {
       throw new BadRequestException('Project is already running');
     }
@@ -289,7 +323,7 @@ export class ProjectService {
         throw new BadRequestException('Failed to send action');
       }
 
-      if (!response.data.status || response.data.status !== "ok") {
+      if (!response.data.status || response.data.status !== 'ok') {
         throw new BadRequestException(response.data);
       }
       return response.data;
