@@ -38,14 +38,14 @@ class HttpServer:
                 raise HTTPException(status_code=400, detail='Invalid action')
 
             try:
-                self.runner.assert_run(data['action'], data['service'])
+                await self.runner.assert_run(data['action'], data['service'])
             except RunException as e:
                 raise HTTPException(status_code=400, detail=str(e))
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
             logging.info(f"Starting {data['action']} on {data['service']} in background thread")
-            
+
             self.executor.submit(self._run_in_thread, data['action'], data['service'])
 
             return {'status': 'ok'}

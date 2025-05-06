@@ -7,6 +7,7 @@ import { PersistedProjectDto } from './dto/project.dto';
 import pirateShips from './pirateShips';
 import { ServiceDto } from 'src/compose/model/Service';
 import { EnvironmentVar } from './dto/environmentVar';
+import { ServiceStatus } from 'src/types/service.enum';
 
 @Injectable()
 export class ProjectRepository {
@@ -172,6 +173,31 @@ export class ProjectRepository {
       where: {
         projectId,
         name: serviceName,
+      },
+    });
+  }
+
+  async updateServiceStatus(
+    projectId: string,
+    serviceName: string,
+    status: ServiceStatus,
+  ) {
+    await this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          update: {
+            where: {
+              name: serviceName,
+            },
+            data: {
+              status: status,
+              statusTimeStamp: new Date(),
+            },
+          },
+        },
       },
     });
   }

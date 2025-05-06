@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Vm } from '@prisma/client';
 import { VmRepository } from './vm.repository';
 import { VmState } from 'src/types/vm.enum';
@@ -7,6 +7,8 @@ import { EventScope, EventType } from '../websockets/dto/websocket-event.dto';
 import { NetworksService } from 'src/networks/networks.service';
 import { PersistedVmDto } from './dto/vm.dto';
 import { IVMManager } from 'src/vm-manager/types/ivm.manager';
+import { ProjectService } from 'src/project/project.service';
+import { ServiceStatus } from 'src/types/service.enum';
 
 @Injectable()
 export class VmService {
@@ -16,13 +18,15 @@ export class VmService {
     private readonly vmRepository: VmRepository,
     private readonly websocketService: WebSocketService,
     private readonly networkService: NetworksService,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
     @Inject('IVM_MANAGER') private readonly vmManager: IVMManager,
   ) {}
 
   async changeVmStatus(vmId: string, status: VmState): Promise<void> {
     await this.vmRepository.updateVm({
       where: { id: vmId },
-      data: { status },
+      data: { status, statusTimeStamp: new Date() },
     });
 
     const vm: PersistedVmDto = await this.vmRepository.getVm({ id: vmId });
@@ -66,6 +70,11 @@ export class VmService {
 
     await this.changeVmStatus(vm.id, VmState.Running);
 
+    await this.projectService.updateAllServiceStatus(
+      vm.project.id,
+      ServiceStatus.Running,
+    );
+
     this.logger.log(`VM ${vm.id} is running on IP ${vm.ip || upVM.ip}`);
   }
 
@@ -77,6 +86,11 @@ export class VmService {
     }
 
     await this.changeVmStatus(vm.id, VmState.Stopping);
+
+    await this.projectService.updateAllServiceStatus(
+      vm.project.id,
+      ServiceStatus.Stopped,
+    );
 
     await this.vmManager.stopVM(vm);
 
@@ -92,6 +106,11 @@ export class VmService {
       throw new Error('VM is stopped');
     }
 
+    await this.projectService.updateAllServiceStatus(
+      vm.project.id,
+      ServiceStatus.Stopped,
+    );
+
     await this.changeVmStatus(vm.id, VmState.Starting);
 
     const restartedVM: Vm = await this.vmManager.restartVM(vm);
@@ -102,6 +121,11 @@ export class VmService {
     });
 
     await this.changeVmStatus(vm.id, VmState.Running);
+
+    await this.projectService.updateAllServiceStatus(
+      vm.project.id,
+      ServiceStatus.Running,
+    );
 
     this.logger.log(`VM ${vm.id} restarted`);
   }

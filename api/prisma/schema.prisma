@@ -54,13 +54,14 @@ model Project {
     vmId               String              @unique
     networkConnections NetworkConnection[]
     services           Service[]
-    environmentVars  Json[]
+    environmentVars    Json[]
 }
 
 model Vm {
     id        String   @id @default(uuid())
     ip        String?  @unique
     status    String   @default("stopped")
+    statusTimeStamp DateTime? @default(now())
     memory    Int
     disk      Int
     cpus      Int
@@ -107,6 +108,9 @@ model Service {
     environment String
     user        String
     deployment  String
+
+    status      String   @default("stopped")
+    statusTimeStamp DateTime? @default(now())
 
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
     projectId String

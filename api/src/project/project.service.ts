@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,6 +21,8 @@ import { DockerService } from 'src/docker/docker.service';
 import { EnvironmentVar } from './dto/environmentVar';
 import axios from 'axios';
 import { ServiceAction, ServiceActionDto } from './dto/serviceAction.dto';
+import { ServiceStatus } from 'src/types/service.enum';
+import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 
 @Injectable()
 export class ProjectService {
@@ -26,6 +30,7 @@ export class ProjectService {
 
   constructor(
     private readonly projectRepository: ProjectRepository,
+    @Inject(forwardRef(() => VmService))
     private readonly vmService: VmService,
     private readonly sourceService: SourceService,
     private readonly networksService: NetworksService,
@@ -165,6 +170,8 @@ export class ProjectService {
       environment: JSON.parse(service.environment),
       user: JSON.parse(service.user),
       deployment: JSON.parse(service.deployment),
+      status: service.status as ServiceStatus,
+      statusTimeStamp: service.statusTimeStamp,
     };
 
     const serviceName = service.image.split(':')[0];
@@ -308,7 +315,56 @@ export class ProjectService {
     return obfuscatedEnvironmentVars.map(this.obfuscateEnvironmentVar);
   }
 
+  async updateServiceStatus(
+    projectId: string,
+    serviceName: string,
+    status: ServiceStatus,
+  ) {
+    await this.projectRepository.updateServiceStatus(
+      projectId,
+      serviceName,
+      status,
+    );
+
+    this.webSocketService.notifyAll({
+      scope: EventScope.SERVICE,
+      event: EventType.STATUS_CHANGE,
+      target: projectId,
+      data: {
+        service: serviceName,
+        status,
+      },
+    });
+  }
+
+  async updateAllServiceStatus(projectId: string, status: ServiceStatus) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    const services = project.services;
+
+    for (const service of services) {
+      await this.updateServiceStatus(projectId, service.name, status);
+    }
+  }
+
+  private actionToStatus(action: ServiceAction): ServiceStatus {
+    switch (action) {
+      case ServiceAction.START:
+        return ServiceStatus.Running;
+      case ServiceAction.STOP:
+        return ServiceStatus.Stopped;
+      case ServiceAction.RESTART:
+        return ServiceStatus.Running;
+      default:
+        throw new BadRequestException('Invalid action');
+    }
+  }
+
   private async sendServiceAction(
+    projectId: string,
     ip: string,
     service: string,
     action: ServiceAction,
@@ -326,6 +382,11 @@ export class ProjectService {
       if (!response.data.status || response.data.status !== 'ok') {
         throw new BadRequestException(response.data);
       }
+
+      const status = this.actionToStatus(action);
+
+      await this.updateServiceStatus(projectId, service, status);
+
       return response.data;
     } catch (e) {
       throw new BadRequestException('Failed to send action');
@@ -347,19 +408,31 @@ export class ProjectService {
 
     switch (data.action) {
       case ServiceAction.START:
-        return this.sendServiceAction(
+        if (service.status === ServiceStatus.Running) {
+          throw new BadRequestException('Service is already running');
+        }
+        return await this.sendServiceAction(
+          projectId,
           project.vm.ip,
           data.service,
           ServiceAction.START,
         );
       case ServiceAction.STOP:
-        return this.sendServiceAction(
+        if (service.status === ServiceStatus.Stopped) {
+          throw new BadRequestException('Service is already stopped');
+        }
+        return await this.sendServiceAction(
+          projectId,
           project.vm.ip,
           data.service,
           ServiceAction.STOP,
         );
       case ServiceAction.RESTART:
-        return this.sendServiceAction(
+        if (service.status === ServiceStatus.Stopped) {
+          throw new BadRequestException('Service is already stopped');
+        }
+        return await this.sendServiceAction(
+          projectId,
           project.vm.ip,
           data.service,
           ServiceAction.RESTART,
