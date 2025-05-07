@@ -41,9 +41,10 @@ const defineInitialEdges = (services: ServiceDto[]): Edge[] => {
 
 const defineInitalNodes = (services: ServiceDto[]): Node[] => {
   return services.map((service) => {
+    const status = service.status ?? "unknown";
     return {
       id: service.name,
-      data: { label: service.name },
+      data: { label: service.name, status },
       style: { borderColor: "green", borderWidth: 2 },
       position: { x: 0, y: 0 },
       type: "custom",
@@ -115,7 +116,7 @@ export const calculateCircularPosition = (
   return services.map((service) => ({
     id: service.name,
     position: getNodePosition(service.name),
-    data: { label: service.name },
+    data: { label: service.name, status: service.status ?? "unknown" },
     type: "custom",
   }));
 };
