@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import type { FC } from "react";
 import { Play, RefreshCw, Square, MoreHorizontal } from "lucide-react";

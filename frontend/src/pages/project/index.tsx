@@ -3,7 +3,7 @@ import ReactflowTab from "@/components/organisms/ProjectTabs/ReactFlow/Reactflow
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReactFlowProvider } from "@xyflow/react";
-import { type FC, useState } from "react";
+import { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProjectManagementPanel from "@/components/organisms/ProjectManagement/ProjectManagementPanel";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";

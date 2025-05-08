@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X } from "lucide-react";
-import { type FC, useState } from "react";
+import { FC, useState } from "react";
 import StatusTab from "./StatusTab";
 import ConfigTab from "./ConfigTab";
 import NetworksTab from "./NetworksTab";

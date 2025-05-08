@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import useDisclosure from "@/hooks/use-disclosure";
-import type { ServiceInformationDto } from "@/services/backendApi/services";
+import { ServiceInformationDto } from "@/services/backendApi/services";
 import ConfigNetworkForm from "./ConfigNetworkForm";
 import {
   useDeleteNetworkConnectionMutation,

@@ -14,7 +14,6 @@ interface ConfigTabProps {
 }
 
 const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
-  console.log(serviceInformations.environment.length);
   const renderSection = (
     title: string,
     isEmpty: boolean,

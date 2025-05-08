@@ -233,7 +233,6 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
         </div>
       </CardContent>
 
-      {/* Confirmation Dialog */}
       <ProjectActionConfirmDialog
         isOpen={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}

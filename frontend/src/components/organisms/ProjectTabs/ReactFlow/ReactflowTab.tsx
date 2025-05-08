@@ -5,9 +5,9 @@ import {
   Background,
   Controls,
   applyNodeChanges,
-  type Edge,
-  type Node,
-  type NodeChange,
+  Edge,
+  Node,
+  NodeChange,
   MiniMap,
   Panel,
 } from "@xyflow/react";
