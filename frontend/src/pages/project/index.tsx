@@ -3,11 +3,13 @@ import ReactflowTab from "@/components/organisms/ProjectTabs/ReactFlow/Reactflow
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReactFlowProvider } from "@xyflow/react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProjectManagementPanel from "@/components/organisms/ProjectManagement/ProjectManagementPanel";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAppDispatch } from "@/hooks/useStore";
+import { setProjectId } from "@/services/metricSlice";
 
 enum TabsValue {
   Topology = "topology",
@@ -16,11 +18,16 @@ enum TabsValue {
 }
 
 const ProjectDetails: FC = () => {
+  const dispatch = useAppDispatch();
   const { projectId } = useParams();
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
 
   const { data: projects, isLoading } = useGetProjectsQuery();
   const currentProject = projects?.find((project) => project.id === projectId);
+
+  useEffect(() => {
+    if (projectId) dispatch(setProjectId(projectId));
+  }, [dispatch, projectId]);
 
   if (isLoading) {
     return (

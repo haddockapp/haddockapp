@@ -35,7 +35,8 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   onClose,
 }) => {
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Status);
-  const status = service?.status ?? ServiceState.Stopped;
+  const status =
+    service?.statusDetails?.State ?? service?.status ?? ServiceState.Stopped;
   const [changeServiceStatus] = useChangeServiceStatusMutation();
   const handleStatusChange = (action: ServiceAction) => {
     if (!service) return;
@@ -151,7 +152,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               >
                 {service && (
                   <StatusTab
-                    status={service.status?.State ?? ServiceState.Stopped}
+                    status={status}
                     image={service.image}
                     onStart={() => handleStatusChange(ServiceAction.START)}
                     onRestart={() => handleStatusChange(ServiceAction.RESTART)}

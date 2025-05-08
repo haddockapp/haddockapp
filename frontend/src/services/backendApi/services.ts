@@ -19,11 +19,28 @@ export interface ServiceInformationDto {
   environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
-  status?: any;
+}
+
+export interface ServiceStatusDetails {
+  State: string;
+  Command: string;
+  Created: number;
+  ExitCode: number;
+  Health: string;
+  ID: string;
+  Image: string;
+  Name: string;
+  Project: string;
+  Service: string;
+  Status: string;
 }
 
 export interface ServiceDto extends ServiceInformationDto {
   icon: string;
+  status: string;
+  statusTimeStamp: Date;
+  // statusDetails is injected by the websocket
+  statusDetails?: ServiceStatusDetails;
 }
 
 const servicesApi = backendApi.injectEndpoints({

@@ -1,5 +1,6 @@
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { io, Socket } from "socket.io-client";
+import { ServiceStatusDetails } from "./backendApi/services";
 
 export enum WebsocketService {
   METRICS = "metrics",
@@ -34,14 +35,7 @@ export type LogsSocketType = {
 };
 
 export type StatusSocketType = {
-  status: {
-    ID: string;
-    Name: string;
-    Image: string;
-    Status: string;
-    State: string;
-    Service: string;
-  }[];
+  status: ServiceStatusDetails[];
 };
 
 interface ProjectEventDto {
@@ -84,7 +78,10 @@ async function handleProjectSubcription<
     ...data,
     services: [data.service],
   });
-  socket.on(data.service, onListen);
+  socket.on(data.service, (d: T) => {
+    console.log(`Received data from ${data.service}:`, d);
+    onListen(d);
+  });
 }
 
 export { handleProjectSubcription };

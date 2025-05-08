@@ -15,13 +15,13 @@ const projectsApi = backendApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     getProjects: builder.query<ProjectDto[], void>({
       query: () => ({
         url: "/project",
       }),
-      providesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      providesTags: [QueryKeys.Projects],
     }),
     updateProject: builder.mutation<
       ProjectDto,
@@ -32,20 +32,20 @@ const projectsApi = backendApi.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     deleteProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/${projectId}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     getEnvironmentVariables: builder.query<EnvironmentVariableDto[], string>({
       query: (projectId) => ({
         url: `/project/${projectId}/environment`,
       }),
-      providesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+      providesTags: [QueryKeys.EnvironmentVariables],
     }),
     createEnvironmentVariable: builder.mutation<
       EnvironmentVariableDto,
@@ -56,7 +56,7 @@ const projectsApi = backendApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+      invalidatesTags: [QueryKeys.EnvironmentVariables],
     }),
     updateEnvironmentVariable: builder.mutation<
       EnvironmentVariableDto,
@@ -67,7 +67,7 @@ const projectsApi = backendApi.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+      invalidatesTags: [QueryKeys.EnvironmentVariables],
     }),
     deleteEnvironmentVariable: builder.mutation<
       void,
@@ -77,7 +77,7 @@ const projectsApi = backendApi.injectEndpoints({
         url: `/project/${projectId}/environment/${key}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
+      invalidatesTags: [QueryKeys.EnvironmentVariables],
     }),
     changeServiceStatus: builder.mutation<
       void,
@@ -88,34 +88,35 @@ const projectsApi = backendApi.injectEndpoints({
         method: "POST",
         body: { service: serviceName, action },
       }),
+      invalidatesTags: [QueryKeys.Projects],
     }),
     startProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/start/${projectId}`,
         method: "POST",
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     stopProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/stop/${projectId}`,
         method: "POST",
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     pullProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/pull/${projectId}`,
         method: "POST",
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
     recreateProject: builder.mutation<void, string>({
       query: (projectId) => ({
         url: `/project/recreate/${projectId}`,
         method: "POST",
       }),
-      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+      invalidatesTags: [QueryKeys.Projects],
     }),
   }),
 });
