@@ -81,13 +81,41 @@ const projectsApi = backendApi.injectEndpoints({
     }),
     changeServiceStatus: builder.mutation<
       void,
-      { projectId: string; serviceName: string; action: ServiceAction }
+      { projectId: string; serviceName: string; status: ServiceAction }
     >({
-      query: ({ projectId, serviceName, action }) => ({
-        url: `/project/${projectId}/service`,
+      query: ({ projectId, serviceName, status }) => ({
+        url: `/project/${projectId}/service}`,
         method: "POST",
-        body: { service: serviceName, action },
+        body: { service: serviceName, status },
       }),
+    }),
+    startProject: builder.mutation<void, string>({
+      query: (projectId) => ({
+        url: `/project/start/${projectId}`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+    }),
+    stopProject: builder.mutation<void, string>({
+      query: (projectId) => ({
+        url: `/project/stop/${projectId}`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+    }),
+    pullProject: builder.mutation<void, string>({
+      query: (projectId) => ({
+        url: `/project/pull/${projectId}`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
+    }),
+    recreateProject: builder.mutation<void, string>({
+      query: (projectId) => ({
+        url: `/project/recreate/${projectId}`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: QueryKeys.Projects, id: "LIST" }],
     }),
   }),
 });
@@ -102,4 +130,8 @@ export const {
   useUpdateEnvironmentVariableMutation,
   useDeleteEnvironmentVariableMutation,
   useChangeServiceStatusMutation,
+  useStartProjectMutation,
+  useStopProjectMutation,
+  usePullProjectMutation,
+  useRecreateProjectMutation,
 } = projectsApi;
