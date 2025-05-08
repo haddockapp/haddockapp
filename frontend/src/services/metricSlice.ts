@@ -28,6 +28,7 @@ export type DiskUsage = {
 
 interface MetricsState {
   projectId: string | null;
+  oldProjectId: string | null;
   cpuUsage: CpuUsage[];
   diskUsage: DiskUsage[];
   memoryUsage: MemoryUsage[];
@@ -36,6 +37,7 @@ interface MetricsState {
 
 const initialState: MetricsState = {
   projectId: null,
+  oldProjectId: null,
   cpuUsage: [],
   diskUsage: [],
   memoryUsage: [],
@@ -47,6 +49,9 @@ const metricSlice = createSlice({
   initialState,
   reducers: {
     setProjectId(state, action: PayloadAction<string | null>) {
+      if (!action.payload) {
+        state.oldProjectId = state.projectId;
+      }
       state.projectId = action.payload;
     },
     setMetrics(

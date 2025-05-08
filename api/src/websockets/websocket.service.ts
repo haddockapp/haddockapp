@@ -114,6 +114,7 @@ export class WebSocketService {
         this.logger.log(
           `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
         );
+        return;
       }
 
       this.logger.log(
