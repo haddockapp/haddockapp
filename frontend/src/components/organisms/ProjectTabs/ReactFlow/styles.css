@@ -80,11 +80,6 @@
   font-size: 14px;
   color: #374151;
   word-break: break-word;
-.custom-node.running {
-  background-image: linear-gradient(white, white),
-      linear-gradient(90deg, #16A34A, #22C55E, #86EFAC, #22C55E, #16A34A);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
 }
 
 /* Handle styling */
@@ -93,11 +88,6 @@
   height: 8px;
   background-color: #6366f1;
   border: 2px solid white;
-.custom-node.starting {
-  background-image: linear-gradient(white, white),
-      linear-gradient(90deg, #FACC15, #F59E0B, #FDE047, #F59E0B, #FACC15);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
 }
 
 /* Edge styling */
@@ -105,11 +95,6 @@
   stroke: #9ca3af;
   stroke-width: 2;
   stroke-dasharray: 5 5;
-.custom-node.stopped {
-  background-image: linear-gradient(white, white),
-      linear-gradient(90deg, #DC2626, #EF4444, #F87171, #EF4444, #DC2626);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
 }
 
 .react-flow__edge.selected path,

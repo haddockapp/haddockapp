@@ -3,7 +3,6 @@ import type { ReactFlowStateStorage } from "@/types/services/services";
 import type { Edge } from "@xyflow/react";
 import { ServiceState } from "@/types/services/services";
 
-// Helper function to check if two services should be connected
 const checkEdgeConditions = (nodeA: ServiceDto, nodeB: ServiceDto) => {
   const networksA = nodeA.networks || [];
   const networksB = nodeB.networks || [];
@@ -26,7 +25,6 @@ const checkEdgeConditions = (nodeA: ServiceDto, nodeB: ServiceDto) => {
   return false;
 };
 
-// Create edges between services based on network connections
 export const defineInitialEdges = (services: ServiceDto[]): Edge[] => {
   const edges: Edge[] = [];
 
@@ -49,20 +47,6 @@ export const defineInitialEdges = (services: ServiceDto[]): Edge[] => {
   return edges;
 };
 
-const defineInitalNodes = (services: ServiceDto[]): Node[] => {
-  return services.map((service) => {
-    const status = service.status ?? "unknown";
-    return {
-      id: service.name,
-      data: { label: service.name, status: status ?? undefined },
-      style: { borderColor: "green", borderWidth: 2 },
-      position: { x: 0, y: 0 },
-      type: "custom",
-    } as Node;
-  });
-};
-
-// Calculate positions for nodes in a circular layout
 export const calculateCircularPosition = (
   services: ServiceDto[],
   projectId: string,
@@ -76,39 +60,33 @@ export const calculateCircularPosition = (
     localStorage.getItem(`${projectId}FlowState`) ?? "{}"
   );
 
-  // Group services by network
   services.forEach((service) => {
     const network = service.networks?.length > 0 ? service.networks[0] : "none";
     if (!networkGroups[network]) networkGroups[network] = [];
     networkGroups[network].push(service.name);
   });
 
-  // Sort networks to ensure consistent layout
   const sortedNetworks = Object.keys(networkGroups).sort((a, b) => {
     if (a === "default") return -1;
     if (b === "default") return 1;
     return 0;
   });
 
-  // Position nodes in a circular layout by network group
   sortedNetworks.forEach((network, networkIndex) => {
     let radius = baseSpacing + networkIndex * baseSpacing;
     const nodes = networkGroups[network];
     const angleStep = (2 * Math.PI) / nodes.length;
 
     nodes.forEach((node, index) => {
-      // Use saved position if available
       if (initialNodesPositions.servicesPositions?.[node]) {
         positions[node] = initialNodesPositions.servicesPositions[node];
         return;
       }
 
-      // Calculate new position
       let angle = index * angleStep;
       let x = center.x + radius * Math.cos(angle);
       let y = center.y + radius * Math.sin(angle);
 
-      // Avoid overlapping nodes
       let iteration = 0;
       while (
         Object.values(positions).some(
@@ -127,7 +105,6 @@ export const calculateCircularPosition = (
     });
   });
 
-  // Create nodes with positions and status
   return services.map((service) => ({
     id: service.name,
     position: positions[service.name] || { x: 0, y: 0 },

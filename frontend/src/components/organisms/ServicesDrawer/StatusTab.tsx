@@ -82,7 +82,9 @@ const StatusTab: FC<StatusTabProps> = ({
                 <h3 className="font-medium text-gray-900">Current Status</h3>
                 <div className="flex items-center gap-2 mt-1">
                   <div className={cn("h-2 w-2 rounded-full", statusInfo.bg)} />
-                  <span className={statusInfo.color}>{status}</span>
+                  <span className={statusInfo.color}>
+                    {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
+                  </span>
                 </div>
               </div>
             </div>

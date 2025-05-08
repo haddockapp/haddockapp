@@ -1,5 +1,5 @@
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
-import { FC, useState, useCallback, useMemo } from "react";
+import { FC, useState, useCallback, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -13,11 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { ReactFlowStateStorage } from "@/types/services/services";
-import {
-  calculateCircularPosition,
-  defineInitialEdges,
-  mockServiceStates,
-} from "./utils";
+import { calculateCircularPosition, defineInitialEdges } from "./utils";
 import CustomNode from "./CustomNode";
 import SwitchWithText from "@/components/molecules/text-switch";
 import { Button } from "@/components/ui/button";
@@ -30,15 +26,11 @@ interface ReactflowTabProps {
 
 const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const {
-    data: originalServices,
+    data: services,
     isLoading,
+    isFetching,
     refetch,
   } = useGetServicesByProjectIdQuery(projectId ?? "");
-
-  // Mock service states for demonstration
-  const services = useMemo(() => {
-    return originalServices ? mockServiceStates(originalServices) : [];
-  }, [originalServices]);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -47,8 +39,28 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     null
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isActuallyRefreshing, setIsActuallyRefreshing] = useState(false);
 
-  // Initialize nodes and edges when services data is available
+  useEffect(() => {
+    if (isFetching) {
+      setIsActuallyRefreshing(true);
+
+      const timeout = setTimeout(() => {
+        if (!isFetching) {
+          setIsActuallyRefreshing(false);
+        }
+      }, 1000);
+
+      return () => clearTimeout(timeout);
+    } else {
+      if (isActuallyRefreshing) {
+        setTimeout(() => {
+          setIsActuallyRefreshing(false);
+        }, 1000);
+      }
+    }
+  }, [isFetching, isActuallyRefreshing]);
+
   useEffect(() => {
     if (services && services.length > 0) {
       const newNodes = calculateCircularPosition(services, projectId);
@@ -57,7 +69,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       setNodes(newNodes);
       setEdges(newEdges);
 
-      // Load saved state from localStorage
       const initialState: ReactFlowStateStorage = JSON.parse(
         localStorage.getItem(`${projectId}FlowState`) ?? "{}"
       );
@@ -65,14 +76,12 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     }
   }, [projectId, services]);
 
-  // Handle node changes (position, selection)
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
       setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
-  // Save node position when dragging stops
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
       const currentNodesPositions: ReactFlowStateStorage = JSON.parse(
@@ -96,7 +105,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     [projectId]
   );
 
-  // Toggle edge visibility
   const onChangeShowEdges = (checked: boolean) => {
     setShowEdges(checked);
 
@@ -111,18 +119,11 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     );
   };
 
-  // Handle node click to open drawer
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedServiceId(node.id);
     setIsDrawerOpen(true);
   };
 
-  const selectedService = useMemo(
-    () => services?.find((s) => s.name === selectedServiceId) ?? null,
-    [services, selectedServiceId]
-  );
-
-  // Get the selected service
   const selectedService = useMemo(() => {
     if (!selectedServiceId || !services) return null;
     return (
@@ -130,7 +131,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     );
   }, [selectedServiceId, services]);
 
-  // Node types for the ReactFlow component
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
 
   if (isLoading) {
@@ -155,7 +155,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   return (
     <div className="mt-2 h-[75vh] pt-8 relative">
       <div className="absolute inset-0 flex">
-        {/* Main ReactFlow canvas */}
         <div className="flex-grow relative">
           <ReactFlow
             nodes={nodes}
@@ -171,7 +170,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
             <Controls className="m-2" />
             <MiniMap className="m-2" nodeColor="#6366f1" />
 
-            {/* Control panel */}
             <Panel
               position="top-left"
               className="bg-white p-2 rounded-md shadow-md m-2"
@@ -189,7 +187,10 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
                   className="flex items-center gap-2"
                   onClick={() => refetch()}
                 >
-                  <RefreshCw size={14} />
+                  <RefreshCw
+                    size={14}
+                    className={isActuallyRefreshing ? "animate-spin" : ""}
+                  />
                   <span>Refresh</span>
                 </Button>
               </div>
@@ -197,7 +198,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
           </ReactFlow>
         </div>
 
-        {/* Service drawer */}
         <ServiceDrawer
           service={selectedService}
           projectId={projectId}

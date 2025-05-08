@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import useDisclosure from "@/hooks/use-disclosure";
-import { ServiceInformationDto } from "@/services/backendApi/services";
+import type { ServiceInformationDto } from "@/services/backendApi/services";
 import ConfigNetworkForm from "./ConfigNetworkForm";
 import {
   useDeleteNetworkConnectionMutation,
@@ -142,12 +142,12 @@ const NetworksTab: FC<NetworksTabProps> = ({
                 Add redirection
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-[500px] p-6">
               <DialogHeader>
                 <DialogTitle>Create a new redirection</DialogTitle>
                 <DialogDescription className="text-sm text-gray-500">
-                  Fill the form below to create a new redirection for your
-                  service
+                  Connect your service port to a domain to make it accessible
+                  from the internet
                 </DialogDescription>
               </DialogHeader>
               <ConfigNetworkForm

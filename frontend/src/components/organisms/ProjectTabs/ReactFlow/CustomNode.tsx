@@ -1,13 +1,11 @@
-import {FC} from "react";
+import type React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { ServiceState } from "@/types/services/services";
 import "./styles.css";
 
-const CustomNode: FC<NodeProps> = ({ data, selected }) => {
-  // Use the status from data or default to Stopped
-    const status = (data.status as ServiceState) ?? ServiceState.Stopped;
+const CustomNode: React.FC<NodeProps> = ({ data, selected }) => {
+  const status = data.status || ServiceState.Stopped;
 
-  // Determine status indicator color and label
   const getStatusInfo = () => {
     switch (status) {
       case ServiceState.Running:
@@ -28,10 +26,8 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
     }
   };
 
-  const { statusClass, statusLabel } = getStatusInfo();
+  const { statusClass } = getStatusInfo();
 
-const CustomNode: React.FC<NodeProps> = ({ data }) => {
-  const status = (data.status as ServiceState) ?? ServiceState.Stopped;
   return (
     <div className={`custom-node ${selected ? "selected" : ""}`}>
       <Handle
@@ -53,8 +49,7 @@ const CustomNode: React.FC<NodeProps> = ({ data }) => {
         </div>
       )}
 
-      {/* Service name */}
-      <div className="service-name">{data.label}</div>
+      <div className="service-name">{data.label as string}</div>
 
       <Handle
         type="source"

@@ -34,7 +34,6 @@ const ProjectDetails: FC = () => {
     <Tabs defaultValue="topology">
       <div className="w-full flex flex-row justify-between">
         <p className="pl-4 self-end text-gray-600">On since: 20 hours</p>
-      <div className="w-full text-right px-8">
         <TabsList>
           <TabsTrigger
             value={TabsValue.Topology}

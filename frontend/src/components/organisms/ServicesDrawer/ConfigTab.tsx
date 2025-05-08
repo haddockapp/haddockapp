@@ -14,6 +14,7 @@ interface ConfigTabProps {
 }
 
 const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
+  console.log(serviceInformations.environment.length);
   const renderSection = (
     title: string,
     isEmpty: boolean,
@@ -34,7 +35,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
     <div className="space-y-8">
       {renderSection(
         "Environment variables",
-        serviceInformations.environment.length === 0,
+        !serviceInformations.environment.length,
         "No environment variables configured",
         <div className="rounded-md border">
           <Table>
@@ -62,7 +63,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
 
       {renderSection(
         "Depends on",
-        serviceInformations.depends_on.length === 0,
+        !serviceInformations.depends_on.length,
         "No service dependencies",
         <div className="rounded-md border">
           <Table>

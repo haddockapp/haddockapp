@@ -31,10 +31,10 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   onClose,
 }) => {
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Status);
+  const status = service?.status ?? ServiceState.Stopped;
 
-  // Get status indicator styles
   const getStatusStyles = () => {
-    switch (service?.status || ServiceState.Stopped) {
+    switch (status) {
       case ServiceState.Running:
         return {
           color: "text-emerald-600",
@@ -68,7 +68,6 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
     >
       {service ? (
         <div className="flex flex-col h-full">
-          {/* Drawer header */}
           <div className="border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -86,7 +85,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                       className={cn("h-2 w-2 rounded-full", statusStyles.bg)}
                     />
                     <span className={statusStyles.color}>
-                      {service.status || ServiceState.Stopped}
+                      {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
                     </span>
                   </div>
                 </div>
@@ -105,7 +104,6 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
             </p>
           </div>
 
-          {/* Drawer content */}
           <div className="flex-1 overflow-auto">
             <Tabs
               defaultValue={TabsValue.Status}
