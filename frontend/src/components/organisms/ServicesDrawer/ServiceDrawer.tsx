@@ -10,6 +10,10 @@ import NetworksTab from "./NetworksTab";
 import type { ServiceDto } from "@/services/backendApi/services";
 import { ServiceState } from "@/types/services/services";
 import { cn } from "@/lib/utils";
+import {
+  ServiceAction,
+  useChangeServiceStatusMutation,
+} from "@/services/backendApi/projects";
 
 enum TabsValue {
   Status = "status",
@@ -32,6 +36,15 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Status);
   const status = service?.status ?? ServiceState.Stopped;
+  const [changeServiceStatus] = useChangeServiceStatusMutation();
+  const handleStatusChange = (action: ServiceAction) => {
+    if (!service) return;
+    changeServiceStatus({
+      projectId,
+      serviceName: service.name,
+      action,
+    });
+  };
 
   const getStatusStyles = () => {
     switch (status) {
@@ -138,11 +151,11 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               >
                 {service && (
                   <StatusTab
-                    status={service.status || ServiceState.Stopped}
+                    status={service.status?.State ?? ServiceState.Stopped}
                     image={service.image}
-                    onStart={() => console.log("Start")}
-                    onRestart={() => console.log("Restart")}
-                    onStop={() => console.log("Stop")}
+                    onStart={() => handleStatusChange(ServiceAction.START)}
+                    onRestart={() => handleStatusChange(ServiceAction.RESTART)}
+                    onStop={() => handleStatusChange(ServiceAction.STOP)}
                   />
                 )}
               </TabsContent>

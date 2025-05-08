@@ -1,7 +1,6 @@
 import type { ServiceDto } from "@/services/backendApi/services";
 import type { ReactFlowStateStorage } from "@/types/services/services";
 import type { Edge } from "@xyflow/react";
-import { ServiceState } from "@/types/services/services";
 
 const checkEdgeConditions = (nodeA: ServiceDto, nodeB: ServiceDto) => {
   const networksA = nodeA.networks || [];
@@ -110,7 +109,7 @@ export const calculateCircularPosition = (
     position: positions[service.name] || { x: 0, y: 0 },
     data: {
       label: service.name,
-      status: service.status ?? ServiceState.Stopped,
+      status: service.status ?? undefined,
       icon: service.icon,
     },
     type: "custom",

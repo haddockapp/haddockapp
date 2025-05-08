@@ -34,7 +34,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
     <div className="space-y-8">
       {renderSection(
         "Environment variables",
-        !serviceInformations.environment.length,
+        !Object.keys(serviceInformations.environment).length,
         "No environment variables configured",
         <div className="rounded-md border">
           <Table>
