@@ -32,21 +32,21 @@
   background-size: 300% 300%;
 }
 
-.custom-node.Running {
+.custom-node.running {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #16A34A, #22C55E, #86EFAC, #22C55E, #16A34A);
     background-origin: border-box;
     background-clip: padding-box, border-box;
 }
 
-.custom-node.Starting {
+.custom-node.starting {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #FACC15, #F59E0B, #FDE047, #F59E0B, #FACC15);
     background-origin: border-box;
     background-clip: padding-box, border-box;
 }
 
-.custom-node.Stopped {
+.custom-node.stopped {
   background-image: linear-gradient(white, white),
       linear-gradient(90deg, #DC2626, #EF4444, #F87171, #EF4444, #DC2626);
     background-origin: border-box;
@@ -89,17 +89,17 @@
   }
 }
 
-.custom-node.Running:hover {
+.custom-node.running:hover {
   animation: runningPulse 1.2s infinite;
     transform: scale(1.03);
 }
 
-.custom-node.Starting:hover {
+.custom-node.starting:hover {
   animation: startingPulse 1.2s infinite;
   transform: scale(1.03);
 }
 
-.custom-node.Stopped:hover {
+.custom-node.stopped:hover {
   animation: stoppedPulse 1.2s infinite;
     transform: scale(1.03);
 }

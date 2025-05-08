@@ -3,6 +3,7 @@ import {
   CreateProjectDto,
   EnvironmentVariableDto,
   ProjectDto,
+  ServiceAction,
   UpdateProjectDto,
 } from "./projects.dto";
 
@@ -78,6 +79,16 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: QueryKeys.EnvironmentVariables, id: "LIST" }],
     }),
+    changeServiceStatus: builder.mutation<
+      void,
+      { projectId: string; serviceName: string; action: ServiceAction }
+    >({
+      query: ({ projectId, serviceName, action }) => ({
+        url: `/project/${projectId}/service`,
+        method: "POST",
+        body: { service: serviceName, action },
+      }),
+    }),
   }),
 });
 
@@ -90,4 +101,5 @@ export const {
   useCreateEnvironmentVariableMutation,
   useUpdateEnvironmentVariableMutation,
   useDeleteEnvironmentVariableMutation,
+  useChangeServiceStatusMutation,
 } = projectsApi;
