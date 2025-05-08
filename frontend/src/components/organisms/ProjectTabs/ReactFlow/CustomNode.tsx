@@ -4,10 +4,7 @@ import "./styles.css";
 import { ServiceState } from "@/types/services/services";
 
 const CustomNode: React.FC<NodeProps> = ({ data }) => {
-  const status =
-    (data.status as keyof typeof ServiceState) in ServiceState
-      ? (data.status as keyof typeof ServiceState)
-      : ServiceState.Stopped;
+  const status = (data.status as ServiceState) ?? ServiceState.Stopped;
   return (
     <div className={`custom-node ${status}`}>
       <Handle

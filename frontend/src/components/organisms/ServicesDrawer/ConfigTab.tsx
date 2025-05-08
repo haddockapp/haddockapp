@@ -1,5 +1,4 @@
-import type React from "react";
-import type { FC } from "react";
+import { FC } from "react";
 import {
   Table,
   TableHeader,
@@ -15,7 +14,6 @@ interface ConfigTabProps {
 }
 
 const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
-  // Helper function to render a section with consistent styling
   const renderSection = (
     title: string,
     isEmpty: boolean,
@@ -34,7 +32,6 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
 
   return (
     <div className="space-y-8">
-      {/* Environment Variables Section */}
       {renderSection(
         "Environment variables",
         serviceInformations.environment.length === 0,
@@ -63,7 +60,6 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         </div>
       )}
 
-      {/* Dependencies Section */}
       {renderSection(
         "Depends on",
         serviceInformations.depends_on.length === 0,
@@ -86,7 +82,6 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         </div>
       )}
 
-      {/* Resource Limits Section */}
       {renderSection(
         "Resource limits",
         serviceInformations.deployment === null,
@@ -123,7 +118,6 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         </div>
       )}
 
-      {/* User Configuration Section */}
       {renderSection(
         "User",
         serviceInformations.user === null,

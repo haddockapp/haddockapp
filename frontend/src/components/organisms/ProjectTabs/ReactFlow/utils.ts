@@ -44,7 +44,7 @@ const defineInitalNodes = (services: ServiceDto[]): Node[] => {
     const status = service.status ?? "unknown";
     return {
       id: service.name,
-      data: { label: service.name, status },
+      data: { label: service.name, status: status ?? undefined },
       style: { borderColor: "green", borderWidth: 2 },
       position: { x: 0, y: 0 },
       type: "custom",
@@ -116,7 +116,7 @@ export const calculateCircularPosition = (
   return services.map((service) => ({
     id: service.name,
     position: getNodePosition(service.name),
-    data: { label: service.name, status: service.status ?? "unknown" },
+    data: { label: service.name, status: service.status ?? undefined },
     type: "custom",
   }));
 };
