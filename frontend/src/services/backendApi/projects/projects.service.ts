@@ -84,7 +84,7 @@ const projectsApi = backendApi.injectEndpoints({
       { projectId: string; serviceName: string; action: ServiceAction }
     >({
       query: ({ projectId, serviceName, action }) => ({
-        url: `/project/${projectId}/service}`,
+        url: `/project/${projectId}/service`,
         method: "POST",
         body: { service: serviceName, action },
       }),
