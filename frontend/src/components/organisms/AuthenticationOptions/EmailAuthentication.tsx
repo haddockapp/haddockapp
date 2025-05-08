@@ -67,13 +67,21 @@ const EmailAuthentication: FC = () => {
           dispatch(setToken(accessToken));
           navigate("/loading");
         })
-        .catch((e) =>
-          toast({
-            title: "Sign up failed",
-            description: e.error.message,
-            variant: "destructive",
-          })
-        );
+        .catch((e) => {
+          if (e.status === 403) {
+            toast({
+              title: "Uninvited user",
+              description:
+                "In order to join, please ask the administrator to invite you",
+              variant: "destructive",
+            });
+          } else
+            toast({
+              title: "Sign up failed",
+              description: e.data.message,
+              variant: "destructive",
+            });
+        });
     },
     [dispatch, form, navigate, triggerLogin, triggerSignUp, type]
   );

@@ -12,10 +12,6 @@ export class UpdateProjectDto {
     @IsOptional()
     description?: string;
 
-    @IsString()
-    @IsOptional()
-    repository_branch?: string;
-
     @IsUUID()
     @IsOptional()
     authorization_id?: string | null;

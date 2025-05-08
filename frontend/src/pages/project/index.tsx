@@ -2,8 +2,10 @@ import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
 import ReactflowTab from "@/components/organisms/ProjectTabs/ReactFlow/ReactflowTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppDispatch } from "@/hooks/useStore";
+import { setProjectId } from "@/services/metricSlice";
 import { ReactFlowProvider } from "@xyflow/react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 enum TabsValue {
@@ -13,12 +15,24 @@ enum TabsValue {
 }
 
 const ProjectDetails: FC = () => {
-  const { projectId } = useParams();
   const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
+
+  const { projectId } = useParams();
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!projectId) return;
+    dispatch(setProjectId(projectId));
+
+    return () => {
+      dispatch(setProjectId(null));
+    };
+  }, [dispatch, projectId]);
 
   return (
     <Tabs defaultValue="topology">
-      <div className="w-full text-right">
+      <div className="w-full text-right px-8">
         <TabsList>
           <TabsTrigger
             value={TabsValue.Topology}

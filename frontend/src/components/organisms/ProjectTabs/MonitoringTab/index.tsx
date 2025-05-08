@@ -1,68 +1,30 @@
-import { useGetSelfQuery } from "@/services/backendApi/users";
-import {
-  getSocket,
-  handleProjectSubcription,
-  LogsSocketType,
-  MetricsSocketType,
-  WebsocketService,
-} from "@/services/websockets";
-import { FC, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { FC } from "react";
 import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
+import Histograms from "./Histograms";
+import { useAppSelector } from "@/hooks/useStore";
 
 const MonitoringTab: FC = () => {
-  const { projectId } = useParams();
-
-  const { data: me } = useGetSelfQuery();
-
-  const [cpuUsage, setCpuUsage] = useState<number>(0);
-  const [memoryUsage, setMemoryUsage] = useState<number>(0);
-  const [logs, setLogs] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!projectId || !me) return;
-
-    handleProjectSubcription<MetricsSocketType>(
-      {
-        projectId,
-        service: WebsocketService.Metrics,
-        subscribe: true,
-        userId: me.id,
-        data: {},
-      },
-      ({ cpuUsage, memoryUsage }) => {
-        if (cpuUsage) setCpuUsage(cpuUsage);
-        if (memoryUsage) setMemoryUsage(memoryUsage);
-      }
-    );
-
-    handleProjectSubcription<LogsSocketType>(
-      {
-        projectId,
-        service: WebsocketService.Logs,
-        subscribe: true,
-        userId: me.id,
-        data: {},
-      },
-      ({ logs }) => {
-        if (logs) setLogs(logs);
-      }
-    );
-
-    const socket = getSocket();
-    if (!socket) return;
-    return () => {
-      socket.off("metrics");
-      socket.off("logs");
-    };
-  }, [me, projectId]);
+  const { cpuUsage, memoryUsage, diskUsage, logs } = useAppSelector(
+    (state) => state.metrics
+  );
 
   return (
-    <div>
+    <div className="px-8 space-y-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
-      <div className="flex flex-col space-y-4">
-        <UsageCharts cpuUsage={cpuUsage} memoryUsage={memoryUsage} />
+      <div className="grid grid-cols-3 w-fit mx-auto justify-items-center gap-x-12">
+        <UsageCharts
+          cpuUsage={cpuUsage.at(-1)?.percent ?? 0}
+          memoryUsage={memoryUsage.at(-1)?.percent ?? 0}
+          diskUsage={diskUsage.at(-1)?.percent ?? 0}
+        />
+        <Histograms
+          cpuData={cpuUsage}
+          diskData={diskUsage}
+          memoryData={memoryUsage}
+        />
+      </div>
+      <div>
         <LogsSection lines={logs} />
       </div>
     </div>

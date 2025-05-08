@@ -1,7 +1,7 @@
 export enum ServiceState {
-  Running = "Running",
-  Starting = "Starting",
-  Stopped = "Stopped",
+  Running = "running",
+  Starting = "starting",
+  Stopped = "stopped",
 }
 
 export type NodePositions = Record<string, { x: number; y: number }>;
