@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import ProjectManagementPanel from "@/components/organisms/ProjectManagement/ProjectManagementPanel";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { setProjectId } from "@/services/metricSlice";
 
 enum TabsValue {
@@ -28,6 +28,10 @@ const ProjectDetails: FC = () => {
   useEffect(() => {
     if (projectId) dispatch(setProjectId(projectId));
   }, [dispatch, projectId]);
+
+  const { cpuUsage, memoryUsage, diskUsage, logs } = useAppSelector(
+    (state) => state.metrics
+  );
 
   if (isLoading) {
     return (
@@ -63,6 +67,12 @@ const ProjectDetails: FC = () => {
             </TabsTrigger>
             <TabsTrigger
               value={TabsValue.Monitoring}
+              disabled={
+                !cpuUsage.length &&
+                !memoryUsage.length &&
+                !diskUsage.length &&
+                !logs.length
+              }
               onClick={() => setSelectedTab(TabsValue.Monitoring)}
             >
               <span

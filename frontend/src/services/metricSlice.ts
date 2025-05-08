@@ -62,7 +62,7 @@ const metricSlice = createSlice({
         memoryUsage: MemoryUsage;
       }>
     ) {
-      const timestamp = new Date().toTimeString();
+      const timestamp = new Date().toUTCString();
 
       state.cpuUsage = [
         ...state.cpuUsage,
