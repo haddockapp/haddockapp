@@ -153,7 +153,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }
 
   return (
-    <div className="mt-2 h-[75vh] pt-8 relative">
+    <div className="mt-2 h-[55vh] pt-8 relative">
       <div className="absolute inset-0 flex">
         <div className="flex-grow relative">
           <ReactFlow

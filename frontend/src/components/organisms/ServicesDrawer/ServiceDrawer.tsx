@@ -28,6 +28,34 @@ interface ServiceDrawerProps {
   onClose: () => void;
 }
 
+function getRelativeTimeLabel(timestamp: Date, status: string) {
+  const now = new Date();
+  const past = new Date(timestamp);
+  const diffMs = now.getTime() - past.getTime();
+
+  const seconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(diffMs / 1000 / 60);
+  const hours = Math.floor(diffMs / 1000 / 60 / 60);
+  const days = Math.floor(diffMs / 1000 / 60 / 60 / 24);
+
+  let timeStr;
+  if (seconds < 60) {
+    timeStr = `${seconds} second${seconds !== 1 ? "s" : ""}`;
+  } else if (minutes < 60) {
+    timeStr = `${minutes} minute${minutes !== 1 ? "s" : ""}`;
+  } else if (hours < 24) {
+    timeStr = `${hours} hour${hours !== 1 ? "s" : ""}`;
+  } else {
+    timeStr = `${days} day${days !== 1 ? "s" : ""}`;
+  }
+
+  return `${capitalize(status)} ${timeStr} ago`;
+}
+
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 const ServiceDrawer: FC<ServiceDrawerProps> = ({
   service,
   projectId,
@@ -102,6 +130,13 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                       {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
                     </span>
                   </div>
+                  <span className="text-xs text-gray-500">
+                    {service.statusDetails?.Status ??
+                      getRelativeTimeLabel(
+                        service.statusTimeStamp,
+                        service.status
+                      )}
+                  </span>
                 </div>
               </div>
               <Button
