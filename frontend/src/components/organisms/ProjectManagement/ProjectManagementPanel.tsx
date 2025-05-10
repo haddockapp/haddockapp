@@ -92,7 +92,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           toast({
             title: "Project recreating",
             description:
-              "Your project is being recreated. This may take several minutes.",
+              "Your project is being recreated. This may take a few moments.",
           });
           break;
       }
@@ -132,7 +132,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
         return {
           title: "Recreate Project",
           description:
-            "This will completely recreate your project VM and redeploy the source. This is a destructive action and may take several minutes.",
+            "This will completely recreate your project VM and redeploy the source. This is a destructive action and may take some time.",
           confirmLabel: "Recreate Project",
           icon: <RotateCcw className="h-5 w-5 text-red-600" />,
           isDestructive: true,
