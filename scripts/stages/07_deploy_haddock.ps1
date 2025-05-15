@@ -93,15 +93,21 @@ Update-Progress -Step 9 -Message "Configuring frontend"
 
 # Setup frontend configuration
 $frontendDir = Join-Path $installDir "frontend"
-$frontendEnvFile = Join-Path $frontendDir ".env"
-if (-not (Test-Path $frontendEnvFile)) {
-    Write-Log "Generating frontend configuration..." "INFO"
-    @"
-VITE_API_URL=http://$IP:3000
-VITE_SOCKET_URL=http://$IP:3001
-VITE_GITHUB_CLIENT_ID=$env:GITHUB_CLIENT_ID
-"@ | Out-File -FilePath $frontendEnvFile -Encoding UTF8
+$configFile = Join-Path $frontendDir "public\config.json"
+
+# Remove existing config if it exists
+if (Test-Path $configFile) {
+    Write-Log "Overwriting frontend configuration..." "INFO"
+    Remove-Item -Path $configFile -Force
 }
+
+Write-Log "Generating frontend configuration..." "INFO"
+@"
+{
+    "backendUrl": "http://$IP:3000",
+    "socketUrl": "http://$IP:3001"
+}
+"@ | Out-File -FilePath $configFile -Encoding UTF8
 
 # Build frontend
 Set-Location $frontendDir
