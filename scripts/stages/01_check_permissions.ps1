@@ -2,10 +2,10 @@ Update-Progress -Step 1 -Message "Checking permissions"
 
 if (-not (Test-AdminPrivileges)) {
     Write-Log "Administrator privileges required" "WARNING"
-    $response = Read-Host "Do you want to run the script as administrator? (Y/N)"
+    $response = Read-Host "Do you want to run the installation as administrator? (Y/N)"
     if ($response -eq "Y" -or $response -eq "y") {
-        # Relaunch script with elevated privileges
-        Start-Process powershell -Verb RunAs -ArgumentList "-File `"$($MyInvocation.MyCommand.Path)`""
+        $installScriptPath = Join-Path $PSScriptRoot "..\install.ps1"
+        Start-Process powershell -Verb RunAs -ArgumentList "-File `"$installScriptPath`""
         exit 0
     }
     exit 1
