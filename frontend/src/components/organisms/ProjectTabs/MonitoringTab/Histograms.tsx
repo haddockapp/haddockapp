@@ -1,10 +1,10 @@
 import { Histogram } from "@/components/ui/charts/histogram";
+import { CpuUsage, DiskUsage, MemoryUsage } from "@/services/metricSlice";
 import { CpuIcon, DiscIcon, MemoryStickIcon } from "lucide-react";
 import { FC } from "react";
 // import cpuUsage from "./cpuUsage.json";
 // import diskUsage from "./diskUsage.json";
 // import memoryUsage from "./memoryUsage.json";
-import { CpuUsage, DiskUsage, MemoryUsage } from ".";
 
 const Histograms: FC<{
   diskData: DiskUsage[];
@@ -23,7 +23,7 @@ const Histograms: FC<{
         },
       }}
       data={cpuData.map((data) => ({
-        x: new Date(data.timestamp).toString(),
+        x: new Date(data.timestamp ?? 0).toString(),
         y: data.percent,
       }))}
     />
@@ -38,7 +38,7 @@ const Histograms: FC<{
         },
       }}
       data={memoryData.map((data) => ({
-        x: new Date(data.timestamp).toString(),
+        x: new Date(data.timestamp ?? 0).toString(),
         y: (data.total - data.available) / 1024 ** 2,
       }))}
     />
@@ -53,7 +53,7 @@ const Histograms: FC<{
         },
       }}
       data={diskData.map((data) => ({
-        x: new Date(data.timestamp).toString(),
+        x: new Date(data.timestamp ?? 0).toString(),
         y: data.used / 1024 ** 3,
       }))}
     />
