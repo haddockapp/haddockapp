@@ -111,7 +111,7 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
         delete newState[original.key];
         return newState;
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
