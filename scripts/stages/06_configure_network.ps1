@@ -14,7 +14,7 @@ Write-Log "Detecting network configuration..." "INFO"
 
 # Get public IP
 try {
-    $publicIP = (Invoke-WebRequest -Uri "https://ifconfig.me" -UseBasicParsing).Content
+    $publicIP = (Invoke-WebRequest ifconfig.me/ip).Content.Trim()
     Write-Log "Public IP: $publicIP" "INFO"
 } catch {
     Write-Log "Could not determine public IP" "WARNING"

@@ -113,7 +113,7 @@ function Test-Component {
         }
         "redis" {
             try {
-                $result = & 'C:\Program Files\Redis\redis-cli.exe' ping
+                $result = & 'C:\Program Files\Memurai\memurai-cli.exe' ping
                 if ($result -eq "PONG") {
                     Write-Log "Redis validation successful" "INFO"
                     return $true
@@ -159,11 +159,12 @@ function Test-Component {
             }
         }
         "caddy" {
-            if ((Get-Service -Name "Caddy").Status -eq "Running") {
+            $caddyProcess = Get-Process -Name "caddy" -ErrorAction SilentlyContinue
+            if ($caddyProcess) {
                 Write-Log "Caddy validation successful" "INFO"
                 return $true
             } else {
-                Write-Log "Caddy validation failed: Service not running" "ERROR"
+                Write-Log "Caddy validation failed: Process not running" "ERROR"
                 return $false
             }
         }
