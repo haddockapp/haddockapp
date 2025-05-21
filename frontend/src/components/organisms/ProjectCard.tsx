@@ -2,23 +2,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FC } from "react";
 import { FolderGit2 } from "lucide-react";
 import { ProjectDto } from "@/services/backendApi/projects";
-import { VmState } from "@/types/vm/vm";
+import ProjectStatusBadge from "./ProjectManagement/ProjectStatusBadge";
 
 interface ProjectCardProps {
   onClick?: () => void;
   project: ProjectDto;
 }
 
-const capitalizeFirstLetter = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
 const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
-  const getDotColor = () => {
-    if (project.vm.status === VmState.Running) return "bg-green-500";
-    if (project.vm.status === VmState.Starting) return "bg-yellow-500";
-    return "bg-red-500";
-  };
   return (
     <Card
       className="w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100"
@@ -43,11 +34,8 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
               </p>
             </div>
           </div>
-          <div className="self-center flex flex-row items-center gap-2">
-            <p className="text-gray-800 font-bold">
-              {capitalizeFirstLetter(project.vm.status)}
-            </p>
-            <div className={`w-4 h-4 rounded-full ${getDotColor()}`} />
+          <div className="self-center">
+            <ProjectStatusBadge status={project.vm.status} />
           </div>
         </div>
       </CardContent>

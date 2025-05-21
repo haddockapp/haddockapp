@@ -1,13 +1,15 @@
-import { FC } from "react";
-import { EllipsisVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { FC } from "react";
+import { Play, RefreshCw, Square, MoreHorizontal } from "lucide-react";
+import { ServiceState } from "@/types/services/services";
+import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ServiceState } from "@/types/services/services";
-import { cn } from "@/lib/utils";
 
 interface StatusTabProps {
   status: string;
@@ -28,83 +30,125 @@ const StatusTab: FC<StatusTabProps> = ({
   const isStopped = status === ServiceState.Stopped;
   const isStarting = status === ServiceState.Starting;
 
-  const getStatusStyles = () => {
+  const getStatusInfo = () => {
     switch (status) {
       case ServiceState.Running:
         return {
           color: "text-emerald-600",
           bg: "bg-emerald-500",
           bgLight: "bg-emerald-50",
+          icon: <Play className="h-5 w-5 text-emerald-600" />,
         };
       case ServiceState.Starting:
         return {
           color: "text-amber-600",
           bg: "bg-amber-500",
           bgLight: "bg-amber-50",
+          icon: <RefreshCw className="h-5 w-5 text-amber-600 animate-spin" />,
         };
       default:
         return {
           color: "text-red-600",
           bg: "bg-red-500",
           bgLight: "bg-red-50",
+          icon: <Square className="h-5 w-5 text-red-600" />,
         };
     }
   };
 
-  const statusStyles = getStatusStyles();
+  const statusInfo = getStatusInfo();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-700">Current status</h3>
-          <div className="flex items-center gap-2">
-            <div className={cn("h-2.5 w-2.5 rounded-full", statusStyles.bg)} />
-            <span className={cn("text-sm font-medium", statusStyles.color)}>
-              {status}
-            </span>
-          </div>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none">
-            <EllipsisVertical className="h-5 w-5" />
-            <span className="sr-only">Actions</span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem
-              onClick={onStart}
-              disabled={isRunning || isStarting}
-              className={cn(
-                (isRunning || isStarting) && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              Start
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={onRestart}
-              disabled={!isRunning}
-              className={cn(!isRunning && "opacity-50 cursor-not-allowed")}
-            >
-              Restart
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={onStop}
-              disabled={isStopped}
-              className={cn(isStopped && "opacity-50 cursor-not-allowed")}
-            >
-              Stop
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <Card
+        className={cn(
+          "border",
+          isRunning
+            ? "border-emerald-200"
+            : isStarting
+            ? "border-amber-200"
+            : "border-red-200"
+        )}
+      >
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={cn("p-2 rounded-full", statusInfo.bgLight)}>
+                {statusInfo.icon}
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Current Status</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={cn("h-2 w-2 rounded-full", statusInfo.bg)} />
+                  <span className={statusInfo.color}>
+                    {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium text-gray-700">Image</h3>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span className="h-1.5 w-1.5 rounded-full bg-gray-800" />
-          <span>{image}</span>
-        </div>
-      </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full h-8 w-8"
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                  <span className="sr-only">Actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                  onClick={onStart}
+                  disabled={isRunning || isStarting}
+                  className={cn(
+                    "cursor-pointer",
+                    (isRunning || isStarting) && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  Start
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={onRestart}
+                  disabled={!isRunning}
+                  className={cn(
+                    "cursor-pointer",
+                    !isRunning && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Restart
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={onStop}
+                  disabled={isStopped}
+                  className={cn(
+                    "cursor-pointer",
+                    isStopped && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Square className="mr-2 h-4 w-4" />
+                  Stop
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium text-gray-900 mb-3">Image Information</h3>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-medium text-gray-700 min-w-24">Image:</span>
+              <span className="text-gray-600">{image}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

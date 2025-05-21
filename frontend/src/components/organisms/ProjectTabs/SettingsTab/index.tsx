@@ -7,6 +7,7 @@ import {
 import DeleteProjectDialog from "./DeleteProjectDialog";
 import EditProjectDialog from "./EditProjectDialog";
 import Variables from "./Variables";
+import { useToast } from "@/hooks/use-toast";
 
 type SettingsTabActionProps = {
   title: string;
@@ -31,13 +32,29 @@ const SettingsTabAction: FC<PropsWithChildren<SettingsTabActionProps>> = ({
 
 const SettingsTab: FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { projectId } = useParams();
   const project = useGetProjectsQuery().data?.find(
     (project) => project.id === projectId
   );
   const [deleteProject] = useDeleteProjectMutation();
   const handleDeleteProject = () => {
-    deleteProject(projectId ?? "");
+    deleteProject(projectId ?? "")
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Project deleted",
+          description: "The project has been deleted successfully.",
+          variant: "default",
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Error deleting project",
+          description: "An error occurred while deleting the project.",
+          variant: "destructive",
+        });
+      });
     navigate("/dashboard");
   };
   return (

@@ -152,7 +152,7 @@ const useWebsockets = () => {
                     JSON.stringify(service.status);
 
                   if (serviceUpdate && isDirty) {
-                    service.status = serviceUpdate;
+                    service.statusDetails = serviceUpdate;
                   }
                 });
               }
@@ -169,7 +169,7 @@ const useWebsockets = () => {
       socket.off(WebsocketService.LOGS);
       socket.off(WebsocketService.STATUS);
     };
-  }, [dispatch, me, projectId]);
+  }, [dispatch, me, projectId, oldProjectId]);
 };
 
 export default useWebsockets;

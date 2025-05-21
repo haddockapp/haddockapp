@@ -10,6 +10,7 @@ import {
   ServiceAction,
   useChangeServiceStatusMutation,
 } from "@/services/backendApi/projects";
+import { ServiceState } from "@/types/services/services";
 
 enum TabsValue {
   Status = "status",
@@ -103,7 +104,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               <TabsContent value="status" className="p-4 border rounded-md">
                 {service && (
                   <StatusTab
-                    status={service.status?.State ?? "unknown"}
+                    status={service.status?.State ?? ServiceState.Stopped}
                     image={service.image}
                     onStart={() => handleStatusChange(ServiceAction.START)}
                     onRestart={() => handleStatusChange(ServiceAction.RESTART)}
