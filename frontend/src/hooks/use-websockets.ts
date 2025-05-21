@@ -48,7 +48,7 @@ const useWebsockets = () => {
           "getProjects" as never,
           undefined as never,
           (draftPosts) => {
-            if (msg.event === "status_change") {
+            if (msg.scope === "project" && msg.event === "status_change") {
               const project = (draftPosts as unknown as ProjectDto[]).find(
                 (project) => project.id === msg.target
               );
