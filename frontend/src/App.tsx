@@ -11,6 +11,7 @@ import Layout from "./components/wrappers/page-layout";
 import AuthenticatedGuard from "./components/wrappers/authenticated-guard";
 import Authentication from "./pages/authentication";
 import LoadingPage from "./pages/loading";
+import AutologinPage from "./pages/autologin";
 
 function App() {
   useWebsockets();
@@ -21,6 +22,7 @@ function App() {
       <Toaster />
       <BrowserRouter>
         <Routes>
+          <Route path="/autologin" element={<AutologinPage />} />
           <Route path="/loading" element={<LoadingPage />} />
           <Route path="/github" element={<GithubCallback />} />
           <Route element={<Layout />}>

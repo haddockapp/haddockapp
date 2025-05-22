@@ -3,6 +3,7 @@ import {
   DomainResponseDto,
   CreateDomainDto,
   DomainStatusDto,
+  DomainApplyResponseDto,
 } from "./domains.dto";
 
 const domainsApi = backendApi.injectEndpoints({
@@ -27,6 +28,13 @@ const domainsApi = backendApi.injectEndpoints({
       }),
       providesTags: [QueryKeys.Domains],
     }),
+    applyDomain: builder.mutation<DomainApplyResponseDto, void>({
+      query: () => ({
+        url: `/domains/apply`,
+        method: "POST",
+      }),
+      invalidatesTags: [QueryKeys.Domains],
+    }),
     getDomainStatus: builder.query<DomainStatusDto, string>({
       query: (id) => ({
         url: `/domains/${id}/status`,
@@ -46,6 +54,7 @@ const domainsApi = backendApi.injectEndpoints({
 export const {
   useCreateDomainMutation,
   useGetAllDomainsQuery,
+  useApplyDomainMutation,
   useGetDomainQuery,
   useGetDomainStatusQuery,
   useDeleteDomainMutation,
