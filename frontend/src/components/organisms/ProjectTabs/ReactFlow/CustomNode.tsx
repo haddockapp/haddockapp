@@ -40,10 +40,10 @@ const CustomNode: React.FC<NodeProps> = ({ data, selected }) => {
         <span className="status-dot"></span>
       </div>
 
-      {data.icon && (
+      {!!data.icon && (
         <div className="service-icon">
           <img
-            src={data.icon || "/placeholder.svg"}
+            src={data.icon as string || "/placeholder.svg"}
             alt={`${data.label} icon`}
           />
         </div>

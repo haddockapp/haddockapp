@@ -104,7 +104,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               <TabsContent value="status" className="p-4 border rounded-md">
                 {service && (
                   <StatusTab
-                    status={service.status?.State ?? ServiceState.Stopped}
+                    status={service.status ?? ServiceState.Stopped}
                     image={service.image}
                     onStart={() => handleStatusChange(ServiceAction.START)}
                     onRestart={() => handleStatusChange(ServiceAction.RESTART)}
