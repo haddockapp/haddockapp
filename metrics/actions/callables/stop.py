@@ -3,8 +3,8 @@ from config import Config
 from actions import get_service_status
 from project_types import RunException
 
-def assert_stop_run(service: str):
-    status = get_service_status(service)
+async def assert_stop_run(service: str):
+    status = await get_service_status(service)
     if status is None:
         raise RunException('Service not found')
     if status != "running":

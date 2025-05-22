@@ -1,16 +1,56 @@
-import React, { ReactNode } from "react";
-import { Handle, Position, NodeProps } from "@xyflow/react";
+import type React from "react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { ServiceState } from "@/types/services/services";
 import "./styles.css";
 
-const CustomNode: React.FC<NodeProps> = ({ data }) => {
+const CustomNode: React.FC<NodeProps> = ({ data, selected }) => {
+  const status = data.status || ServiceState.Stopped;
+
+  const getStatusInfo = () => {
+    switch (status) {
+      case ServiceState.Running:
+        return {
+          statusClass: "running",
+          statusLabel: "Running",
+        };
+      case ServiceState.Starting:
+        return {
+          statusClass: "starting",
+          statusLabel: "Starting",
+        };
+      default:
+        return {
+          statusClass: "stopped",
+          statusLabel: "Stopped",
+        };
+    }
+  };
+
+  const { statusClass } = getStatusInfo();
+
   return (
-    <div className="custom-node Running">
+    <div className={`custom-node ${selected ? "selected" : ""}`}>
       <Handle
         type="target"
         position={Position.Left}
         className="custom-handle"
       />
-      <span>{data.label as ReactNode}</span>
+
+      <div className={`status-indicator ${statusClass}`}>
+        <span className="status-dot"></span>
+      </div>
+
+      {data.icon && (
+        <div className="service-icon">
+          <img
+            src={data.icon || "/placeholder.svg"}
+            alt={`${data.label} icon`}
+          />
+        </div>
+      )}
+
+      <div className="service-name">{data.label as string}</div>
+
       <Handle
         type="source"
         position={Position.Right}

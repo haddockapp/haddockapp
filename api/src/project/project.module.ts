@@ -24,6 +24,6 @@ import { WebsocketModule } from 'src/websockets/websocket.module';
   ],
   controllers: [ProjectController],
   providers: [ProjectService, ProjectRepository],
-  exports: [ProjectRepository],
+  exports: [ProjectRepository, ProjectService],
 })
 export class ProjectModule {}

@@ -1,6 +1,12 @@
 import { Source } from "@/types/source";
 import { VMInfos } from "@/types/vm/vm";
 
+export enum ServiceAction {
+  START = "start",
+  STOP = "stop",
+  RESTART = "restart",
+}
+
 export type CreateProjectDto = {
   repository_organisation: string;
   repository_name: string;

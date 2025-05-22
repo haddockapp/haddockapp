@@ -61,10 +61,6 @@ export class WebSocketService {
 
   removeProject(projectId: string) {
     if (this.projects[projectId]) {
-      this.projects[projectId].clients.forEach((client) => {
-        client.client.socket.disconnect();
-      });
-
       this.projects[projectId].websocket.close();
       delete this.projects[projectId];
       this.logger.log(`Project ${projectId} removed`);
@@ -114,6 +110,7 @@ export class WebSocketService {
         this.logger.log(
           `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
         );
+        return;
       }
 
       this.logger.log(

@@ -63,10 +63,13 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   const subdomainValue = watch("subdomain");
 
   const onSubmit: SubmitHandler<ConfigNetworkFormType> = (data) => {
+    const fullDomain = subdomainValue
+      ? `${subdomainValue}.${data.domain}`
+      : data.domain;
     createRedirection({
       projectId: projectId,
       port: parseInt(data.port),
-      domain: `${subdomainValue}.${domainValue}`,
+      domain: fullDomain,
     });
     onClose();
   };

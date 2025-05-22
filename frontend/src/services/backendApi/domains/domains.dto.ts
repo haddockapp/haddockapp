@@ -27,3 +27,10 @@ export interface DomainStatusDto {
 
   canBeLinked: boolean;
 }
+
+export interface DomainApplyResponseDto {
+  mainDomain: string;
+  frontendUrl: string;
+  backendUrl: string;
+  autologin: string;
+}

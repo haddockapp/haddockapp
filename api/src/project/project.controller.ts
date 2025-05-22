@@ -31,8 +31,6 @@ export class ProjectController {
     private readonly projectService: ProjectService,
     private readonly projectRepository: ProjectRepository,
     private readonly sourceService: SourceService,
-    private readonly composeService: ComposeService,
-    private readonly dockerService: DockerService,
     private readonly authorizationService: AuthorizationService,
   ) {}
 
@@ -69,14 +67,24 @@ export class ProjectController {
     return project;
   }
 
-  @Post('/deploy/:id')
+  @Post('/stop/:id')
+  async stopProject(@Param('id') projectId: string) {
+    await this.projectService.stopProject(projectId);
+  }
+
+  @Post('/start/:id')
+  async startProject(@Param('id') projectId: string) {
+    await this.projectService.startProject(projectId);
+  }
+
+  @Post('/pull/:id')
   async deployProject(@Param('id') projectId: string) {
     await this.projectService.deployProject(projectId);
   }
 
-  @Post('/rebuild/:id')
-  async rebuildProject(@Param('id') projectId: string) {
-    await this.projectService.rebuildProject(projectId);
+  @Post('/recreate/:id')
+  async recreateProject(@Param('id') projectId: string) {
+    await this.projectService.recreateProject(projectId);
   }
 
   @Patch(':id')
@@ -186,9 +194,6 @@ export class ProjectController {
     @Param('id') projectId: string,
     @Body() data: ServiceActionDto,
   ) {
-    return await this.projectService.serviceAction(
-      projectId,
-      data
-    );
+    return await this.projectService.serviceAction(projectId, data);
   }
 }
