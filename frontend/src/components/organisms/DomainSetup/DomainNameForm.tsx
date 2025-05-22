@@ -41,8 +41,8 @@ const DomainNameForm: FC<DomainNameFormProps> = ({ domain, main }) => {
   const onSubmit = form.handleSubmit((data) => {
     triggerCreateDomain({ domain: data.domain, main: main ?? false })
       .unwrap()
-      .then((d) => {
-        toast({ title: "Domain created", description: JSON.stringify(d) });
+      .then(() => {
+        toast({ title: "Domain created successfully" });
         form.reset();
       })
       .catch((e) => {
