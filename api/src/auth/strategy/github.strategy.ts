@@ -65,7 +65,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
       const count = await this.userRepository.nbUsers();
       const invitation = await this.invitationService.findByEmail(useremail);
 
-      if (this.invitationService.userCanRegister(count, invitation))
+      if (!this.invitationService.userCanRegister(count, invitation))
         throw new ForbiddenException();
 
       const createdUser = await this.userRepository.createUser({

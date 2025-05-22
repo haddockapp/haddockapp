@@ -10,6 +10,7 @@ import { CaddyService } from '../caddy/caddy.service';
 import { FrontendService } from '../frontend/frontend.service';
 import { ConfigurationService } from 'src/configuration/configuration.service';
 import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
+import { AutologinsService } from '../autologins/autologins.service';
 
 @Injectable()
 export class DomainsService {
@@ -21,6 +22,7 @@ export class DomainsService {
     private readonly frontendService: FrontendService,
     private readonly caddyService: CaddyService,
     private readonly configurationService: ConfigurationService,
+    private readonly autologinService: AutologinsService,
   ) { }
 
   private generateDomainChallenge() {
@@ -72,31 +74,6 @@ export class DomainsService {
 
   private async linkDomain(domain: Domain, canBeLinked: boolean) {
     await this.domainRepository.linkDomain(domain.id, canBeLinked);
-
-    if (domain.main && canBeLinked) {
-      const serverIp = '127.0.0.1';
-      const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
-      const data = {
-        data: [
-          {
-            hostname: domain.domain,
-            ip: serverIp,
-            port: 3001,
-          },
-          {
-            hostname: `api.${domain.domain}`,
-            ip: serverIp,
-            port: 3000,
-          }
-        ],
-      };
-
-      await this.caddyService.generate({
-        template: 'reverse-proxies.hbs',
-        data,
-        dest,
-      })
-    }
   }
 
 
@@ -132,7 +109,7 @@ export class DomainsService {
     return this.domainRepository.deleteDomain(id);
   }
 
-  async apply() {
+  async apply(userId: string) {
     const mainDomain = await this.domainRepository.getMainDomain();
     if (!mainDomain) {
       throw new ForbiddenException('Cannot apply without a main domain');
@@ -166,10 +143,13 @@ export class DomainsService {
 
     await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
     await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
+    const autologinToken = await this.autologinService.generateToken(userId);
+
     return {
       mainDomain: mainDomain.domain,
       frontendUrl: `https://${mainDomain.domain}`,
-      backendUrl: `https://api.${mainDomain.domain}`
+      backendUrl: `https://api.${mainDomain.domain}`,
+      autologin: autologinToken
     }
   }
 }
