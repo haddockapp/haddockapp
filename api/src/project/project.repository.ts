@@ -142,7 +142,7 @@ export class ProjectRepository {
     ]);
   }
 
-  async removeServiceFromProject(projectId: string, serviceName: string) {
+  async removeServiceFromProject(projectId: string, serviceId: string) {
     return this.prismaService.project.update({
       where: {
         id: projectId,
@@ -150,7 +150,7 @@ export class ProjectRepository {
       data: {
         services: {
           delete: {
-            name: serviceName,
+            id: serviceId,
           },
         },
       },
@@ -167,19 +167,19 @@ export class ProjectRepository {
 
   async getProjectService(
     projectId: string,
-    serviceName: string,
+    serviceId: string,
   ): Promise<Service | null> {
     return this.prismaService.service.findFirst({
       where: {
         projectId,
-        name: serviceName,
+        id: serviceId,
       },
     });
   }
 
   async updateServiceStatus(
     projectId: string,
-    serviceName: string,
+    serviceId: string,
     status: ServiceStatus,
   ) {
     await this.prismaService.project.update({
@@ -190,7 +190,7 @@ export class ProjectRepository {
         services: {
           update: {
             where: {
-              name: serviceName,
+              id: serviceId,
             },
             data: {
               status: status,

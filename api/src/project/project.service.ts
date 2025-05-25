@@ -317,12 +317,12 @@ export class ProjectService {
 
   async updateServiceStatus(
     projectId: string,
-    serviceName: string,
+    serviceId: string,
     status: ServiceStatus,
   ) {
     await this.projectRepository.updateServiceStatus(
       projectId,
-      serviceName,
+      serviceId,
       status,
     );
 
@@ -331,7 +331,7 @@ export class ProjectService {
       event: EventType.STATUS_CHANGE,
       target: projectId,
       data: {
-        service: serviceName,
+        service: serviceId,
         status,
       },
     });
@@ -346,7 +346,7 @@ export class ProjectService {
     const services = project.services;
 
     for (const service of services) {
-      await this.updateServiceStatus(projectId, service.name, status);
+      await this.updateServiceStatus(projectId, service.id, status);
     }
   }
 
@@ -366,12 +366,13 @@ export class ProjectService {
   private async sendServiceAction(
     projectId: string,
     ip: string,
-    service: string,
+    serviceName: string,
+    serviceId: string,
     action: ServiceAction,
   ) {
     try {
       const response = await axios.post(`http://${ip}:55001/action`, {
-        service,
+        serviceName,
         action,
       });
 
@@ -385,7 +386,7 @@ export class ProjectService {
 
       const status = this.actionToStatus(action);
 
-      await this.updateServiceStatus(projectId, service, status);
+      await this.updateServiceStatus(projectId, serviceId, status);
 
       return response.data;
     } catch (e) {
@@ -414,7 +415,8 @@ export class ProjectService {
         return await this.sendServiceAction(
           projectId,
           project.vm.ip,
-          data.service,
+          service.name,
+          service.id,
           ServiceAction.START,
         );
       case ServiceAction.STOP:
@@ -424,7 +426,8 @@ export class ProjectService {
         return await this.sendServiceAction(
           projectId,
           project.vm.ip,
-          data.service,
+          service.name,
+          service.id,
           ServiceAction.STOP,
         );
       case ServiceAction.RESTART:
@@ -434,7 +437,8 @@ export class ProjectService {
         return await this.sendServiceAction(
           projectId,
           project.vm.ip,
-          data.service,
+          service.name,
+          service.id,
           ServiceAction.RESTART,
         );
       default:

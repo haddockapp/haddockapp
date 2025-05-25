@@ -100,7 +100,8 @@ model Invitation {
 }
 
 model Service {
-    name        String   @id
+    id          String   @id @default(uuid())
+    name        String
     image       String
     ports       String[]
     networks    String[]
