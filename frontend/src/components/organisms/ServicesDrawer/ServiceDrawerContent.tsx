@@ -33,7 +33,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
     if (!service) return;
     changeServiceStatus({
       projectId,
-      serviceName: service.name,
+      serviceId: service.id,
       action,
     });
   };

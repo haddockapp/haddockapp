@@ -372,7 +372,7 @@ export class ProjectService {
   ) {
     try {
       const response = await axios.post(`http://${ip}:55001/action`, {
-        serviceName,
+        service: serviceName,
         action,
       });
 
@@ -401,7 +401,7 @@ export class ProjectService {
     }
 
     const service = project.services.find(
-      (service) => service.name === data.service,
+      (service) => service.id === data.service,
     );
     if (!service) {
       throw new NotFoundException('Service not found');
