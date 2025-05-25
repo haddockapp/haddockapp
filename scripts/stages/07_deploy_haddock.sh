@@ -30,8 +30,8 @@ section_progress "Configuring backend"
 
 # Setup backend files
 run_command "Setting up backend configuration..." bash -c '
-    sudo touch /opt/haddock/api/services.caddy
-    sudo touch /opt/haddock/api/app.caddy
+    sudo touch /etc/caddy/services.caddy
+    sudo touch /etc/caddy/app.caddy
 '
 
 # Generate .env file if needed
@@ -50,7 +50,7 @@ JWT_SECRET=$JWT_SECRET
 SERVER_IP=$IP
 GITHUB_CLIENT_ID=***REMOVED***
 GITHUB_CLIENT_SECRET=***REMOVED***
-FRONTEND_CONFIG=/opt/haddock/frontend/public/config.json
+FRONTEND_CONFIG=/opt/haddock/frontend/dist/config.json
 FRONTEND_PORT=80
 PORT=3000
 EOF
