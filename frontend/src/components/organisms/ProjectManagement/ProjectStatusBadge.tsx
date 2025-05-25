@@ -34,6 +34,14 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
           borderColor: "border-amber-200",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
+      case VmState.Stopping:
+        return {
+          label: "Stopping",
+          bgColor: "bg-amber-100",
+          textColor: "text-amber-700",
+          borderColor: "border-amber-200",
+          icon: <Loader2 className="h-4 w-4 animate-spin" />,
+        };
       case VmState.Stopped:
         return {
           label: "Stopped",
