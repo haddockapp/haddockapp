@@ -79,7 +79,6 @@ async function handleProjectSubcription<
     services: [data.service],
   });
   socket.on(data.service, (d: T) => {
-    console.log(`Received data from ${data.service}:`, d);
     onListen(d);
   });
 }
