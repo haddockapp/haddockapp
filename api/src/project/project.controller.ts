@@ -137,10 +137,10 @@ export class ProjectController {
     );
   }
 
-  @Get(':id/service/:name')
+  @Get(':id/service/:serviceId')
   async getProjectServiceInformations(
     @Param('id') projectId: string,
-    @Param('name') serviceName: string,
+    @Param('serviceId') serviceId: string,
   ): Promise<ProjectServiceDto> {
     const project = await this.projectRepository.findProjectById(projectId);
     if (!project) {
@@ -148,7 +148,7 @@ export class ProjectController {
     }
 
     const service = project.services.find(
-      (service) => service.name === serviceName,
+      (service) => service.id === serviceId,
     );
     if (!service) {
       throw new NotFoundException('Service not found');

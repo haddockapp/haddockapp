@@ -1,6 +1,6 @@
 import { IsBoolean, IsString, Matches } from "class-validator";
 
-const DOMAIN_NAME_REGEX = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}$/;
+const DOMAIN_NAME_REGEX = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,8}$/;
 
 export class CreateDomainDto {
     @IsString()

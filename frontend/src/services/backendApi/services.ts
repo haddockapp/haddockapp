@@ -36,6 +36,7 @@ export interface ServiceStatusDetails {
 }
 
 export interface ServiceDto extends ServiceInformationDto {
+  id: string;
   icon: string;
   status: string;
   statusTimeStamp: Date;
@@ -54,10 +55,10 @@ const servicesApi = backendApi.injectEndpoints({
     }),
     getServiceInformations: builder.query<
       ServiceInformationDto,
-      { projectId: string; serviceName: string }
+      { projectId: string; serviceId: string }
     >({
-      query: ({ projectId, serviceName }) => ({
-        url: `/project/${projectId}/service/${serviceName}`,
+      query: ({ projectId, serviceId }) => ({
+        url: `/project/${projectId}/service/${serviceId}`,
         method: "GET",
       }),
       providesTags: [QueryKeys.Projects],
