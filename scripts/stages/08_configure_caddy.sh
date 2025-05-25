@@ -25,7 +25,7 @@ output "Creating Caddy configuration... "
 {
     # Backup existing config if it exists
     [ -f /etc/caddy/Caddyfile ] && sudo mv /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak
-    
+
     # Create new Caddyfile
     sudo tee /etc/caddy/Caddyfile >/dev/null << EOF
 :80 {
@@ -34,8 +34,8 @@ output "Creating Caddy configuration... "
     file_server
 }
 
-import /opt/haddock/api/services.caddy
-import /opt/haddock/api/app.caddy
+import /etc/caddy/services.caddy
+import /etc/caddy/app.caddy
 EOF
 
     # Set proper permissions
