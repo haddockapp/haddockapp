@@ -52,12 +52,14 @@ export class VagrantManager implements IVMManager {
     switch (source.type) {
       case 'github': {
         const composePath = this.getComposePath(source);
-        const envArgs = project.environmentVars.flatMap(
-          (envVar: EnvironmentVar) => [`${envVar.key}="${envVar.value}"`],
-        ).join(' ');
+        const envArgs = project.environmentVars
+          .flatMap((envVar: EnvironmentVar) => [
+            `${envVar.key}="${envVar.value}"`,
+          ])
+          .join(' ');
 
         await execCommand(
-          `cd ${project.path} && vagrant ssh -c 'cd service && ${envArgs} docker-compose -f ${composePath} up --build -d'`,
+          `cd ${project.path} && vagrant ssh -c 'cd source && ${envArgs} docker-compose -f ${composePath} up --build -d'`,
         );
         break;
       }
@@ -74,6 +76,7 @@ export class VagrantManager implements IVMManager {
 
     const template: string = this.template({
       ...vm,
+      source_dir: process.env.SOURCE_DIR || 'source',
       name: vm.project.id,
       compose_path: composePath,
     });

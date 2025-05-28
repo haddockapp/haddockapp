@@ -74,7 +74,9 @@ export class ProjectService {
       if (e instanceof ExecutionError) {
         this.logger.error(`Failed to destroy vm: ${e.message}`);
       }
-      return;
+      throw new BadRequestException(
+        'Failed to delete the VM. Please try again later.',
+      );
     }
 
     await this.projectRepository.deleteProject(projectId);
@@ -157,6 +159,7 @@ export class ProjectService {
       if (e instanceof ExecutionError) {
         this.logger.error(`Failed to destroy vm: ${e.message}`);
       }
+
       return;
     }
 

@@ -54,7 +54,7 @@ $script = <<-'SCRIPT'
     VENV_DIR="$SERVICE_DIR/venv"
     SYSTEMD_SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
     CONFIG_FILE="$SERVICE_DIR/config.py"
-    DEPLOYMENT_DIR="/home/vagrant/service"
+    DEPLOYMENT_DIR="/home/vagrant/source"
 
     sudo mv $SOURCE_DIR $SERVICE_DIR
 
@@ -107,7 +107,7 @@ Vagrant.configure("2") do |config|
     vm_name.vm.box = "generic/debian12"
 
     vm_name.vm.network "private_network", type: "dhcp"
-    vm_name.vm.synced_folder "./", "/home/vagrant/service"
+    vm_name.vm.synced_folder "{{source_dir}}", "/home/vagrant/source"
     vm_name.vm.provision "file", source: "../../metrics", destination: "$HOME/"
 
     {{#eq provider "libvirt"}}
