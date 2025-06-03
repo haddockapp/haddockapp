@@ -57,6 +57,7 @@ export class UserController {
   }
 
   @Get(':id/data')
+  @UseGuards(AdminGuard)
   async downloadUserData(@Param('id') id: string, @Res() res: Response) {
     const buffer = await this.userService.getUserDataFile(id);
 
