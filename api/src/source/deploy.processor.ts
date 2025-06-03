@@ -62,10 +62,11 @@ export class DeployConsumer {
       `Cloning github repository ${organization}/${repository}#${branch} to ${repoPath}`,
     );
 
-    const authorizationType: AuthorizationEnum =
-      await this.authorizationService.getAuthorizationType(
-        source.authorizationId,
-      );
+    const authorizationType: AuthorizationEnum = source.authorizationId
+      ? await this.authorizationService.getAuthorizationType(
+          source.authorizationId,
+        )
+      : AuthorizationEnum.NONE;
 
     switch (authorizationType) {
       case AuthorizationEnum.DEPLOY_KEY: {
@@ -111,6 +112,21 @@ export class DeployConsumer {
             onAuthFailure: () => {
               throw new DeployError('Failed to authenticate with github');
             },
+          })
+          .catch((err) => {
+            this.logger.error(`Failed to clone repository: ${err.message}`);
+            throw new DeployError('Failed to clone repository');
+          });
+      }
+      case AuthorizationEnum.NONE: {
+        await git
+          .clone({
+            fs,
+            http,
+            url: `https://github.com/${organization}/${repository}.git`,
+            dir: repoPath,
+            ref: branch,
+            singleBranch: true,
           })
           .catch((err) => {
             this.logger.error(`Failed to clone repository: ${err.message}`);
