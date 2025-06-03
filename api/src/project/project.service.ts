@@ -157,6 +157,7 @@ export class ProjectService {
       if (e instanceof ExecutionError) {
         this.logger.error(`Failed to destroy vm: ${e.message}`);
       }
+
       return;
     }
 

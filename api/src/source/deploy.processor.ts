@@ -49,15 +49,24 @@ export class DeployConsumer {
       getSettings<GithubSourceSettingsDto>(source.settings);
 
     const deployPath = `../workspaces/${source.project?.id}`;
+    const repoPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (fs.existsSync(repoPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${repoPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(repoPath, { recursive: true });
+    }
 
     this.logger.log(
-      `Cloning github repository ${organization}/${repository}#${branch} to ${deployPath}`,
+      `Cloning github repository ${organization}/${repository}#${branch} to ${repoPath}`,
     );
 
-    const authorizationType: AuthorizationEnum =
-      await this.authorizationService.getAuthorizationType(
-        source.authorizationId,
-      );
+    const authorizationType: AuthorizationEnum = source.authorizationId
+      ? await this.authorizationService.getAuthorizationType(
+          source.authorizationId,
+        )
+      : AuthorizationEnum.NONE;
 
     switch (authorizationType) {
       case AuthorizationEnum.DEPLOY_KEY: {
@@ -72,7 +81,7 @@ export class DeployConsumer {
           fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
 
           await execCommand(
-            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${deployPath}`,
+            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${repoPath}`,
           );
         } catch (e) {
           fs.unlinkSync(tempFilePath);
@@ -93,7 +102,7 @@ export class DeployConsumer {
             fs,
             http,
             url: `https://github.com/${organization}/${repository}.git`,
-            dir: deployPath,
+            dir: repoPath,
             ref: branch,
             singleBranch: true,
             onAuth: () =>
@@ -103,6 +112,21 @@ export class DeployConsumer {
             onAuthFailure: () => {
               throw new DeployError('Failed to authenticate with github');
             },
+          })
+          .catch((err) => {
+            this.logger.error(`Failed to clone repository: ${err.message}`);
+            throw new DeployError('Failed to clone repository');
+          });
+      }
+      case AuthorizationEnum.NONE: {
+        await git
+          .clone({
+            fs,
+            http,
+            url: `https://github.com/${organization}/${repository}.git`,
+            dir: repoPath,
+            ref: branch,
+            singleBranch: true,
           })
           .catch((err) => {
             this.logger.error(`Failed to clone repository: ${err.message}`);
@@ -124,14 +148,17 @@ export class DeployConsumer {
     switch (source.type) {
       case 'github': {
         const settings = getSettings<GithubSourceSettingsDto>(source.settings);
-        return settings.composePath;
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
       }
       default:
         throw new Error(`Unknown source type ${source.type}`);
     }
   }
 
-  private async handleProjectServices(projectId: string, source: PersistedSourceDto) {
+  private async handleProjectServices(
+    projectId: string,
+    source: PersistedSourceDto,
+  ) {
     const composePath: string = this.getComposePath(source);
 
     const rawCompose = this.composeService.readComposeFile(
@@ -142,7 +169,9 @@ export class DeployConsumer {
       return;
     }
 
-    const services: ServiceDto[] = this.composeService.parseServices(rawCompose.toString());
+    const services: ServiceDto[] = this.composeService.parseServices(
+      rawCompose.toString(),
+    );
 
     await this.projectRepository.setServicesToProject(projectId, services);
 
