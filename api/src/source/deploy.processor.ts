@@ -117,6 +117,7 @@ export class DeployConsumer {
             this.logger.error(`Failed to clone repository: ${err.message}`);
             throw new DeployError('Failed to clone repository');
           });
+        break;
       }
       case AuthorizationEnum.NONE: {
         await git
@@ -132,6 +133,7 @@ export class DeployConsumer {
             this.logger.error(`Failed to clone repository: ${err.message}`);
             throw new DeployError('Failed to clone repository');
           });
+        break;
       }
     }
     return deployPath;

@@ -30,7 +30,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
                 <p className="text-gray-800 font-semibold">12/09/2024</p>
               </div>
               <p className="text-gray-700 line-clamp-2">
-                {project.description ?? "No description for this project ..."}
+                {project.description ?? ""}
               </p>
             </div>
           </div>
