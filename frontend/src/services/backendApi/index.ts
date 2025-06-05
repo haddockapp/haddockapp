@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../authSlice";
 
 const baseQuery = fetchBaseQuery({
-  timeout: 20_000,
+  timeout: 60_000,
   prepareHeaders: (headers, { getState }) => {
     const { token } = (getState() as RootState).auth;
     if (token) headers.set("Authorization", `Bearer ${token}`);

@@ -43,23 +43,44 @@ const useWebsockets = () => {
     socket.emit("join", { userId: me.id });
 
     socket.on("message", (msg: SocketMessage) => {
-      dispatch(
-        backendApi.util.updateQueryData(
-          "getProjects" as never,
-          undefined as never,
-          (draftPosts) => {
-            if (msg.scope === "project" && msg.event === "status_change") {
-              const project = (draftPosts as unknown as ProjectDto[]).find(
-                (project) => project.id === msg.target
-              );
-              if (project) {
-                project.vm.status = (msg.data as { status: string })
-                  .status as VmState;
+      if (msg.scope === "project" && msg.event === "status_change")
+        dispatch(
+          backendApi.util.updateQueryData(
+            "getProjects" as never,
+            undefined as never,
+            (draftPosts) => {
+              if (msg.scope === "project" && msg.event === "status_change") {
+                const project = (draftPosts as unknown as ProjectDto[]).find(
+                  (project) => project.id === msg.target
+                );
+                if (project) {
+                  project.vm.status = (msg.data as { status: string })
+                    .status as VmState;
+                }
               }
             }
-          }
-        )
-      );
+          )
+        );
+      if (msg.scope === "service" && msg.event === "status_change")
+        dispatch(
+          backendApi.util.updateQueryData(
+            "getServicesByProjectId" as never,
+            projectId as never,
+            (draftPosts) => {
+              (draftPosts as unknown as ServiceDto[]).map((service) => {
+                const data = msg.data as { service: string; status: string };
+                if (service.id !== data.service) return;
+                const isDirty =
+                  JSON.stringify(data.status) !==
+                  JSON.stringify(service.status);
+
+                if (isDirty) {
+                  service.status = data.status;
+                }
+              });
+            }
+          )
+        );
     });
 
     return () => {
