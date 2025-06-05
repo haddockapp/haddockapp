@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_CONFIG_KEY, IS_PUBLIC_KEY } from '../auth.decorator';
@@ -45,7 +45,7 @@ export class AccessGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !user.isActive) {
-      throw new ForbiddenException(`Access denied.`);
+      throw new UnauthorizedException(`Access denied.`);
     }
 
     return true;
