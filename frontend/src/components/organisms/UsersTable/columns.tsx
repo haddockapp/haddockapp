@@ -98,7 +98,11 @@ export const generateColumns = ({
               <span>Reset password</span>
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={row.original.role === UserRole.Invited}
+              disabled={
+                row.original.id !== connectedUser.id &&
+                (connectedUser.role !== UserRole.Admin ||
+                  row.original.role === UserRole.Invited)
+              }
               className="cursor-pointer"
               onClick={() => onDownloadPersonalData(row.original)}
             >
