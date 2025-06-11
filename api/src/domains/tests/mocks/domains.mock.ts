@@ -14,6 +14,7 @@ export const generateMockDomain = (): Domain => ({
   challenge: faker.string.alphanumeric(32),
   main: faker.datatype.boolean(),
   linked: faker.datatype.boolean(),
+  https: true,
 });
 
 export const createDtoFromDomain = (domain: Domain): CreateDomainDto => ({
