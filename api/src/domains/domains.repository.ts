@@ -5,7 +5,7 @@ import { CreateDomainDto } from './dto/create-domain.dto';
 
 @Injectable()
 export class DomainRepository {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) { }
 
   async createDomain(
     data: CreateDomainDto,
@@ -16,7 +16,8 @@ export class DomainRepository {
         data: {
           domain: data.domain,
           main: data.main,
-          challenge
+          challenge,
+          https: data.https,
         },
       });
     } catch (error) {

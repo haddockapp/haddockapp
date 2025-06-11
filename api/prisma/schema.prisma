@@ -87,6 +87,7 @@ model Domain {
     challenge String
     main      Boolean @default(false)
     linked    Boolean @default(false)
+    https     Boolean @default(true)
 }
 
 model AppConfiguration {
