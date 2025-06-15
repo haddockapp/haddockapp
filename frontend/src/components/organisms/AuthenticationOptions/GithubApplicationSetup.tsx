@@ -3,21 +3,10 @@ import { FC } from "react";
 import Configuration from "@/components/organisms/Configuration/SetupGithubApp";
 import SimpleDialog from "@/components/organisms/SimpleDialog";
 import useDisclosure from "@/hooks/use-disclosure";
-import { toast } from "@/hooks/use-toast";
-import { Copy } from "lucide-react";
+import Copiable from "@/components/atoms/copiable";
 
 const GithubApplicationSetup: FC = () => {
   const disclosureMethods = useDisclosure();
-
-  const callbackUrl = `${window.location.origin}/github`;
-
-  const handleCopyCallbackUrl = () => {
-    navigator.clipboard.writeText(callbackUrl);
-    toast({
-      title: "Copied to clipboard",
-      duration: 1000,
-    });
-  };
 
   return (
     <SimpleDialog
@@ -31,19 +20,7 @@ const GithubApplicationSetup: FC = () => {
           behalf.
           <br />
           In the Callback URL field, please choose{" "}
-          <div className="inline-flex items-center space-x-1 pr-1">
-            <b
-              onClick={handleCopyCallbackUrl}
-              className="cursor-pointer hover:underline"
-            >
-              {callbackUrl}
-            </b>
-            <Copy
-              onClick={handleCopyCallbackUrl}
-              size="16px"
-              className="text-primary cursor-pointer"
-            />
-          </div>
+          <Copiable text={`${window.location.origin}/github`} />
           as your callback URL.
         </>
       }
