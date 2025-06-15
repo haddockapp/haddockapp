@@ -30,6 +30,7 @@ export const backendApi = createApi({
       api,
       extraOptions
     );
+    if (result.error?.status === "FETCH_ERROR") api.dispatch(logout());
     if (result.error?.status === 401) api.dispatch(logout());
     return result;
   },
