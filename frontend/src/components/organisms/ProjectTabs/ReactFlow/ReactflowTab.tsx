@@ -35,6 +35,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [showEdges, setShowEdges] = useState(true);
+  const [isNodesInitialized, setIsNodesInitialized] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null
   );
@@ -62,7 +63,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }, [isFetching, isActuallyRefreshing]);
 
   useEffect(() => {
-    if (services && services.length > 0) {
+    if (services && services.length > 0 && !isNodesInitialized) {
       const newNodes = calculateCircularPosition(services, projectId);
       const newEdges = defineInitialEdges(services);
 
@@ -73,8 +74,9 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
         localStorage.getItem(`${projectId}FlowState`) ?? "{}"
       );
       setShowEdges(initialState.showEdges ?? true);
+      setIsNodesInitialized(true);
     }
-  }, [projectId, services]);
+  }, [projectId, services, isNodesInitialized]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
