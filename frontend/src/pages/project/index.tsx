@@ -27,6 +27,10 @@ const ProjectDetails: FC = () => {
 
   useEffect(() => {
     if (projectId) dispatch(setProjectId(projectId));
+
+    return () => {
+      dispatch(setProjectId(null));
+    };
   }, [dispatch, projectId]);
 
   const { cpuUsage, memoryUsage, diskUsage, logs } = useAppSelector(

@@ -50,7 +50,7 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
   const { isSetupComplete } = useSetup();
 
   return (
-    <div className="space-y-4 h-full justify-between flex flex-col">
+    <div className="space-y-4 h-full justify-between flex flex-col overflow-x-auto">
       <Accordion type="multiple" value={accordionOpen}>
         {(isSetupComplete
           ? settings
