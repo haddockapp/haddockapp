@@ -145,8 +145,8 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
         />
         {isMainDomain && (
           <p className="text-sm text-red-500 italic mt-2">
-            Primary domain itself cannot be used as a redirection domain, please
-            indicates a subdomain.
+            The primary domain cannot be used as a redirection domain. Please
+            choose a subdomain instead.
           </p>
         )}
       </div>
