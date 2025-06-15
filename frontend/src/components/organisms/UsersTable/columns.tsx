@@ -89,7 +89,7 @@ export const generateColumns = ({
             <DropdownMenuItem
               disabled={
                 connectedUser.role !== UserRole.Admin ||
-                row.original.role === UserRole.Invited
+                row.original.role !== UserRole.Member
               }
               className="cursor-pointer"
               onClick={() => onResetPassword(row.original)}
