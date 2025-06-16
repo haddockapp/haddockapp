@@ -50,6 +50,14 @@ export class DomainRepository {
     });
   }
 
+  async findDomainByName(domainName: string): Promise<Domain | null> {
+    return this.prismaService.domain.findFirst({
+      where: {
+        domain: domainName,
+      },
+    });
+  }
+
   async deleteDomain(id: string): Promise<Domain> {
     return this.prismaService.domain.delete({
       where: {
