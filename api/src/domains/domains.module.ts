@@ -19,5 +19,8 @@ import { AutologinsModule } from '../autologins/autologins.module';
     DnsService,
     DomainRepository
   ],
+  exports: [
+    DomainRepository
+  ],
 })
 export class DomainsModule {}
