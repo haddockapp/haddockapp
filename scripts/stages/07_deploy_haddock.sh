@@ -53,6 +53,8 @@ GITHUB_CLIENT_SECRET=***REMOVED***
 FRONTEND_CONFIG=/opt/haddock/frontend/dist/config.json
 FRONTEND_PORT=80
 PORT=3000
+WS_PORT=3001
+SOURCE_DIR=source
 EOF
 fi
 
