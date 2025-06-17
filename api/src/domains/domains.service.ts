@@ -15,7 +15,7 @@ import { AutologinsService } from '../autologins/autologins.service';
 @Injectable()
 export class DomainsService {
 
-  constructor (
+  constructor(
     private readonly domainRepository: DomainRepository,
     private readonly bindingService: BindingService,
     private readonly dnsService: DnsService,
@@ -127,7 +127,7 @@ export class DomainsService {
     const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
     await this.caddyService.generate({
       template: 'reverse-proxies.hbs',
-      data:{
+      data: {
         data: [
           {
             hostname: `${caddyPrefix}${mainDomain.domain}`,
@@ -139,6 +139,11 @@ export class DomainsService {
             ip: '127.0.0.1',
             port: +process.env.PORT
           },
+          {
+            hostname: `${caddyPrefix}ws.${mainDomain.domain}`,
+            ip: '127.0.0.1',
+            port: +process.env.WS_PORT
+          },
         ]
       },
       dest,
@@ -146,6 +151,7 @@ export class DomainsService {
 
 
     await this.frontendService.setFrontendConfigValue('backendUrl', `${protocol}://api.${mainDomain.domain}`);
+    await this.frontendService.setFrontendConfigValue('socketUrl', `${protocol}://ws.${mainDomain.domain}`);
     await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
     const autologinToken = await this.autologinService.generateToken(userId);
 
@@ -153,6 +159,7 @@ export class DomainsService {
       mainDomain: mainDomain.domain,
       frontendUrl: `${protocol}://${mainDomain.domain}`,
       backendUrl: `${protocol}://api.${mainDomain.domain}`,
+      socketUrl: `${protocol}://ws.${mainDomain.domain}`,
       autologin: autologinToken
     }
   }

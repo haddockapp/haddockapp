@@ -11,7 +11,7 @@ import { WebSocketService } from './websocket.service';
 import { WebsocketConnectDto } from './dto/connect.dto';
 import { ProjectEventDto } from './dto/project-event.dto';
 
-@WebSocketGateway(3001, {
+@WebSocketGateway(+process.env.WS_PORT, {
   cors: {
     origin: '*',
   },
