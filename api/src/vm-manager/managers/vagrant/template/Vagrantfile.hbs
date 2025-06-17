@@ -1,27 +1,25 @@
 $script = <<-'SCRIPT'
-    # Update the package database
-    sudo apt-get update
+# Update the package database
+    sudo apt-get update -y
 
     # Install prerequisite packages
-    sudo apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        gnupg \
-        lsb-release
+    # Add Docker s official GPG key:
+    sudo apt-get update -y
+    sudo apt-get install -y ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-    # Set up the stable repository
+    # Add the repository to Apt sources:
     echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get -y update
 
-    # Update the package database again
-    sudo apt-get update
-
-    # Install Docker Engine
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    # Install Docker Engine, containerd, and Docker Compose
+    VERSION_STRING=5:28.2.2-1~debian.12~bookworm
+    sudo apt-get install -y docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
 
     # Enable Docker service to start on boot
     sudo systemctl enable docker
@@ -31,17 +29,6 @@ $script = <<-'SCRIPT'
 
     # Add the vagrant user to the docker group (optional, for convenience)
     sudo usermod -aG docker vagrant
-
-    # Install Docker Compose
-    DOCKER_COMPOSE_VERSION="2.20.2"
-    sudo curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-    # Apply executable permissions to the binary
-    sudo chmod +x /usr/local/bin/docker-compose
-
-    # Create a symbolic link to /usr/bin (optional)
-    sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
 
     # Setting up the metrics service
 
@@ -69,14 +56,14 @@ $script = <<-'SCRIPT'
         deactivate
     fi
 
-    # Create the config.py file with handlebars variable {{compose_path}}
+    # Create the config.py file with handlebars variable compose.yml
     echo "Writing config.py to $CONFIG_FILE..."
 
     cat <<EOF | sudo tee $CONFIG_FILE
 class Config:
     WS_PORT = 55000
     HTTP_PORT = 55001
-    COMPOSE_PATH = "$DEPLOYMENT_DIR/{{compose_path}}"
+    COMPOSE_PATH = "$DEPLOYMENT_DIR/compose.yml"
 EOF
 
     echo "Creating systemd service file at $SYSTEMD_SERVICE_FILE..."
