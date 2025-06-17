@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import { Play, RefreshCw, Square, MoreHorizontal } from "lucide-react";
 import { ServiceState } from "@/types/services/services";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatusTabProps {
   status: string;
@@ -29,6 +30,16 @@ const StatusTab: FC<StatusTabProps> = ({
   const isRunning = status === ServiceState.Running;
   const isStopped = status === ServiceState.Stopped;
   const isStarting = status === ServiceState.Starting;
+
+  const [skeletonStatus, setSkeletonStatus] = useState<boolean>(false);
+
+  const handleChangeStatus = (fn: () => void) => {
+    setSkeletonStatus(true);
+    fn();
+    setTimeout(() => {
+      setSkeletonStatus(false);
+    }, 1000);
+  };
 
   const getStatusInfo = () => {
     switch (status) {
@@ -80,9 +91,13 @@ const StatusTab: FC<StatusTabProps> = ({
                 <h3 className="font-medium text-gray-900">Current Status</h3>
                 <div className="flex items-center gap-2 mt-1">
                   <div className={cn("h-2 w-2 rounded-full", statusInfo.bg)} />
-                  <span className={statusInfo.color}>
-                    {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
-                  </span>
+                  {skeletonStatus ? (
+                    <Skeleton className="h-[24px] w-[96px]" />
+                  ) : (
+                    <span className={statusInfo.color}>
+                      {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -100,7 +115,7 @@ const StatusTab: FC<StatusTabProps> = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem
-                  onClick={onStart}
+                  onClick={() => handleChangeStatus(onStart)}
                   disabled={isRunning || isStarting}
                   className={cn(
                     "cursor-pointer",
@@ -111,7 +126,7 @@ const StatusTab: FC<StatusTabProps> = ({
                   Start
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={onRestart}
+                  onClick={() => handleChangeStatus(onRestart)}
                   disabled={!isRunning}
                   className={cn(
                     "cursor-pointer",
@@ -122,7 +137,7 @@ const StatusTab: FC<StatusTabProps> = ({
                   Restart
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={onStop}
+                  onClick={() => handleChangeStatus(onStop)}
                   disabled={isStopped}
                   className={cn(
                     "cursor-pointer",

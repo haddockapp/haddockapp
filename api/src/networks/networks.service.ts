@@ -62,7 +62,7 @@ export class NetworksService {
       throw new BadRequestException('Invalid domain name');
     }
 
-    const existingDomain = await this.domainRepository.findDomainByName(data.domain);
+    const existingDomain = await this.domainRepository.findDomainByName(domainName);
     if (!existingDomain) {
       throw new BadRequestException('Domain does not exist');
     }

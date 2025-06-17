@@ -6,6 +6,7 @@ import {
   FormControl,
   FormMessage,
   Form,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -24,7 +25,11 @@ import { z } from "zod";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z
+    .string()
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, {
+      message: "Your password is too weak",
+    }),
   name: z.string().min(3).optional(),
 });
 
@@ -137,6 +142,17 @@ const EmailAuthentication: FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+                <FormMessage />
+                {form.formState.errors.password && type === "sign-up" && (
+                  <FormDescription className="text-red-500">
+                    <span>Password must contain at least</span>
+                    <li>one uppercase letter</li>
+                    <li>one lowercase letter</li>
+                    <li>one number</li>
+                    <li>one special character</li>
+                    <li>be at least 8 characters long</li>
+                  </FormDescription>
+                )}
                 <FormControl>
                   <Input
                     type="password"
@@ -144,7 +160,6 @@ const EmailAuthentication: FC = () => {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />

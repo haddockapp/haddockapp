@@ -38,6 +38,10 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
     formState: { errors },
   } = methods;
   const { data: domains } = useGetAllDomainsQuery();
+  const mainDomain = useMemo(() => {
+    return domains?.find((domain) => domain.main)?.domain;
+  }, [domains]);
+
   const [createRedirection] = useCreateNetworkConnectionMutation();
 
   const portOptions = useMemo(
@@ -62,6 +66,10 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   const domainValue = watch("domain");
   const subdomainValue = watch("subdomain");
 
+  const isMainDomain = useMemo(() => {
+    return subdomainValue === "" && domainValue === mainDomain;
+  }, [subdomainValue, domainValue, mainDomain]);
+
   const onSubmit: SubmitHandler<ConfigNetworkFormType> = (data) => {
     const fullDomain = subdomainValue
       ? `${subdomainValue}.${data.domain}`
@@ -75,8 +83,10 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   };
 
   const isSubmitDisabled = useMemo(() => {
-    return Boolean(!portValue || !domainValue || errors.subdomain);
-  }, [portValue, domainValue, errors.subdomain]);
+    return Boolean(
+      !portValue || !domainValue || errors.subdomain || isMainDomain
+    );
+  }, [portValue, domainValue, errors.subdomain, isMainDomain]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -133,6 +143,12 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
           value={`${subdomainValue}${subdomainValue ? "." : ""}${domainValue}`}
           disabled
         />
+        {isMainDomain && (
+          <p className="text-sm text-red-500 italic mt-2">
+            The primary domain cannot be used as a redirection domain. Please
+            choose a subdomain instead.
+          </p>
+        )}
       </div>
       <Button
         className="w-full"

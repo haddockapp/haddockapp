@@ -3,6 +3,7 @@ import { FC } from "react";
 import Configuration from "@/components/organisms/Configuration/SetupGithubApp";
 import SimpleDialog from "@/components/organisms/SimpleDialog";
 import useDisclosure from "@/hooks/use-disclosure";
+import Copiable from "@/components/atoms/copiable";
 
 const GithubApplicationSetup: FC = () => {
   const disclosureMethods = useDisclosure();
@@ -11,10 +12,18 @@ const GithubApplicationSetup: FC = () => {
     <SimpleDialog
       {...disclosureMethods}
       title="Add a new configuration"
-      description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Suspendisse mollis placerat leo in pellentesque. Vivamus tellus
-dolor, euismod eget luctus vel, placerat nec metus. Proin nibh
-ligula, porta eu libero ultricies, vulputate sodales augue."
+      description={
+        <>
+          In order to use Haddock with a Github Application, you will need to
+          setup your application in the Github Developer settings. This will
+          allow Haddock to access your repositories and perform actions on your
+          behalf.
+          <br />
+          In the Callback URL field, please choose{" "}
+          <Copiable text={`${window.location.origin}/github`} />
+          as your callback URL.
+        </>
+      }
       Content={Configuration}
       Trigger={({ onOpen }) => (
         <Button variant="outline" onClick={onOpen} className="space-x-2">

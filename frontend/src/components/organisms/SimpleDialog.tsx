@@ -13,7 +13,7 @@ interface SimpleDialogProps {
   Trigger: FC<{ onOpen: () => void }>;
   Content: FC<{ onClose?: () => void; isAppSetup?: boolean }>;
   title: string;
-  description: string;
+  description: JSX.Element | string;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;

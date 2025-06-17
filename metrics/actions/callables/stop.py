@@ -12,6 +12,6 @@ async def assert_stop_run(service: str):
 
 async def stop_service(service: str):
     try:
-        subprocess.run(['docker-compose', '-f', Config.COMPOSE_PATH, 'stop', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        subprocess.run(['docker', 'compose', '-f', Config.COMPOSE_PATH, 'stop', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         return None

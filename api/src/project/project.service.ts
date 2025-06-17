@@ -23,6 +23,8 @@ import axios from 'axios';
 import { ServiceAction, ServiceActionDto } from './dto/serviceAction.dto';
 import { ServiceStatus } from 'src/types/service.enum';
 import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class ProjectService {
@@ -36,6 +38,7 @@ export class ProjectService {
     private readonly networksService: NetworksService,
     private readonly webSocketService: WebSocketService,
     private readonly dockerService: DockerService,
+    @InjectQueue('deploys') private readonly deployQueue: Queue,
   ) {}
 
   async updateProject(
@@ -95,15 +98,7 @@ export class ProjectService {
     if (!project) {
       throw new NotFoundException('Project not found.');
     }
-    this.logger.log(`Stopping project ${project.id}`);
-    try {
-      await this.vmService.downVm(project.vmId);
-    } catch (e) {
-      if (e instanceof ExecutionError) {
-        this.logger.error(`Failed to stop vm: ${e.message}`);
-      }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
-    }
+    await this.deployQueue.add('stop', project);
   }
 
   async startProject(projectId: string) {
@@ -111,15 +106,7 @@ export class ProjectService {
     if (!project) {
       throw new NotFoundException('Project not found.');
     }
-    this.logger.log(`Starting project ${project.id}`);
-    try {
-      await this.vmService.upVm(project.vmId);
-    } catch (e) {
-      if (e instanceof ExecutionError) {
-        this.logger.error(`Failed to start vm: ${e.message}`);
-      }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
-    }
+    await this.deployQueue.add('start', project);
   }
 
   async deployProject(projectId: string) {

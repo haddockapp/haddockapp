@@ -10,6 +10,7 @@ import { VmModule } from 'src/vm/vm.module';
 import { NetworksModule } from 'src/networks/networks.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { WebsocketModule } from 'src/websockets/websocket.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -21,6 +22,9 @@ import { WebsocketModule } from 'src/websockets/websocket.module';
     NetworksModule,
     AuthorizationModule,
     forwardRef(() => WebsocketModule),
+    BullModule.registerQueue({
+      name: 'deploys',
+    }),
   ],
   controllers: [ProjectController],
   providers: [ProjectService, ProjectRepository],
