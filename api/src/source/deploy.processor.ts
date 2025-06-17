@@ -21,6 +21,7 @@ import { VmRepository } from 'src/vm/vm.repository';
 import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { ComposeService } from 'src/compose/compose.service';
 import { ServiceDto } from 'src/compose/model/Service';
+import { PersistedProjectDto } from 'src/project/dto/project.dto';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -229,6 +230,36 @@ export class DeployConsumer {
       }
       await this.vmService.changeVmStatus(source.project.vmId, VmState.Error);
       return;
+    }
+  }
+
+  @Process('start')
+  async start(job: Job<PersistedProjectDto>) {
+    const project = job.data;
+
+    this.logger.log(`Starting project ${project.id}`);
+    try {
+      await this.vmService.upVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to start vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+    }
+  }
+
+  @Process('stop')
+  async stop(job: Job<PersistedProjectDto>) {
+    const project = job.data;
+
+    this.logger.log(`Stopping project ${project.id}`);
+    try {
+      await this.vmService.downVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to stop vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
     }
   }
 }
