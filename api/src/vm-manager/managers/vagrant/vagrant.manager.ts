@@ -59,7 +59,7 @@ export class VagrantManager implements IVMManager {
           .join(' ');
 
         await execCommand(
-          `cd ${project.path} && vagrant ssh -c 'cd source && ${envArgs} docker-compose -f ${composePath} up --build -d'`,
+          `cd ${project.path} && vagrant ssh -c 'cd source && ${envArgs} docker compose -f ${composePath} up --build -d'`,
         );
         break;
       }

@@ -12,6 +12,6 @@ async def assert_start_run(service: str):
 
 async def start_service(service: str):
     try:
-        subprocess.run(['docker-compose', '-f', Config.COMPOSE_PATH, 'start', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        subprocess.run(['docker', 'compose', '-f', Config.COMPOSE_PATH, 'start', service], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         return None
