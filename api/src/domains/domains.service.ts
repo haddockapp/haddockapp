@@ -15,7 +15,7 @@ import { AutologinsService } from '../autologins/autologins.service';
 @Injectable()
 export class DomainsService {
 
-  constructor (
+  constructor(
     private readonly domainRepository: DomainRepository,
     private readonly bindingService: BindingService,
     private readonly dnsService: DnsService,
@@ -115,6 +115,9 @@ export class DomainsService {
       throw new ForbiddenException('Cannot apply without a main domain');
     }
 
+    const protocol = mainDomain.https ? 'https' : 'http';
+    const caddyPrefix = mainDomain.https ? '' : 'http://'; // Should prefix with http to disable HTTPS in Caddy config
+
     const status = await this.getDomainStatus(mainDomain.id);
 
     if (!status.canBeLinked) {
@@ -124,31 +127,39 @@ export class DomainsService {
     const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
     await this.caddyService.generate({
       template: 'reverse-proxies.hbs',
-      data:{
+      data: {
         data: [
           {
-            hostname: mainDomain.domain,
+            hostname: `${caddyPrefix}${mainDomain.domain}`,
             ip: '127.0.0.1',
             port: +process.env.FRONTEND_PORT
           },
           {
-            hostname: `api.${mainDomain.domain}`,
+            hostname: `${caddyPrefix}api.${mainDomain.domain}`,
             ip: '127.0.0.1',
             port: +process.env.PORT
+          },
+          {
+            hostname: `${caddyPrefix}ws.${mainDomain.domain}`,
+            ip: '127.0.0.1',
+            port: +process.env.WS_PORT
           },
         ]
       },
       dest,
     });
 
-    await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
+
+    await this.frontendService.setFrontendConfigValue('backendUrl', `${protocol}://api.${mainDomain.domain}`);
+    await this.frontendService.setFrontendConfigValue('socketUrl', `${protocol}://ws.${mainDomain.domain}`);
     await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
     const autologinToken = await this.autologinService.generateToken(userId);
 
     return {
       mainDomain: mainDomain.domain,
-      frontendUrl: `https://${mainDomain.domain}`,
-      backendUrl: `https://api.${mainDomain.domain}`,
+      frontendUrl: `${protocol}://${mainDomain.domain}`,
+      backendUrl: `${protocol}://api.${mainDomain.domain}`,
+      socketUrl: `${protocol}://ws.${mainDomain.domain}`,
       autologin: autologinToken
     }
   }

@@ -74,6 +74,7 @@ model Vm {
 model NetworkConnection {
     id        String   @id @default(uuid())
     domain    String   @unique
+    https     Boolean  @default(true)
     port      Int
     createdAt DateTime @default(now())
 
@@ -87,6 +88,7 @@ model Domain {
     challenge String
     main      Boolean @default(false)
     linked    Boolean @default(false)
+    https     Boolean @default(true)
 }
 
 model AppConfiguration {
