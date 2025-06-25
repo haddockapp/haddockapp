@@ -1,14 +1,21 @@
 type CaddyfileConfig = {
-    template: 'reverse-proxies.hbs';
+  template: 'reverse-proxies.hbs';
+  data: {
     data: {
-        data: {
-            hostname: string;
-            ip: string;
-            port: number;
-        }[]
+      hostname: string;
+      ip: string;
+      port: number;
+    }[];
+    frontend?: {
+      root: string;
+      hostname: string;
+      ip: string;
+      port: number;
+      https: boolean;
     };
-}
+  };
+};
 
 export type CaddyConfig = CaddyfileConfig & {
-    dest: string;
-}
+  dest: string;
+};

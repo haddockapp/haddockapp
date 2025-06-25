@@ -27,7 +27,7 @@ output "\n${BLUE}▶ Installing dependencies...${NC}"
 }
 
 # Install dependencies
-DEPENDENCIES=("curl" "wget" "gpg" "git" "unzip" "redis-server" "qemu-system" "libvirt-daemon-system" "libvirt-dev" "bc" "rubygems" "ruby-dev" "build-essential")
+DEPENDENCIES=("curl" "wget" "gpg" "git" "unzip" "redis-server" "qemu-system" "libvirt-daemon-system" "libvirt-dev" "bc" "build-essential")
 total=${#DEPENDENCIES[@]}
 current=0
 
@@ -43,6 +43,48 @@ for dep in "${DEPENDENCIES[@]}"; do
     fi
     update_progress 2
 done
+
+# Install rbenv and Ruby
+if [ -x "$(command -v rbenv)" ]; then
+    output "${GREEN}✓${NC} rbenv is already installed"
+else
+    output "Installing rbenv..."
+    if [ "$PM" = "apt" ]; then
+        # Install rbenv dependencies
+        run_command "Installing rbenv dependencies..." "sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev"
+        
+        # Install rbenv
+        if run_command "Installing rbenv..." "curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-installer | bash"; then
+            # Initialize rbenv in current session
+            export PATH="$HOME/.rbenv/bin:$PATH"
+            eval "$(rbenv init -)"
+            
+            # Install latest stable Ruby
+            run_command "Installing Ruby 3.3.8..." "rbenv install 3.3.8"
+            run_command "Setting global Ruby version..." "rbenv global 3.3.8"
+            
+            output "${GREEN}✓${NC} rbenv and Ruby installed successfully"
+        else
+            output "${RED}✗${NC} Failed to install rbenv"
+            failed_installations+=("rbenv")
+        fi
+    elif [ "$PM" = "brew" ]; then
+        if run_command "Installing rbenv..." "brew install rbenv ruby-build"; then
+            # Initialize rbenv in current session
+            export PATH="$HOME/.rbenv/bin:$PATH"
+            eval "$(rbenv init -)"
+            
+            # Install latest stable Ruby
+            run_command "Installing Ruby 3.3.8..." "rbenv install 3.3.8"
+            run_command "Setting global Ruby version..." "rbenv global 3.3.8"
+            
+            output "${GREEN}✓${NC} rbenv and Ruby installed successfully"
+        else
+            output "${RED}✗${NC} Failed to install rbenv"
+            failed_installations+=("rbenv")
+        fi
+    fi
+fi
 
 # Install Caddy with proper repository setup
 if [ -x "$(command -v caddy)" ]; then
