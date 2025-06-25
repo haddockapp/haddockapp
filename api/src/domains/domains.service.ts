@@ -130,11 +130,6 @@ export class DomainsService {
       data: {
         data: [
           {
-            hostname: `${caddyPrefix}${mainDomain.domain}`,
-            ip: '127.0.0.1',
-            port: +process.env.FRONTEND_PORT
-          },
-          {
             hostname: `${caddyPrefix}api.${mainDomain.domain}`,
             ip: '127.0.0.1',
             port: +process.env.PORT
@@ -145,6 +140,13 @@ export class DomainsService {
             port: +process.env.WS_PORT
           },
         ]
+      },
+      frontend: {
+        root: process.env.CADDY_FRONTEND_ROOT,
+        hostname: mainDomain.domain,
+        ip: '127.0.0.1',
+        port: +process.env.FRONTEND_PORT,
+        https: mainDomain.https,
       },
       dest,
     });
