@@ -3,12 +3,14 @@
 	reverse_proxy * {{ip}}:{{port}}
 }
 {{/each}}
+{{#if frontend}}
 {{frontend.hostname}} {
 {{#if frontend.https}}
-    reverse_proxy * {{ip}}:{{port}}
+    reverse_proxy * {{frontend.ip}}:{{frontend.port}}
 {{else}}
     root * {{frontend.root}}
     try_files {path} /index.html
     file_server
 {{/if}}
 }
+{{/if}}

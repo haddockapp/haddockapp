@@ -139,14 +139,14 @@ export class DomainsService {
             ip: '127.0.0.1',
             port: +process.env.WS_PORT
           },
-        ]
-      },
-      frontend: {
-        root: process.env.CADDY_FRONTEND_ROOT,
-        hostname: mainDomain.domain,
-        ip: '127.0.0.1',
-        port: +process.env.FRONTEND_PORT,
-        https: mainDomain.https,
+        ],
+        frontend: {
+          root: process.env.FRONTEND_ROOT,
+          hostname: `${caddyPrefix}${mainDomain.domain}`,
+          ip: '127.0.0.1',
+          port: +process.env.FRONTEND_PORT,
+          https: mainDomain.https,
+        },
       },
       dest,
     });
