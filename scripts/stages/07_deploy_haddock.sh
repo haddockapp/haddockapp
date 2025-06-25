@@ -4,27 +4,21 @@ section_progress "Deploying Haddock"
 ##############################################
 
 # Download Haddock
-# output "Downloading Haddock..."
-# curl -L --silent --show-error "https://releases.haddock.ovh/main/release.zip" -o /tmp/haddock.zip &
-# spinner $! "Downloading Haddock..."
+output "Downloading Haddock..."
+curl -L --silent --show-error "https://releases.haddock.ovh/main/release.zip" -o /tmp/haddock.zip &
+spinner $! "Downloading Haddock..."
 
 # Create directory with proper permissions
 sudo mkdir -p /opt/haddock
 sudo chown $USER:$USER /opt/haddock
 
 # Extract files
-# output "Extracting files..."
-# sudo unzip -q /tmp/haddock.zip -d /opt/haddock &
-# spinner $! "Extracting files..."
-
-run_command "Cloning Haddock repository..." "sudo -u arthur git clone git@github.com:haddockapp/haddockapp.git /tmp/haddock"
-
-run_command "Changing branch..." "cd /tmp/haddock && sudo -u arthur git switch feature/installer-ruby"
-
-run_command "Copying files..." "cp -r /tmp/haddock/. /opt/haddock"
+output "Extracting files..."
+sudo unzip -q /tmp/haddock.zip -d /opt/haddock &
+spinner $! "Extracting files..."
 
 # Remove the zip file
-# sudo rm -f /tmp/haddock.zip
+sudo rm -f /tmp/haddock.zip
 
 # Set proper permissions
 sudo chown -R $USER:$USER /opt/haddock
