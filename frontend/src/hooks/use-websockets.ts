@@ -29,6 +29,103 @@ const useWebsockets = () => {
   const { data: me } = useGetSelfQuery(undefined, { skip: !isAuth });
 
   const { socketUrl } = useAppSelector((state) => state.config);
+  const { projectId, oldProjectId } = useAppSelector((state) => state.metrics);
+
+  const unsubscribe = (unsubscribeProjectId: string) => {
+    if (!me) return;
+    const socket = getSocket();
+    if (!socket) return;
+
+    if (!unsubscribeProjectId) return;
+
+    console.log("UNSUBSCRIBE");
+    socket.emit("project", {
+      projectId: unsubscribeProjectId,
+      services: [
+        WebsocketService.METRICS,
+        WebsocketService.LOGS,
+        WebsocketService.STATUS,
+      ],
+      subscribe: false,
+      userId: me.id,
+      data: {},
+    });
+    return;
+  };
+
+  const subscribe = async () => {
+    if (!me) return;
+    if (!projectId) return;
+
+    console.log("SUBSCRIBE");
+    await handleProjectSubcription<MetricsSocketType>(
+      {
+        projectId,
+        service: WebsocketService.METRICS,
+        subscribe: true,
+        userId: me.id,
+        data: {},
+      },
+      ({ data }) => {
+        if (data) {
+          dispatch(
+            setMetrics({
+              cpuUsage: data.cpu_usage,
+              diskUsage: data.disk_usage,
+              memoryUsage: data.memory_usage,
+            })
+          );
+        }
+      }
+    );
+
+    await handleProjectSubcription<LogsSocketType>(
+      {
+        projectId,
+        service: WebsocketService.LOGS,
+        subscribe: true,
+        userId: me.id,
+        data: {},
+      },
+      ({ logs }) => {
+        if (logs) {
+          dispatch(setLogs(logs));
+        }
+      }
+    );
+
+    await handleProjectSubcription<StatusSocketType>(
+      {
+        projectId,
+        service: WebsocketService.STATUS,
+        subscribe: true,
+        userId: me.id,
+        data: {},
+      },
+      ({ status }) => {
+        dispatch(
+          backendApi.util.updateQueryData(
+            "getServicesByProjectId" as never,
+            projectId as never,
+            (draftPosts) => {
+              (draftPosts as unknown as ServiceDto[]).map((service) => {
+                const serviceUpdate = status.find(
+                  (s) => s.Service === service.name
+                );
+                const isDirty =
+                  JSON.stringify(serviceUpdate) !==
+                  JSON.stringify(service.status);
+
+                if (serviceUpdate && isDirty) {
+                  service.statusDetails = serviceUpdate;
+                }
+              });
+            }
+          )
+        );
+      }
+    );
+  };
 
   useEffect(() => {
     if (!me || !socketUrl) return;
@@ -56,6 +153,14 @@ const useWebsockets = () => {
                 if (project) {
                   project.vm.status = (msg.data as { status: string })
                     .status as VmState;
+
+                  if (project.vm.status === VmState.Running) {
+                    subscribe();
+                  } else {
+                    if (project.vm.status === VmState.Stopped && projectId) {
+                      unsubscribe(projectId);
+                    }
+                  }
                 }
               }
             }
@@ -89,103 +194,15 @@ const useWebsockets = () => {
     };
   }, [dispatch, me, socketUrl]);
 
-  const { projectId, oldProjectId } = useAppSelector((state) => state.metrics);
-
   useEffect(() => {
-    if (!me) return;
-    const socket = getSocket();
-    if (!socket) return;
-
-    if (!projectId && !oldProjectId) return;
-
-    if (!projectId) {
-      socket.emit("project", {
-        projectId: oldProjectId,
-        services: [
-          WebsocketService.METRICS,
-          WebsocketService.LOGS,
-          WebsocketService.STATUS,
-        ],
-        subscribe: false,
-        userId: me.id,
-        data: {},
-      });
-      return;
+    if (!projectId && oldProjectId) {
+      unsubscribe(oldProjectId);
     }
-
-    const subscribe = async () => {
-      await handleProjectSubcription<MetricsSocketType>(
-        {
-          projectId,
-          service: WebsocketService.METRICS,
-          subscribe: true,
-          userId: me.id,
-          data: {},
-        },
-        ({ data }) => {
-          if (data) {
-            dispatch(
-              setMetrics({
-                cpuUsage: data.cpu_usage,
-                diskUsage: data.disk_usage,
-                memoryUsage: data.memory_usage,
-              })
-            );
-          }
-        }
-      );
-
-      await handleProjectSubcription<LogsSocketType>(
-        {
-          projectId,
-          service: WebsocketService.LOGS,
-          subscribe: true,
-          userId: me.id,
-          data: {},
-        },
-        ({ logs }) => {
-          if (logs) {
-            dispatch(setLogs(logs));
-          }
-        }
-      );
-
-      await handleProjectSubcription<StatusSocketType>(
-        {
-          projectId,
-          service: WebsocketService.STATUS,
-          subscribe: true,
-          userId: me.id,
-          data: {},
-        },
-        ({ status }) => {
-          dispatch(
-            backendApi.util.updateQueryData(
-              "getServicesByProjectId" as never,
-              projectId as never,
-              (draftPosts) => {
-                (draftPosts as unknown as ServiceDto[]).map((service) => {
-                  const serviceUpdate = status.find(
-                    (s) => s.Service === service.name
-                  );
-                  const isDirty =
-                    JSON.stringify(serviceUpdate) !==
-                    JSON.stringify(service.status);
-
-                  if (serviceUpdate && isDirty) {
-                    service.statusDetails = serviceUpdate;
-                  }
-                });
-              }
-            )
-          );
-        }
-      );
-    };
-
     subscribe();
 
     return () => {
+      const socket = getSocket();
+      if (!socket) return;
       socket.off(WebsocketService.METRICS);
       socket.off(WebsocketService.LOGS);
       socket.off(WebsocketService.STATUS);
