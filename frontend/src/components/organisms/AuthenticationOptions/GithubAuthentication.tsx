@@ -8,11 +8,13 @@ import GithubApplicationSetup from "./GithubApplicationSetup";
 type GithubAuthenticationProps = {
   reason: GithubAuthReason;
   authorizationName?: string;
+  isDisabled?: boolean;
 };
 
 const GithubAuthentication: FC<GithubAuthenticationProps> = ({
   reason,
   authorizationName,
+  isDisabled,
 }) => {
   const { githubConfig } = useConfiguration();
 
@@ -22,6 +24,7 @@ const GithubAuthentication: FC<GithubAuthenticationProps> = ({
     <div>
       {githubConfig ? (
         <GithubSignInButton
+          isDisabled={isDisabled}
           isSignedIn={
             reason === GithubAuthReason.CREATE_AUTHORIZATION ? false : isAuth
           }

@@ -5,17 +5,19 @@ import { Check } from "lucide-react";
 interface GithubSignInButtonProps {
   redirectUrl: string;
   isSignedIn?: boolean;
+  isDisabled?: boolean;
 }
 const GithubSignInButton: FC<GithubSignInButtonProps> = ({
   redirectUrl,
   isSignedIn,
+  isDisabled,
 }) => (
   <Button
     variant="dark"
     onClick={
       isSignedIn ? undefined : () => (window.location.href = redirectUrl)
     }
-    disabled={isSignedIn}
+    disabled={isSignedIn || isDisabled}
     className="p-4 gap-2"
   >
     {isSignedIn ? (

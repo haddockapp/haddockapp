@@ -276,6 +276,7 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
           <div className="space-y-5">
             <div>
               <GithubAuthentication
+                isDisabled={!watchName}
                 authorizationName={watchName}
                 reason={GithubAuthReason.CREATE_AUTHORIZATION}
               />
