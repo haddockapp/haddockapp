@@ -1,13 +1,22 @@
 import { ScrollFollow, LazyLog } from "@melloware/react-logviewer";
 import { ScrollTextIcon } from "lucide-react";
-import { FC, useMemo } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 
 type LogsSectionProps = {
   lines: string[];
 };
 
 const LogsSection: FC<LogsSectionProps> = ({ lines }) => {
-  const text = useMemo<string>(() => lines.join("\n"), [lines]);
+  const [logText, setLogText] = useState("");
+  const prevLinesRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const newLines = lines.slice(prevLinesRef.current.length);
+    if (newLines.length > 0) {
+      setLogText((prev) => prev + newLines.join("\n") + "\n");
+      prevLinesRef.current = lines;
+    }
+  }, [lines]);
 
   return (
     <div className="space-y-2">
@@ -22,7 +31,7 @@ const LogsSection: FC<LogsSectionProps> = ({ lines }) => {
             <LazyLog
               selectableLines
               enableSearch
-              text={text}
+              text={logText}
               follow={follow}
               onScroll={onScroll}
             />
