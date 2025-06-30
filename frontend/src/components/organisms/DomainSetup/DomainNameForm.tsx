@@ -35,7 +35,7 @@ const DomainNameForm: FC<DomainNameFormProps> = ({ domain, main }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      https: domain?.https || undefined,
+      https: domain?.https || true,
       domain: domain?.domain || "",
     },
   });
