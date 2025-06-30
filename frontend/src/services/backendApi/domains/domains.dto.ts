@@ -1,12 +1,13 @@
 export interface CreateDomainDto {
   domain: string;
-
+  https?: boolean;
   main: boolean;
 }
 
 export interface DomainResponseDto {
   id: string;
   domain: string;
+  https: boolean;
   main: boolean;
 
   primaryBinding: string;
