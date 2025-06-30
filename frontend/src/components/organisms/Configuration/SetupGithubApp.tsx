@@ -10,9 +10,12 @@ import {
 import { Input } from "@/components/ui/input";
 import useConfiguration from "@/hooks/use-configuration";
 import { toast } from "@/hooks/use-toast";
-import { useCreateConfigurationMutation } from "@/services/backendApi/configuration";
+import {
+  useCreateConfigurationMutation,
+  useGetConfigurationQuery,
+} from "@/services/backendApi/configuration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, useCallback, useEffect } from "react";
+import { FC, useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,15 +25,12 @@ const formSchema = z.object({
 });
 
 export type ConfigurationProps = {
-  isAppSetup?: boolean;
   onClose?: () => void;
 };
 
-const Configuration: FC<ConfigurationProps> = ({
-  isAppSetup = true,
-  onClose,
-}) => {
+const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
   const [triggerCreateConfiguration] = useCreateConfigurationMutation();
+  const { data: configurationData } = useGetConfigurationQuery();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,6 +72,11 @@ const Configuration: FC<ConfigurationProps> = ({
 
   const onSubmit = form.handleSubmit(handleCreateConfiguration);
 
+  const isGithubAppConfirmed = useMemo(
+    () => configurationData?.find((c) => c.key === "github_client_id"),
+    [configurationData]
+  );
+
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="space-y-8 text-start">
@@ -107,7 +112,9 @@ const Configuration: FC<ConfigurationProps> = ({
             )}
           />
         </div>
-        <Button type="submit">{!isAppSetup ? "Update" : "Submit"}</Button>
+        <Button type="submit">
+          {!isGithubAppConfirmed ? "Update" : "Submit"}
+        </Button>
       </form>
     </Form>
   );

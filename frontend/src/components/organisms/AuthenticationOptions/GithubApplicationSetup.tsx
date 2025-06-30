@@ -15,13 +15,22 @@ const GithubApplicationSetup: FC = () => {
       description={
         <>
           In order to use Haddock with a Github Application, you will need to
-          setup your application in the Github Developer settings. This will
-          allow Haddock to access your repositories and perform actions on your
-          behalf.
+          setup your application in the Github Developer settings.
           <br />
-          In the Callback URL field, please choose{" "}
+          This will allow Haddock to access your repositories and perform
+          actions on your behalf.
+          <br />
+          For the <i>application name field</i>, you can write{" "}
+          <Copiable text="Haddock" />
+          <br />
+          In the <i>homepage URL field</i>, please input{" "}
+          <Copiable text={`${window.location.origin}`} />
+          <br />
+          In the <i>callback URL field</i>, insert{" "}
           <Copiable text={`${window.location.origin}/github`} />
-          as your callback URL.
+          <br />
+          Once you have created your application, you will need to copy the
+          credentials into Haddock :
         </>
       }
       Content={Configuration}
