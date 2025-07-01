@@ -13,7 +13,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { ReactFlowStateStorage } from "@/types/services/services";
-import { calculateCircularPosition, defineInitialEdges } from "./utils";
+import {
+  calculateCircularPositions,
+  generateServiceNodes,
+  defineInitialEdges,
+} from "./utils";
 import CustomNode from "./CustomNode";
 import SwitchWithText from "@/components/molecules/text-switch";
 import { Button } from "@/components/ui/button";
@@ -63,18 +67,34 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }, [isFetching, isActuallyRefreshing]);
 
   useEffect(() => {
-    if (services && services.length > 0 && !isNodesInitialized) {
-      const newNodes = calculateCircularPosition(services, projectId);
+    if (services && services.length > 0) {
+      if (!isNodesInitialized) {
+        const positions = calculateCircularPositions(services, projectId);
+        const newNodes = generateServiceNodes(services, positions);
+        setNodes(newNodes);
+        setIsNodesInitialized(true);
+      } else {
+        setNodes((prevNodes) =>
+          prevNodes.map((node) => {
+            const service = services.find((s) => s.name === node.id);
+            if (!service) return node;
+            return {
+              ...node,
+              data: {
+                label: service.name,
+                status: service.status ?? undefined,
+                icon: service.icon,
+              },
+            };
+          })
+        );
+      }
       const newEdges = defineInitialEdges(services);
-
-      setNodes(newNodes);
       setEdges(newEdges);
-
       const initialState: ReactFlowStateStorage = JSON.parse(
         localStorage.getItem(`${projectId}FlowState`) ?? "{}"
       );
       setShowEdges(initialState.showEdges ?? true);
-      setIsNodesInitialized(true);
     }
   }, [projectId, services, isNodesInitialized]);
 
