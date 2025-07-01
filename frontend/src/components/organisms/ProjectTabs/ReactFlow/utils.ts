@@ -46,13 +46,13 @@ export const defineInitialEdges = (services: ServiceDto[]): Edge[] => {
   return edges;
 };
 
-export const calculateCircularPosition = (
+export const calculateCircularPositions = (
   services: ServiceDto[],
   projectId: string,
   center = { x: 500, y: 400 },
   baseSpacing = 250,
   minDistance = 150
-) => {
+): Record<string, { x: number; y: number }> => {
   const networkGroups: Record<string, string[]> = {};
   const positions: Record<string, { x: number; y: number }> = {};
   const initialNodesPositions: ReactFlowStateStorage = JSON.parse(
@@ -104,6 +104,13 @@ export const calculateCircularPosition = (
     });
   });
 
+  return positions;
+};
+
+export const generateServiceNodes = (
+  services: ServiceDto[],
+  positions: Record<string, { x: number; y: number }>
+) => {
   return services.map((service) => ({
     id: service.name,
     position: positions[service.name] || { x: 0, y: 0 },
