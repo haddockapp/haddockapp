@@ -24,9 +24,8 @@ const UsersSettings: FC = () => {
   return (
     <div className="flex flex-col space-y-4">
       <span className="text-gray-800">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
-        purus ut sem malesuada tincidunt. Nullam nec purus ut sem malesuada
-        tincidunt. Nullam nec purus ut sem malesuada tincidunt.
+        Below is the list of users that have access to the platform, with their
+        informations and roles. You can manage current users or invite new ones.
       </span>
       <UsersTable users={data || []} />
       <div className="flex items-center space-x-2 justify-end">
