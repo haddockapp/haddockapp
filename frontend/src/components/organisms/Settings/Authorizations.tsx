@@ -321,10 +321,10 @@ const Authorizations: FC = () => {
   return (
     <div className="flex flex-col space-y-4">
       <p className="text-zinc-600">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-        mollis placerat leo in pellentesque. Vivamus tellus dolor, euismod eget
-        luctus vel, placerat nec metus. Proin nibh ligula, porta eu libero
-        ultricies, vulputate sodales augue.
+        Authorizations are used to authenticate with Github services. Below is
+        the list of authorizations you have created. <br />
+        The type of authorization are: OAuth, Personal Access Token and Private
+        SSH Key.
       </p>
       {(authorizations?.length ?? 0) === 0 ? null : isLoading ? (
         <Skeleton className="h-20" />
@@ -373,10 +373,7 @@ const Authorizations: FC = () => {
       <SimpleDialog
         {...disclosureMethods}
         title="Add a new Authorization"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Suspendisse mollis placerat leo in pellentesque. Vivamus tellus
-    dolor, euismod eget luctus vel, placerat nec metus. Proin nibh
-    ligula, porta eu libero ultricies, vulputate sodales augue."
+        description="To create a new authorization, you need to provide a label and select the type of authorization you want to create. Once you choose the type of authorization, follow the instructions or provide the necessary informations."
         Content={() => (
           <CreateNewAuthorization onClose={disclosureMethods.onClose} />
         )}

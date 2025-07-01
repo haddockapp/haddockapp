@@ -7,10 +7,9 @@ const ChangeGithubApplication: FC<ChangeGithubApplicationProps> = () => {
   return (
     <div className="space-y-4">
       <p className="text-zinc-600">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-        mollis placerat leo in pellentesque. Vivamus tellus dolor, euismod eget
-        luctus vel, placerat nec metus. Proin nibh ligula, porta eu libero
-        ultricies, vulputate sodales augue.
+        In order to use Haddock with a Github Application, you will need to
+        setup your application in the Github Developer settings. <br />
+        You can setup or modify the application here.
       </p>
       <GithubApplicationSetup />
     </div>

@@ -16,21 +16,21 @@ const steps: SetupDomainStep[] = [
     value: "primaryBinding",
     title: "Link primary domain name",
     subtitle:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Configure the main domain name for your platform. This will be the primary address users will use to access your services.",
   },
   {
     boolean: "wildcardStatus",
     value: "wildcardBinding",
     title: "Link wildcard domain name",
     subtitle:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Set up a wildcard domain to allow access to all subdomains (e.g., *.yourdomain.com). This is useful for multi-site or dynamic subdomain setups.",
   },
   {
     boolean: "challengeStatus",
     value: "challengeBinding",
     title: "Haddock verification challenge",
     subtitle:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Add the provided TXT record to your DNS to verify domain ownership. This step is required to complete the domain setup process.",
   },
 ];
 
