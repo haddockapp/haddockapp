@@ -1,5 +1,5 @@
-name: Remontée de Bug
-description: Signalez un bug rencontré dans Haddock.
+name: Bug Report
+description: Report a bug encountered in Haddock.
 title: "[Bug]: "
 labels: ["bug", "triage"]
 projects: ["haddock-project/1", "haddock-project/bug-tracking"]
@@ -9,29 +9,29 @@ body:
   - type: markdown
     attributes:
       value: |
-        Merci de prendre le temps de signaler ce bug. Nous apprécions votre contribution pour améliorer Haddock !
+        Thank you for taking the time to report this bug. We appreciate your contribution to improving Haddock!
   - type: input
     id: contact
     attributes:
-      label: Coordonnées
-      description: Comment pouvons-nous vous contacter si nous avons besoin de plus d'informations ?
-      placeholder: ex. email@exemple.com
+      label: Contact Information
+      description: How can we reach you if we need more information?
+      placeholder: e.g. email@example.com
     validations:
       required: false
   - type: textarea
     id: what-happened
     attributes:
-      label: Que s'est-il passé ?
-      description: Décrivez le problème et ce que vous attendiez comme comportement.
-      placeholder: Décrivez le bug observé ici.
-      value: "Un bug est survenu !"
+      label: What happened?
+      description: Describe the issue and what you expected to happen instead.
+      placeholder: Describe the observed bug here.
+      value: "A bug occurred!"
     validations:
       required: true
   - type: dropdown
     id: version
     attributes:
-      label: Version de Haddock
-      description: Quelle version de Haddock utilisez-vous ?
+      label: Haddock Version
+      description: Which version of Haddock are you using?
       options:
         - 1.0.0
         - 1.0.1 (Beta)
@@ -41,8 +41,8 @@ body:
   - type: dropdown
     id: environnement
     attributes:
-      label: Environnement de travail
-      description: Où avez-vous rencontré ce bug ?
+      label: Environment
+      description: Where did you encounter this bug?
       options:
         - Windows
         - macOS
@@ -54,16 +54,16 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Journaux d'erreurs
-      description: Collez ici les journaux ou erreurs pertinents. Ce champ sera formaté automatiquement.
+      label: Error Logs
+      description: Paste any relevant logs or error messages here. This field will be automatically formatted.
       render: shell
     validations:
       required: false
   - type: checkboxes
     id: terms
     attributes:
-      label: Code de Conduite
-      description: En soumettant cette issue, vous acceptez de suivre notre [Code de Conduite](https://example.com).
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
       options:
-        - label: J'accepte de respecter le Code de Conduite de ce projet.
+        - label: I agree to follow this project’s Code of Conduct.
           required: true

@@ -1,5 +1,5 @@
 name: Suggestion
-description: Proposez une idée ou une amélioration pour Haddock.
+description: Propose an idea or improvement for Haddock.
 title: "[Suggestion]: "
 labels: ["enhancement", "idea"]
 projects: ["haddock-project/1", "haddock-project/enhancements"]
@@ -9,50 +9,50 @@ body:
   - type: markdown
     attributes:
       value: |
-        Merci de partager vos idées pour rendre Haddock encore meilleur ! Nous lisons attentivement toutes les suggestions.
+        Thank you for sharing your ideas to make Haddock even better! We carefully review all suggestions.
   - type: input
     id: contact
     attributes:
-      label: Coordonnées
-      description: Comment pouvons-nous vous contacter si nous avons des questions sur votre idée ?
-      placeholder: ex. email@exemple.com
+      label: Contact Information
+      description: How can we reach you if we have questions about your idea?
+      placeholder: e.g. email@example.com
     validations:
       required: false
   - type: textarea
     id: idea-description
     attributes:
-      label: Description de votre suggestion
-      description: Expliquez votre idée ou votre amélioration, ainsi que son impact sur Haddock.
-      placeholder: Décrivez votre suggestion ici.
+      label: Description of Your Suggestion
+      description: Explain your idea or improvement, and its potential impact on Haddock.
+      placeholder: Describe your suggestion here.
     validations:
       required: true
   - type: checkboxes
     id: benefits
     attributes:
-      label: Bénéfices
-      description: Quels sont, selon vous, les avantages de cette suggestion ?
+      label: Benefits
+      description: What do you see as the benefits of this suggestion?
       options:
-        - label: Amélioration de l'expérience utilisateur
-        - label: Performance accrue
-        - label: Résolution d'un problème existant
-        - label: Autre (précisez dans la description)
+        - label: Improved user experience
+        - label: Increased performance
+        - label: Solves an existing issue
+        - label: Other (please specify in the description)
   - type: dropdown
     id: priority
     attributes:
-      label: Niveau de priorité
-      description: Quelle priorité donnez-vous à cette suggestion ?
+      label: Priority Level
+      description: What priority would you assign to this suggestion?
       options:
-        - Basse
-        - Moyenne
-        - Haute
+        - Low
+        - Medium
+        - High
       default: 1
     validations:
       required: true
   - type: checkboxes
     id: terms
     attributes:
-      label: Code de Conduite
-      description: En soumettant cette issue, vous acceptez de suivre notre [Code de Conduite](https://example.com).
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
       options:
-        - label: J'accepte de respecter le Code de Conduite de ce projet.
+        - label: I agree to follow this project’s Code of Conduct.
           required: true
