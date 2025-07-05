@@ -1,59 +1,121 @@
-# Haddock - Votre Ingénieur Plateforme
+# Haddock — Your All-in-One Platform Engineer
 
-**Haddock** est une solution Platform as a Service (PaaS) moderne et innovante, conçue pour simplifier le déploiement des applications en s’appuyant sur les conteneurs. Contrairement aux autres solutions PaaS, Haddock élimine les configurations fastidieuses des environnements et propose une approche clé en main, flexible et hautement configurable, adaptée à tous types de structures, des agences web aux entreprises souhaitant moderniser leur infrastructure.
+**Haddock** is a modern, developer-friendly Platform-as-a-Service (PaaS) designed to streamline application deployment through containerization. Unlike traditional PaaS offerings, Haddock removes the need for tedious environment configuration and offers a fully automated, flexible, and self-hostable infrastructure solution — tailored for both nimble web agencies and enterprises seeking to modernize their stack.
 
-## Table des Matières
+---
 
-- [À propos de Haddock](#à-propos-de-haddock)
-- [Fonctionnalités](#fonctionnalités)
-- [Avantages](#avantages)
-- [Défis Résolus](#défis-résolus)
-- [Contributions](#contributions)
-- [Support](#support)
-- [Licence](#licence)
+## 📚 Table of Contents
 
-## À propos de Haddock
+- [🚀 About Haddock](#-about-haddock)
+- [🧰 Features](#-features)
+- [🎯 Benefits](#-benefits)
+- [🛠️ Problems We Solve](#-problems-we-solve)
+- [🤝 Contributing](#-contributing)
+- [💬 Support](#-support)
+- [📄 License](#-license)
 
-Les conteneurs sont au centre du développement logiciel moderne, offrant flexibilité et efficacité dans le déploiement d’applications dans différents environnements. Haddock se distingue par sa capacité à gérer des environnements Open Container sans configuration complexe, en se basant uniquement sur les fichiers de conteneurisation habituels des projets.
+---
 
-Haddock est soutenu par une communauté active et est entièrement open source et self-hostable, permettant aux entreprises de garder le contrôle total sur leur infrastructure tout en profitant des avantages des solutions PaaS.
+## 🚀 About Haddock
 
-## Fonctionnalités
+Container-based development has become the foundation of scalable and portable software. **Haddock** enhances this model by providing a zero-config deployment platform that automatically interprets your existing container setup — no extra YAMLs or custom tooling required.
 
-- **Aucun fichier de configuration nécessaire** : Haddock utilise uniquement les fichiers de conteneurisation existants, rendant le déploiement simple et rapide.
-- **Sécurité et virtualisation** : Chaque application fonctionne dans une machine virtuelle optimisée et sécurisée par une couche réseau robuste.
-- **Déploiement multi-environnements** : Supporte les environnements de développement, de pré-production et de production simultanément sans intervention administrative.
-- **Supporte tous types d’applications** : Compatible avec des templates d’applications, des services orchestrés via Compose, et des déploiements automatiques depuis GitHub.
-- **Adaptabilité et scalabilité** : S’adapte à divers besoins, des simples sites web aux infrastructures complexes.
-- **Open Source et Self-hostable** : Haddock est gratuit, open source et peut être hébergé sur votre propre serveur.
+Haddock is fully **open source**, **self-hostable**, and backed by a growing developer community. It gives you full control over your infrastructure, with the simplicity of a plug-and-play PaaS.
 
-## Avantages
+---
 
-- **Portabilité et Uniformité** : Réduit les erreurs et accélère le cycle de développement.
-- **Coûts Réduits** : Une seule machine peut gérer plusieurs projets simultanément sans nécessiter une gestion complexe.
-- **Flexibilité** : S’adresse aussi bien aux agences web qu’aux grandes entreprises, avec une approche personnalisable selon les besoins.
+## 🧰 Features
 
-## Défis Résolus
+- ⚙️ **Zero Configuration**  
+  Deploy apps directly from existing container files — no extra configuration needed.
 
-Les agences web et les ESN rencontrent des défis tels que la gestion des conflits de configuration, la collaboration entre équipes, et le déploiement rapide de nouvelles fonctionnalités. Haddock répond à ces problématiques en automatisant le déploiement et en standardisant les environnements, tout en maintenant la stabilité et la sécurité.
+- 🔐 **Secure & Isolated Environments**  
+  Each application runs in an isolated virtual machine with a hardened network layer.
 
-## Contributions
+- 🧪 **Multi-Environment Workflow**  
+  Easily manage dev, staging, and production environments in parallel with no manual setup.
 
-Les contributions sont les bienvenues ! Veuillez consulter notre [guide de contribution](CONTRIBUTING.md) pour savoir comment participer au projet.
+- 🛠️ **Universal App Support**  
+  Works with any application structure — from GitHub-based CI/CD pipelines to Docker Compose services.
 
-## Support
+- 📈 **Scalable by Design**  
+  Start small, scale easily — from simple static sites to large-scale distributed systems.
 
-Pour toute question ou assistance, n’hésitez pas à nous contacter :
+- 💻 **Self-Hostable & Open Source**  
+  Deploy Haddock on your own servers. Full transparency. Full control.
 
-- **Thomas Mazaud**
-- **Alexandru Gherasie**
-- **Léo Dubosclard**
-- **Maxime Dziura**
-- **Arthur Delbarre**
-- **Mathias André**
+---
 
-## Licence
+## 🎯 Benefits
 
-Haddock est développé dans le cadre d'un projet académique par des étudiants d'Epitech. Le code est protégé par une licence personnalisée qui limite son utilisation à des fins éducatives, de démonstration et d'étude uniquement. Toute redistribution, modification ou utilisation commerciale du logiciel est interdite sans l'autorisation écrite préalable des auteurs.
+- 🔁 **Consistency Across Environments**  
+  No more “works on my machine” — ensure identical behavior from dev to production.
 
-Le logiciel est fourni "tel quel", sans aucune garantie. Pour plus d'informations ou pour toute demande de licence, veuillez contacter l'équipe Haddock à l'adresse suivante : thomas.mazaud@epitech.eu.
+- 💰 **Cost-Efficient**  
+  Consolidate multiple apps on a single machine without complex orchestration layers.
+
+- 🔧 **Built for Developers & Teams**  
+  Whether you're a freelancer, agency, or enterprise dev team, Haddock adapts to your workflow.
+
+---
+
+## 🛠️ Problems We Solve
+
+Modern development teams face challenges such as:
+
+- ⚠️ Config conflicts and fragile infrastructure
+- 🐌 Slow deployment cycles
+- 🔁 Inconsistent environments
+- 🧩 Lack of standardization across teams
+
+**Haddock** addresses these with:
+
+- ✅ Automated container-based deployment
+- ✅ Standardized environments across teams
+- ✅ Simple Git-based CI/CD hooks
+- ✅ Secure, isolated runtimes with no overhead
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from developers of all levels! To get started:
+
+1. Read the [contribution guide](CONTRIBUTING.md)
+2. Fork the repository
+3. Create your feature branch
+4. Submit a pull request
+
+We appreciate your help in building the future of simple, scalable app deployment 🚢
+
+---
+
+## 💬 Support
+
+For questions, suggestions, or bug reports, feel free to reach out to the core team:
+
+- Thomas Mazaud
+- Alexandru Gherasie
+- Léo Dubosclard
+- Maxime Dziura
+- Arthur Delbarre
+- Mathias André
+
+---
+
+## 📄 License
+
+Haddock is a student-led academic project developed at [Epitech](https://www.epitech.eu/).  
+It is released under a **custom educational license**. Usage is strictly limited to:
+
+- Educational purposes
+- Demonstration and experimentation
+- Non-commercial research
+
+Commercial use, redistribution, or modification outside these scopes is prohibited without prior written consent.
+
+> 📬 For licensing requests or inquiries, please contact: **contact@haddock.ovh**
+
+---
+
+**Made with 🐳 and ❤️ by the Haddock team**
