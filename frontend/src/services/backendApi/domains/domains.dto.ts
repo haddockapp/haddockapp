@@ -1,12 +1,13 @@
 export interface CreateDomainDto {
   domain: string;
-
+  https?: boolean;
   main: boolean;
 }
 
 export interface DomainResponseDto {
   id: string;
   domain: string;
+  https: boolean;
   main: boolean;
 
   primaryBinding: string;
@@ -26,4 +27,11 @@ export interface DomainStatusDto {
   challengeStatus: boolean;
 
   canBeLinked: boolean;
+}
+
+export interface DomainApplyResponseDto {
+  mainDomain: string;
+  frontendUrl: string;
+  backendUrl: string;
+  autologin: string;
 }

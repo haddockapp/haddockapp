@@ -1,25 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Handler } from './types/handler';
 import { Client } from './types/client';
 import { WebsocketEventDto } from './dto/websocket-event.dto';
-import { ProjectEventDto } from './dto/project-event.dto';
-import { ProjectHandlers } from './types/project-handlers';
+import { ProjectEventDto, ServiceEnum } from './dto/project-event.dto';
+import { MetricsClient, ProjectHandler } from './types/project-handler';
 import { ProjectRepository } from 'src/project/project.repository';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
+import { io } from 'socket.io-client';
 
 @Injectable()
 export class WebSocketService {
   constructor(private readonly projectRepository: ProjectRepository) {}
 
   private clients: { [key: string]: Client } = {};
-  private projects: { [key: string]: ProjectHandlers } = {};
+  private projects: { [key: string]: ProjectHandler } = {};
+  private readonly logger = new Logger(WebSocketService.name);
 
   addClient(userId: string, client: Socket) {
     this.clients[userId] = {
       userId,
       socket: client,
     };
+    this.logger.log(`Client ${userId} connected`);
   }
 
   removeClient(client: Socket) {
@@ -29,6 +31,12 @@ export class WebSocketService {
     if (userId) {
       delete this.clients[userId];
     }
+
+    Object.keys(this.projects).forEach((projectId) => {
+      this.removeClientFromProject(client, projectId);
+    });
+
+    this.logger.log(`Client ${userId} disconnected`);
   }
 
   notifyUser(userId: string, message: object) {
@@ -44,37 +52,196 @@ export class WebSocketService {
     });
   }
 
-  getClient(userId: string): Client | undefined {
-    return this.clients[userId];
+  async createProject(projectId: string) {
+    if (!this.projects[projectId]) {
+      await this.createProjectHandler(projectId);
+      this.logger.log(`Project ${projectId} created`);
+    }
   }
 
-  async protectService(client: Socket, eventData: ProjectEventDto) {
+  removeProject(projectId: string) {
+    if (this.projects[projectId]) {
+      this.projects[projectId].websocket.close();
+      delete this.projects[projectId];
+      this.logger.log(`Project ${projectId} removed`);
+    }
+  }
+
+  private handleSubsriptions(client: MetricsClient, projectId: string) {
+    const project = this.projects[projectId];
+    const services = client.subscriptions;
+    const currentSubscriptions = project.subsciptions;
+
+    services.forEach((service) => {
+      if (currentSubscriptions[service] === 0) {
+        project.websocket.emit('subscribe', client.subscriptions);
+      }
+      project.subsciptions[service]++;
+    });
+  }
+
+  private handleUnsubscriptions(client: MetricsClient, projectId: string) {
+    const project = this.projects[projectId];
+    const services = client.subscriptions;
+    const currentSubscriptions = project.subsciptions;
+
+    services.forEach((service) => {
+      if (currentSubscriptions[service] === 1) {
+        project.websocket.emit('unsubscribe', client.subscriptions);
+      }
+      project.subsciptions[service]--;
+    });
+  }
+
+  async handleUnsubscribe(client: Socket, eventData: ProjectEventDto) {
+    if (this.projects[eventData.projectId]) {
+      const subscribed: MetricsClient = this.projects[
+        eventData.projectId
+      ].clients.find((c) => c.client.userId === eventData.userId);
+
+      this.handleUnsubscriptions(subscribed, eventData.projectId);
+
+      subscribed.subscriptions = subscribed.subscriptions.filter(
+        (s) => !eventData.services.includes(s),
+      );
+
+      if (subscribed.subscriptions.length === 0) {
+        this.removeClientFromProject(client, eventData.projectId);
+        this.logger.log(
+          `Client ${eventData.userId} unsubscribed from project ${eventData.projectId}`,
+        );
+        return;
+      }
+
+      this.logger.log(
+        `Client ${eventData.userId} unsubscribed from services ${eventData.services} in project ${eventData.projectId}`,
+      );
+    }
+  }
+
+  async handleSubscribe(client: Socket, eventData: ProjectEventDto) {
     if (!this.projects[eventData.projectId]) {
-      const project: PersistedProjectDto =
-        await this.projectRepository.findProjectById(eventData.projectId);
-
-      if (!project) {
-        throw new Error('Project not found');
-      }
-
-      this.projects[eventData.projectId] = new ProjectHandlers(project);
+      await this.createProjectHandler(eventData.projectId);
     }
-    const project = this.projects[eventData.projectId];
 
-    const handler: Handler = project[eventData.service];
+    const clientAlreadySubscribed = this.projects[
+      eventData.projectId
+    ].clients.find((c) => c.client.userId === eventData.userId);
 
-    if (handler) {
-      if (eventData.subscribe) {
-        handler.handleSubscribe(
-          { userId: eventData.userId, socket: client },
-          eventData.data,
-        );
-      } else {
-        handler.handleUnsubscribe(
-          { userId: eventData.userId, socket: client },
-          eventData.data,
-        );
-      }
+    if (clientAlreadySubscribed) {
+      clientAlreadySubscribed.subscriptions = Array.from(
+        new Set([
+          ...clientAlreadySubscribed.subscriptions,
+          ...eventData.services,
+        ]),
+      );
+
+      this.handleSubsriptions(clientAlreadySubscribed, eventData.projectId);
+
+      this.logger.log(
+        `Client ${eventData.userId} subscribed to project ${eventData.projectId} updated with services ${clientAlreadySubscribed.subscriptions}`,
+      );
+      return;
     }
+
+    const newClient: MetricsClient = {
+      client: {
+        userId: eventData.userId,
+        socket: client,
+      },
+      subscriptions: eventData.services,
+    };
+
+    this.projects[eventData.projectId].clients.push(newClient);
+
+    this.handleSubsriptions(newClient, eventData.projectId);
+    this.logger.log(
+      `Client ${eventData.userId} subscribed to project ${eventData.projectId} with services ${eventData.services}`,
+    );
+  }
+
+  private removeClientFromProject(client: Socket, projectId: string) {
+    this.projects[projectId].clients = this.projects[projectId].clients.filter(
+      (c) => c.client.socket !== client,
+    );
+  }
+
+  private async createProjectHandler(projectId: string) {
+    this.logger.log(`Creating project handler for project ${projectId}`);
+
+    const project: PersistedProjectDto =
+      await this.projectRepository.findProjectById(projectId);
+
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    this.projects[projectId] = {
+      clients: [],
+      websocket: io(`ws://${project.vm.ip}:55000`, { reconnection: false }),
+      subsciptions: {
+        [ServiceEnum.METRICS]: 0,
+        [ServiceEnum.LOGS]: 0,
+        [ServiceEnum.STATUS]: 0,
+      },
+    };
+
+    const ws = this.projects[projectId].websocket;
+
+    ws.on('disconnect', () => {
+      this.logger.error(`Websocket connection closed for project ${projectId}`);
+      this.removeProject(projectId);
+    });
+
+    ws.on('connect_error', (err) => {
+      this.logger.error(`Connection error for project ${projectId}:`, err);
+      this.removeProject(projectId);
+    });
+
+    ws.on('error', (err) => {
+      this.logger.error(`Error for project ${projectId}:`, err);
+    });
+
+    ws.on('metrics', (data) => {
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.METRICS)) {
+          return;
+        }
+        client.client.socket.emit('metrics', {
+          data,
+        });
+      });
+    });
+
+    ws.on('logs', (data) => {
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.LOGS)) {
+          return;
+        }
+        client.client.socket.emit('logs', {
+          logs: data.split('\n'),
+        });
+      });
+    });
+
+    ws.on('status', (data) => {
+      this.projects[projectId].clients.forEach((client) => {
+        if (!client.subscriptions) {
+          return;
+        }
+        if (!client.subscriptions.includes(ServiceEnum.STATUS)) {
+          return;
+        }
+        client.client.socket.emit('status', {
+          status: data,
+        });
+      });
+    });
   }
 }

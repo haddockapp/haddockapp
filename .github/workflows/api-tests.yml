@@ -1,0 +1,62 @@
+name: API Tests
+
+on:
+  [workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: haddock
+          POSTGRES_PASSWORD: haddock
+          POSTGRES_DB: haddock_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: './api/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run migrations
+        run: yarn migrate
+        env:
+          DATABASE_URL: postgresql://haddock:haddock@localhost:5432/haddock_test
+          
+      - name: Run tests
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://haddock:haddock@localhost:5432/haddock_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test_secret
+          NODE_ENV: test

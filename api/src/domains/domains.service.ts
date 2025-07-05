@@ -8,17 +8,21 @@ import { DomainStatusDto } from './dto/domain-status.dto';
 import { DnsService } from './dns/dns.service';
 import { CaddyService } from '../caddy/caddy.service';
 import { FrontendService } from '../frontend/frontend.service';
-import { hostname } from 'os';
+import { ConfigurationService } from 'src/configuration/configuration.service';
+import { CONFIGURED_KEY } from 'src/configuration/utils/consts';
+import { AutologinsService } from '../autologins/autologins.service';
 
 @Injectable()
 export class DomainsService {
 
-  constructor (
+  constructor(
     private readonly domainRepository: DomainRepository,
     private readonly bindingService: BindingService,
     private readonly dnsService: DnsService,
     private readonly frontendService: FrontendService,
-    private readonly caddyService: CaddyService
+    private readonly caddyService: CaddyService,
+    private readonly configurationService: ConfigurationService,
+    private readonly autologinService: AutologinsService,
   ) { }
 
   private generateDomainChallenge() {
@@ -70,32 +74,6 @@ export class DomainsService {
 
   private async linkDomain(domain: Domain, canBeLinked: boolean) {
     await this.domainRepository.linkDomain(domain.id, canBeLinked);
-
-    
-    if (domain.main && canBeLinked) {
-      const serverIp = '127.0.0.1';
-      const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_SERVICES_FILE}`;
-      const data = {
-        data: [
-          {
-            hostname: domain.domain,
-            ip: serverIp,
-            port: 3001,
-          },
-          {
-            hostname: `api.${domain.domain}`,
-            ip: serverIp,
-            port: 3000,
-          }
-        ],
-      };
-
-      await this.caddyService.generate({
-        template: 'reverse-proxies.hbs',
-        data,
-        dest,
-      })
-    }
   }
 
 
@@ -131,11 +109,14 @@ export class DomainsService {
     return this.domainRepository.deleteDomain(id);
   }
 
-  async apply() {
+  async apply(userId: string) {
     const mainDomain = await this.domainRepository.getMainDomain();
     if (!mainDomain) {
       throw new ForbiddenException('Cannot apply without a main domain');
     }
+
+    const protocol = mainDomain.https ? 'https' : 'http';
+    const caddyPrefix = mainDomain.https ? '' : 'http://'; // Should prefix with http to disable HTTPS in Caddy config
 
     const status = await this.getDomainStatus(mainDomain.id);
 
@@ -146,28 +127,42 @@ export class DomainsService {
     const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
     await this.caddyService.generate({
       template: 'reverse-proxies.hbs',
-      data:{
+      data: {
         data: [
           {
-            hostname: mainDomain.domain,
-            ip: '127.0.0.1',
-            port: +process.env.FRONTEND_PORT
-          },
-          {
-            hostname: `api.${mainDomain.domain}`,
+            hostname: `${caddyPrefix}api.${mainDomain.domain}`,
             ip: '127.0.0.1',
             port: +process.env.PORT
           },
-        ]
+          {
+            hostname: `${caddyPrefix}ws.${mainDomain.domain}`,
+            ip: '127.0.0.1',
+            port: +process.env.WS_PORT
+          },
+        ],
+        frontend: {
+          root: process.env.FRONTEND_ROOT,
+          hostname: `${caddyPrefix}${mainDomain.domain}`,
+          ip: '127.0.0.1',
+          port: +process.env.FRONTEND_PORT,
+          https: mainDomain.https,
+        },
       },
       dest,
     });
 
-    await this.frontendService.setFrontendConfigValue('backendUrl', `https://api.${mainDomain.domain}`);
+
+    await this.frontendService.setFrontendConfigValue('backendUrl', `${protocol}://api.${mainDomain.domain}`);
+    await this.frontendService.setFrontendConfigValue('socketUrl', `${protocol}://ws.${mainDomain.domain}`);
+    await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
+    const autologinToken = await this.autologinService.generateToken(userId);
+
     return {
       mainDomain: mainDomain.domain,
-      frontendUrl: `https://${mainDomain.domain}`,
-      backendUrl: `https://api.${mainDomain.domain}`
+      frontendUrl: `${protocol}://${mainDomain.domain}`,
+      backendUrl: `${protocol}://api.${mainDomain.domain}`,
+      socketUrl: `${protocol}://ws.${mainDomain.domain}`,
+      autologin: autologinToken
     }
   }
 }

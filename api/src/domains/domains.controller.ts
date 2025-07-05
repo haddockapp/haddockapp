@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { DomainsService } from './domains.service';
 import { CreateDomainDto } from './dto/create-domain.dto';
+import { CurrentUser } from '../auth/user.context';
+import { User } from '@prisma/client';
 
 @Controller('domains')
 export class DomainsController {
@@ -12,8 +14,8 @@ export class DomainsController {
   }
 
   @Post('apply')
-  apply() {
-    return this.domainsService.apply();
+  apply(@CurrentUser() user: User) {
+    return this.domainsService.apply(user.id);
   }
 
   @Get()

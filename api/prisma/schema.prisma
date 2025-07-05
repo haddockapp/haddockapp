@@ -5,83 +5,116 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  authorization Authorization?
+    id       String  @id @default(uuid())
+    name     String
+    email    String  @unique
+    password String?
+    role     String
+    isActive Boolean @default(true)
 }
 
 model Authorization {
-  id    String @id @default(uuid())
-  type  String
-  value String @unique
+    id    String @id @default(uuid())
+    name  String
+    type  String
+    value Json
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
-  sources Source[]
+    sources Source[]
 }
 
 model Source {
-  id   String @id @default(uuid())
-  type String
+    id   String @id @default(uuid())
+    type String
 
-  authorization   Authorization @relation(fields: [authorizationId], references: [id])
-  authorizationId String
+    authorization   Authorization? @relation(fields: [authorizationId], references: [id])
+    authorizationId String?
 
-  settings Json
+    settings Json
 
-  project Project?
+    project Project?
 }
 
 model Project {
-  id                 String              @id @default(uuid())
-  name               String
-  description        String?
-  path               String?             @unique
-  source             Source              @relation(fields: [sourceId], references: [id])
-  sourceId           String              @unique
-  vm                 Vm                  @relation(fields: [vmId], references: [id])
-  vmId               String              @unique
-  networkConnections NetworkConnection[]
+    id                 String              @id @default(uuid())
+    name               String
+    description        String?
+    path               String?             @unique
+    source             Source              @relation(fields: [sourceId], references: [id])
+    sourceId           String              @unique
+    vm                 Vm                  @relation(fields: [vmId], references: [id])
+    vmId               String              @unique
+    networkConnections NetworkConnection[]
+    services           Service[]
+    environmentVars    Json[]
 }
 
 model Vm {
-  id        String   @id @default(uuid())
-  ip        String?  @unique
-  status    String   @default("stopped")
-  memory    Int
-  disk      Int
-  cpus      Int
-  provider  String
-  createdAt DateTime @default(now())
+    id        String   @id @default(uuid())
+    ip        String?  @unique
+    status    String   @default("stopped")
+    statusTimeStamp DateTime? @default(now())
+    memory    Int
+    disk      Int
+    cpus      Int
+    provider  String
+    createdAt DateTime @default(now())
 
-  project Project?
+    project Project?
 }
 
 model NetworkConnection {
-  id        String   @id @default(uuid())
-  domain    String   @unique
-  port      Int
-  createdAt DateTime @default(now())
+    id        String   @id @default(uuid())
+    domain    String   @unique
+    https     Boolean  @default(true)
+    port      Int
+    createdAt DateTime @default(now())
 
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId String
 }
 
 model Domain {
-    id       String   @id @default(uuid())
-    domain   String   @unique
+    id        String  @id @default(uuid())
+    domain    String  @unique
     challenge String
-    main     Boolean  @default(false)
-    linked   Boolean  @default(false)
+    main      Boolean @default(false)
+    linked    Boolean @default(false)
+    https     Boolean @default(true)
+}
+
+model AppConfiguration {
+    key   String @unique
+    value Json
+}
+
+model Invitation {
+    id    String @id @default(uuid())
+    email String @unique
+}
+
+model Service {
+    id          String   @id @default(uuid())
+    name        String
+    image       String
+    ports       String[]
+    networks    String[]
+    depends_on  String[]
+    environment String
+    user        String
+    deployment  String
+
+    status      String   @default("stopped")
+    statusTimeStamp DateTime? @default(now())
+
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId String
 }

@@ -46,6 +46,7 @@ export class NetworksRepository {
 
   async createNetworkConnection(
     data: CreateNetworkConnectionDto,
+    https: boolean,
   ): Promise<NetworkConnection> {
     const project = await this.prismaService.project.findUnique({
       where: {
@@ -58,6 +59,7 @@ export class NetworksRepository {
         domain: data.domain,
         port: data.port,
         projectId: project.id,
+        https
       },
     });
   }

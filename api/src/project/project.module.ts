@@ -8,6 +8,9 @@ import { DockerModule } from 'src/docker/docker.module';
 import { ProjectService } from './project.service';
 import { VmModule } from 'src/vm/vm.module';
 import { NetworksModule } from 'src/networks/networks.module';
+import { AuthorizationModule } from '../authorization/authorization.module';
+import { WebsocketModule } from 'src/websockets/websocket.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -17,9 +20,14 @@ import { NetworksModule } from 'src/networks/networks.module';
     DockerModule,
     forwardRef(() => VmModule),
     NetworksModule,
+    AuthorizationModule,
+    forwardRef(() => WebsocketModule),
+    BullModule.registerQueue({
+      name: 'deploys',
+    }),
   ],
   controllers: [ProjectController],
   providers: [ProjectService, ProjectRepository],
-  exports: [ProjectRepository],
+  exports: [ProjectRepository, ProjectService],
 })
 export class ProjectModule {}

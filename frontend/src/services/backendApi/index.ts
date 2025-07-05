@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../authSlice";
 
 const baseQuery = fetchBaseQuery({
-  timeout: 5000,
+  timeout: 60_000,
   prepareHeaders: (headers, { getState }) => {
     const { token } = (getState() as RootState).auth;
     if (token) headers.set("Authorization", `Bearer ${token}`);
@@ -15,6 +15,10 @@ export enum QueryKeys {
   Projects = "Projects",
   Domains = "Domains",
   Redirections = "Redirections",
+  Configurations = "Configurations",
+  Authorizations = "Authorizations",
+  Users = "Users",
+  EnvironmentVariables = "EnvironmentVariables",
 }
 
 export const backendApi = createApi({
@@ -26,9 +30,10 @@ export const backendApi = createApi({
       api,
       extraOptions
     );
+    if (result.error?.status === "FETCH_ERROR") api.dispatch(logout());
     if (result.error?.status === 401) api.dispatch(logout());
     return result;
   },
   endpoints: () => ({}),
-  tagTypes: [QueryKeys.Projects, QueryKeys.Domains, QueryKeys.Redirections],
+  tagTypes: Object.values(QueryKeys),
 });

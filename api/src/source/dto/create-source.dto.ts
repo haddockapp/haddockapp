@@ -1,15 +1,15 @@
-import { Authorization } from "@prisma/client";
+import { Authorization } from '@prisma/client';
 
 export class CreateGithubSourceDto {
-    type: "github"
+  type: 'github';
 
-    authorization: Authorization
+  authorization: Authorization;
 
-    organization: string;
+  organization: string;
 
-    repository: string;
+  repository: string;
 
-    branch: string;
+  branch: string;
 }
 
-export type CreateSourceDto = CreateGithubSourceDto
+export type CreateSourceDto = CreateGithubSourceDto;

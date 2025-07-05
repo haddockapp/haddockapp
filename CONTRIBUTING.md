@@ -1,78 +1,122 @@
-# Guide de Contribution à Haddock
+# 🌊 Haddock – Contribution Guide
 
-Nous sommes ravis que vous envisagiez de contribuer à Haddock ! Vos contributions sont essentielles pour améliorer cette plateforme et la rendre plus accessible et efficace pour tous ses utilisateurs. Ce guide vous aidera à démarrer et à comprendre comment vous pouvez participer.
+Thank you for your interest in contributing to **Haddock**! Whether you're reporting bugs, suggesting features, writing code, or improving the docs—your help makes this project better for everyone.
 
-## Table des Matières
+This guide will walk you through how to get started and how to make your contributions count.
 
-- [Code de Conduite](#code-de-conduite)
-- [Comment Contribuer](#comment-contribuer)
-- [Soumettre un Bug](#soumettre-un-bug)
-- [Suggérer des Améliorations](#suggérer-des-améliorations)
-- [Créer une Pull Request](#créer-une-pull-request)
-- [Configuration de l'Environnement de Développement](#configuration-de-lenvironnement-de-développement)
-- [Revue de Code](#revue-de-code)
-- [Ressources Utiles](#ressources-utiles)
+---
 
-## Code de Conduite
+## 📚 Table of Contents
 
-En contribuant à Haddock, vous acceptez de respecter notre [Code de Conduite](CODE_OF_CONDUCT.md). Soyez respectueux et bienveillant envers les autres contributeurs et utilisateurs.
+- [🌟 Code of Conduct](#-code-of-conduct)
+- [🤝 Ways to Contribute](#-ways-to-contribute)
+- [🐞 Reporting Bugs](#-reporting-bugs)
+- [💡 Suggesting Enhancements](#-suggesting-enhancements)
+- [🚀 Creating a Pull Request](#-creating-a-pull-request)
+- [🛠️ Setting Up the Development Environment](#-setting-up-the-development-environment)
+- [🔍 Code Review Process](#-code-review-process)
+- [📎 Useful Resources](#-useful-resources)
 
-## Comment Contribuer
+---
 
-Il existe plusieurs façons de contribuer à Haddock :
+## 🌟 Code of Conduct
 
-1. **Soumettre un Bug** : Signalez des problèmes que vous rencontrez.
-2. **Suggérer des Améliorations** : Proposez des nouvelles fonctionnalités ou des modifications.
-3. **Écrire du Code** : Corrigez des bugs, améliorez la documentation, ou ajoutez de nouvelles fonctionnalités.
-4. **Améliorer la Documentation** : Corrigez des erreurs, clarifiez des explications, ou ajoutez des tutoriels.
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).  
+We expect all contributors to foster a **friendly, respectful, and inclusive environment**.
 
-## Soumettre un Bug
+---
 
-Si vous trouvez un bug, veuillez ouvrir une issue sur GitHub et inclure :
+## 🤝 Ways to Contribute
 
-- Une description claire du problème.
-- Les étapes pour reproduire le bug.
-- Le comportement attendu.
-- Tout message d’erreur ou capture d’écran pertinent.
+There’s more than one way to contribute to Haddock:
 
-## Suggérer des Améliorations
+- **Report Bugs** — Help us identify and fix issues.
+- **Propose Enhancements** — Suggest new features or improvements.
+- **Write Code** — Fix bugs, implement features, or improve the structure.
+- **Improve Documentation** — Fix typos, clarify explanations, or add new tutorials.
 
-Pour proposer une amélioration ou une nouvelle fonctionnalité, ouvrez une issue en décrivant :
+No contribution is too small—every bit helps!
 
-- Le problème que cette amélioration résoudrait.
-- Une description détaillée de la suggestion.
-- Tout exemple de code ou maquette si applicable.
+---
 
-## Créer une Pull Request
+## 🐞 Reporting Bugs
 
-1. **Forkez le projet** et clonez votre fork localement.
-2. **Créez une branche** pour votre modification : `git checkout -b feature/nom-de-la-fonctionnalité`.
-3. **Faites vos modifications** et ajoutez des tests si nécessaire.
-4. **Validez vos changements** : `git commit -m "Ajout de la fonctionnalité X"`.
-5. **Poussez votre branche** : `git push origin feature/nom-de-la-fonctionnalité`.
-6. **Ouvrez une Pull Request** sur le dépôt principal en expliquant les modifications apportées.
+Found a bug? Let us know!
 
-### Conseils pour une Bonne Pull Request
+Please open an issue and include:
 
-- Assurez-vous que votre code est propre, bien commenté et respecte les normes du projet.
-- Testez vos modifications localement pour éviter les erreurs.
-- Répondez rapidement aux commentaires des reviewers pour faciliter le processus de revue.
+- A **clear description** of the issue.
+- Steps to **reproduce** the problem.
+- What you **expected to happen**.
+- Any relevant **error messages**, logs, or screenshots.
 
-## Configuration de l'Environnement de Développement
+---
 
-1. Clonez le projet : 
+## 💡 Suggesting Enhancements
+
+Have an idea to improve Haddock? Great! Open an issue and tell us:
+
+- **What problem** your idea solves.
+- A detailed **description** of the proposed solution.
+- Any mockups, code snippets, or examples (if applicable).
+
+---
+
+## 🚀 Creating a Pull Request
+
+Want to contribute code? Here's how to submit a PR:
+
+1. **Fork the repository** and clone your fork.
+2. **Create a new branch**:  
+   `git checkout -b feature/your-feature-name`
+3. **Make your changes** and add tests if needed.
+4. **Commit your changes**:  
+   `git commit -m "Add feature X"`
+5. **Push your branch**:  
+   `git push origin feature/your-feature-name`
+6. **Open a Pull Request** and provide a clear description of your changes.
+
+### ✅ Tips for a Great Pull Request
+
+- Follow the project's **coding standards and conventions**.
+- Keep your PR **focused**—one feature or fix per PR.
+- Write **clear, descriptive commit messages**.
+- Make sure your code is **well-documented and tested**.
+- Be responsive to feedback during the review process.
+
+---
+
+## 🛠️ Setting Up the Development Environment
+
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/username/haddock.git
    cd haddock
    ```
 
-2. Installez les dépendances nécessaires et suivez les instructions dans le fichier `README.md` pour configurer votre environnement.
+2. Install dependencies as described in the `README.md` file.
+3. Run the project locally and verify everything works before submitting changes.
 
-3. Lancez l’application localement pour vérifier que tout fonctionne correctement avant de soumettre vos modifications.
+---
 
-## Revue de Code
+## 🔍 Code Review Process
 
-Toutes les Pull Requests seront examinées par au moins un mainteneur. Nous visons à fournir des retours dans les meilleurs délais, mais cela peut varier en fonction de la charge de travail. Merci de votre patience !
+Every pull request will be reviewed by at least one maintainer.  
+We aim to provide feedback as quickly as possible, but response times may vary depending on team availability.
 
-Merci pour votre contribution à Haddock ! Si vous avez des questions, n’hésitez pas à nous contacter via les issues GitHub.
+Your patience and collaboration are appreciated!
+
+---
+
+## 📎 Useful Resources
+
+- [Readme](./README.md)
+- [Official Documentation](https://haddock.ovh)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [GitHub Issues](https://github.com/haddockapp/haddockapp/issues)
+
+---
+
+Thank you for helping make **Haddock** better! 💙
+If you have any questions, feel free to reach out by opening an issue or starting a discussion.

@@ -1,0 +1,338 @@
+[
+    {
+        "user": 83.77,
+        "system": 45.46,
+        "idle": 4081.95,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:05:37.913Z"
+    },
+    {
+        "user": 83.77,
+        "system": 45.46,
+        "idle": 4081.95,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:05:37.940Z"
+    },
+    {
+        "user": 83.91,
+        "system": 45.51,
+        "idle": 4084.84,
+        "percent": 6.2,
+        "timestamp": "2025-05-01T13:05:41.059Z"
+    },
+    {
+        "user": 83.91,
+        "system": 45.51,
+        "idle": 4084.84,
+        "percent": 6.2,
+        "timestamp": "2025-05-01T13:05:41.084Z"
+    },
+    {
+        "user": 84.02,
+        "system": 45.59,
+        "idle": 4087.78,
+        "percent": 6.1,
+        "timestamp": "2025-05-01T13:05:44.143Z"
+    },
+    {
+        "user": 84.02,
+        "system": 45.59,
+        "idle": 4087.78,
+        "percent": 6.1,
+        "timestamp": "2025-05-01T13:05:44.171Z"
+    },
+    {
+        "user": 84.11,
+        "system": 45.61,
+        "idle": 4090.73,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:05:47.249Z"
+    },
+    {
+        "user": 84.11,
+        "system": 45.61,
+        "idle": 4090.73,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:05:47.279Z"
+    },
+    {
+        "user": 84.2,
+        "system": 45.66,
+        "idle": 4093.63,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:05:50.385Z"
+    },
+    {
+        "user": 84.2,
+        "system": 45.66,
+        "idle": 4093.63,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:05:50.413Z"
+    },
+    {
+        "user": 84.31,
+        "system": 45.72,
+        "idle": 4096.57,
+        "percent": 5.5,
+        "timestamp": "2025-05-01T13:05:53.468Z"
+    },
+    {
+        "user": 84.31,
+        "system": 45.72,
+        "idle": 4096.57,
+        "percent": 5.5,
+        "timestamp": "2025-05-01T13:05:53.490Z"
+    },
+    {
+        "user": 84.39,
+        "system": 45.76,
+        "idle": 4099.51,
+        "percent": 3.9,
+        "timestamp": "2025-05-01T13:05:56.558Z"
+    },
+    {
+        "user": 84.39,
+        "system": 45.76,
+        "idle": 4099.51,
+        "percent": 3.9,
+        "timestamp": "2025-05-01T13:05:56.583Z"
+    },
+    {
+        "user": 84.5,
+        "system": 45.78,
+        "idle": 4102.46,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:05:59.641Z"
+    },
+    {
+        "user": 84.5,
+        "system": 45.78,
+        "idle": 4102.46,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:05:59.665Z"
+    },
+    {
+        "user": 84.58,
+        "system": 45.81,
+        "idle": 4105.39,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:06:02.753Z"
+    },
+    {
+        "user": 84.58,
+        "system": 45.81,
+        "idle": 4105.39,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:06:02.785Z"
+    },
+    {
+        "user": 84.68,
+        "system": 45.86,
+        "idle": 4108.31,
+        "percent": 4.9,
+        "timestamp": "2025-05-01T13:06:05.842Z"
+    },
+    {
+        "user": 84.68,
+        "system": 45.86,
+        "idle": 4108.31,
+        "percent": 4.9,
+        "timestamp": "2025-05-01T13:06:05.871Z"
+    },
+    {
+        "user": 84.79,
+        "system": 45.89,
+        "idle": 4111.26,
+        "percent": 4.5,
+        "timestamp": "2025-05-01T13:06:08.940Z"
+    },
+    {
+        "user": 84.79,
+        "system": 45.89,
+        "idle": 4111.26,
+        "percent": 4.5,
+        "timestamp": "2025-05-01T13:06:08.964Z"
+    },
+    {
+        "user": 84.89,
+        "system": 45.93,
+        "idle": 4114.16,
+        "percent": 4.9,
+        "timestamp": "2025-05-01T13:06:12.068Z"
+    },
+    {
+        "user": 84.89,
+        "system": 45.93,
+        "idle": 4114.16,
+        "percent": 4.9,
+        "timestamp": "2025-05-01T13:06:12.094Z"
+    },
+    {
+        "user": 84.97,
+        "system": 46.01,
+        "idle": 4117.1,
+        "percent": 5.2,
+        "timestamp": "2025-05-01T13:06:15.159Z"
+    },
+    {
+        "user": 84.97,
+        "system": 46.01,
+        "idle": 4117.1,
+        "percent": 5.2,
+        "timestamp": "2025-05-01T13:06:15.185Z"
+    },
+    {
+        "user": 85.07,
+        "system": 46.05,
+        "idle": 4120.04,
+        "percent": 4.5,
+        "timestamp": "2025-05-01T13:06:18.251Z"
+    },
+    {
+        "user": 85.07,
+        "system": 46.05,
+        "idle": 4120.04,
+        "percent": 4.5,
+        "timestamp": "2025-05-01T13:06:18.275Z"
+    },
+    {
+        "user": 85.17,
+        "system": 46.08,
+        "idle": 4122.94,
+        "percent": 4.3,
+        "timestamp": "2025-05-01T13:06:21.394Z"
+    },
+    {
+        "user": 85.17,
+        "system": 46.08,
+        "idle": 4122.94,
+        "percent": 4.3,
+        "timestamp": "2025-05-01T13:06:21.429Z"
+    },
+    {
+        "user": 85.28,
+        "system": 46.16,
+        "idle": 4125.87,
+        "percent": 6.1,
+        "timestamp": "2025-05-01T13:06:24.484Z"
+    },
+    {
+        "user": 85.28,
+        "system": 46.16,
+        "idle": 4125.87,
+        "percent": 6.1,
+        "timestamp": "2025-05-01T13:06:24.508Z"
+    },
+    {
+        "user": 85.36,
+        "system": 46.19,
+        "idle": 4128.81,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:06:27.568Z"
+    },
+    {
+        "user": 85.36,
+        "system": 46.19,
+        "idle": 4128.81,
+        "percent": 3.6,
+        "timestamp": "2025-05-01T13:06:27.593Z"
+    },
+    {
+        "user": 85.45,
+        "system": 46.23,
+        "idle": 4131.74,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:06:30.651Z"
+    },
+    {
+        "user": 85.45,
+        "system": 46.23,
+        "idle": 4131.74,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:06:30.684Z"
+    },
+    {
+        "user": 85.53,
+        "system": 46.25,
+        "idle": 4134.68,
+        "percent": 3.3,
+        "timestamp": "2025-05-01T13:06:33.751Z"
+    },
+    {
+        "user": 85.53,
+        "system": 46.25,
+        "idle": 4134.68,
+        "percent": 3.3,
+        "timestamp": "2025-05-01T13:06:33.782Z"
+    },
+    {
+        "user": 85.63,
+        "system": 46.29,
+        "idle": 4137.61,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:06:36.849Z"
+    },
+    {
+        "user": 85.63,
+        "system": 46.29,
+        "idle": 4137.61,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:06:36.876Z"
+    },
+    {
+        "user": 85.73,
+        "system": 46.33,
+        "idle": 4140.54,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:06:40.017Z"
+    },
+    {
+        "user": 85.73,
+        "system": 46.33,
+        "idle": 4140.54,
+        "percent": 4.6,
+        "timestamp": "2025-05-01T13:06:40.042Z"
+    },
+    {
+        "user": 85.87,
+        "system": 46.41,
+        "idle": 4143.46,
+        "percent": 7,
+        "timestamp": "2025-05-01T13:06:43.123Z"
+    },
+    {
+        "user": 85.87,
+        "system": 46.41,
+        "idle": 4143.46,
+        "percent": 7,
+        "timestamp": "2025-05-01T13:06:43.151Z"
+    },
+    {
+        "user": 85.98,
+        "system": 46.46,
+        "idle": 4146.4,
+        "percent": 5.5,
+        "timestamp": "2025-05-01T13:06:46.227Z"
+    },
+    {
+        "user": 85.98,
+        "system": 46.46,
+        "idle": 4146.4,
+        "percent": 5.5,
+        "timestamp": "2025-05-01T13:06:46.251Z"
+    },
+    {
+        "user": 86.08,
+        "system": 46.49,
+        "idle": 4149.34,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:06:49.309Z"
+    },
+    {
+        "user": 86.08,
+        "system": 46.49,
+        "idle": 4149.34,
+        "percent": 4.2,
+        "timestamp": "2025-05-01T13:06:49.333Z"
+    }
+]

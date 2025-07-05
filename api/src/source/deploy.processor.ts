@@ -4,7 +4,6 @@ import { Job } from 'bull';
 import * as fs from 'fs';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
-import { PrismaService } from '../prisma/prisma.service';
 import { VmState } from '../types/vm.enum';
 import { VmService } from '../vm/vm.service';
 import { GithubSourceSettingsDto } from './dto/settings.dto';
@@ -12,14 +11,28 @@ import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
 import { ExecutionError } from 'src/types/error/execution.error';
+import { AuthorizationService } from '../authorization/authorization.service';
+import { execCommand } from 'src/utils/exec-utils';
+import { AuthorizationEnum } from 'src/authorization/types/authorization.enum';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import { ProjectRepository } from 'src/project/project.repository';
+import { VmRepository } from 'src/vm/vm.repository';
+import { PersistedVmDto } from 'src/vm/dto/vm.dto';
+import { ComposeService } from 'src/compose/compose.service';
+import { ServiceDto } from 'src/compose/model/Service';
+import { PersistedProjectDto } from 'src/project/dto/project.dto';
 
 @Processor('deploys')
 export class DeployConsumer {
   private readonly logger = new Logger(DeployConsumer.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly vmRepository: VmRepository,
+    private readonly projectRepository: ProjectRepository,
     private readonly vmService: VmService,
+    private readonly authorizationService: AuthorizationService,
+    private readonly composeService: ComposeService,
   ) {}
 
   @OnQueueFailed()
@@ -37,33 +50,93 @@ export class DeployConsumer {
       getSettings<GithubSourceSettingsDto>(source.settings);
 
     const deployPath = `../workspaces/${source.project?.id}`;
+    const repoPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (fs.existsSync(repoPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${repoPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(repoPath, { recursive: true });
+    }
 
     this.logger.log(
-      `Cloning github repository ${organization}/${repository}#${branch} to ${deployPath}`,
+      `Cloning github repository ${organization}/${repository}#${branch} to ${repoPath}`,
     );
 
-    await git
-      .clone({
-        fs,
-        http,
-        url: `https://github.com/${organization}/${repository}.git`,
-        dir: deployPath,
-        ref: branch,
-        singleBranch: true,
-        onAuth: () => {
-          return {
-            username: 'x-access-token',
-            password: source.authorization.value,
-          };
-        },
-        onAuthFailure: () => {
-          throw new DeployError('Failed to authenticate with github');
-        },
-      })
-      .catch((err) => {
-        this.logger.error(`Failed to clone repository: ${err.message}`);
-        throw new DeployError('Failed to clone repository');
-      });
+    const authorizationType: AuthorizationEnum = source.authorizationId
+      ? await this.authorizationService.getAuthorizationType(
+          source.authorizationId,
+        )
+      : AuthorizationEnum.NONE;
+
+    switch (authorizationType) {
+      case AuthorizationEnum.DEPLOY_KEY: {
+        const tempFilePath = join(tmpdir(), `ssh-key-${Date.now()}`);
+
+        try {
+          const key =
+            (await this.authorizationService.getAuthorizationKey(
+              source.authorizationId,
+            )) + '\n';
+
+          fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
+
+          await execCommand(
+            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${repoPath}`,
+          );
+        } catch (e) {
+          fs.unlinkSync(tempFilePath);
+
+          if (e instanceof ExecutionError) {
+            this.logger.error(`Failed to clone repository: ${e.message}`);
+          }
+          throw new DeployError('Failed to clone repository');
+        }
+
+        fs.unlinkSync(tempFilePath);
+        break;
+      }
+      case AuthorizationEnum.OAUTH:
+      case AuthorizationEnum.PERSONAL_ACCESS_TOKEN: {
+        await git
+          .clone({
+            fs,
+            http,
+            url: `https://github.com/${organization}/${repository}.git`,
+            dir: repoPath,
+            ref: branch,
+            singleBranch: true,
+            onAuth: () =>
+              this.authorizationService.getDeployHeaderForAuthorization(
+                source.authorizationId,
+              ),
+            onAuthFailure: () => {
+              throw new DeployError('Failed to authenticate with github');
+            },
+          })
+          .catch((err) => {
+            this.logger.error(`Failed to clone repository: ${err.message}`);
+            throw new DeployError('Failed to clone repository');
+          });
+        break;
+      }
+      case AuthorizationEnum.NONE: {
+        await git
+          .clone({
+            fs,
+            http,
+            url: `https://github.com/${organization}/${repository}.git`,
+            dir: repoPath,
+            ref: branch,
+            singleBranch: true,
+          })
+          .catch((err) => {
+            this.logger.error(`Failed to clone repository: ${err.message}`);
+            throw new DeployError('Failed to clone repository');
+          });
+        break;
+      }
+    }
     return deployPath;
   }
 
@@ -72,6 +145,40 @@ export class DeployConsumer {
       return this.deployGithubSource(source);
     }
     throw new Error(`Unknown source type ${source.type}`);
+  }
+
+  private getComposePath(source: PersistedSourceDto): string {
+    switch (source.type) {
+      case 'github': {
+        const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+      }
+      default:
+        throw new Error(`Unknown source type ${source.type}`);
+    }
+  }
+
+  private async handleProjectServices(
+    projectId: string,
+    source: PersistedSourceDto,
+  ) {
+    const composePath: string = this.getComposePath(source);
+
+    const rawCompose = this.composeService.readComposeFile(
+      projectId,
+      composePath,
+    );
+    if (!rawCompose) {
+      return;
+    }
+
+    const services: ServiceDto[] = this.composeService.parseServices(
+      rawCompose.toString(),
+    );
+
+    await this.projectRepository.setServicesToProject(projectId, services);
+
+    this.logger.log(`Added services to project ${projectId}`);
   }
 
   @Process('deploy')
@@ -83,17 +190,17 @@ export class DeployConsumer {
     try {
       const deployPath: string = await this.getDeployPath(source);
 
-      await this.prisma.project.update({
-        where: {
-          id: source.project.id,
-        },
+      await this.projectRepository.updateProject({
+        where: { id: source.project.id },
         data: {
           path: deployPath,
         },
       });
 
+      await this.handleProjectServices(source.project.id, source);
+
       this.logger.log(`Setting up VM for project ${source.project.id}`);
-      await this.vmService.setVagrantFile(source.project.vmId, deployPath);
+      await this.vmService.createVM(source.project.vmId, deployPath);
 
       this.logger.log(`Starting VM for project ${source.project.id}`);
       await this.vmService.upVm(source.project.vmId);
@@ -107,11 +214,11 @@ export class DeployConsumer {
       } else {
         this.logger.error(`Unexpected error: ${e.message}`);
       }
-      const vm = await this.prisma.vm.findUnique({
-        where: {
-          id: source.project.vmId,
-        },
+
+      const vm: PersistedVmDto = await this.vmRepository.getVm({
+        id: source.project.vmId,
       });
+
       if (vm.status === VmState.Starting || vm.status === VmState.Running) {
         try {
           await this.vmService.downVm(source.project.vmId);
@@ -123,6 +230,36 @@ export class DeployConsumer {
       }
       await this.vmService.changeVmStatus(source.project.vmId, VmState.Error);
       return;
+    }
+  }
+
+  @Process('start')
+  async start(job: Job<PersistedProjectDto>) {
+    const project = job.data;
+
+    this.logger.log(`Starting project ${project.id}`);
+    try {
+      await this.vmService.upVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to start vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+    }
+  }
+
+  @Process('stop')
+  async stop(job: Job<PersistedProjectDto>) {
+    const project = job.data;
+
+    this.logger.log(`Stopping project ${project.id}`);
+    try {
+      await this.vmService.downVm(project.vmId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to stop vm: ${e.message}`);
+      }
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
     }
   }
 }

@@ -1,12 +1,13 @@
-import { constants } from "@/constants";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ConfigState {
-  backendUrl: string;
+  backendUrl: string | null;
+  socketUrl: string | null;
 }
 
 const initialState: ConfigState = {
-  backendUrl: constants.apiUrl,
+  backendUrl: null,
+  socketUrl: null,
 };
 
 const configSlice = createSlice({
@@ -16,9 +17,12 @@ const configSlice = createSlice({
     setBackendUrl(state, action: PayloadAction<string>) {
       state.backendUrl = action.payload;
     },
+    setSocketUrl(state, action: PayloadAction<string>) {
+      state.socketUrl = action.payload;
+    },
   },
 });
 
-export const { setBackendUrl } = configSlice.actions;
+export const { setBackendUrl, setSocketUrl } = configSlice.actions;
 
 export default configSlice;

@@ -153,7 +153,7 @@ describe('DomainsService', () => {
       caddyService.generate.mockResolvedValue();
       frontendService.setFrontendConfigValue.mockResolvedValue();
 
-      const result = await service.apply();
+      const result = await service.apply("16e1feaa-e7ff-49aa-870e-8fb333f21843");
 
       expect(result.mainDomain).toEqual(mockDomain.domain);
       expect(caddyService.generate).toHaveBeenCalled();
@@ -166,7 +166,7 @@ describe('DomainsService', () => {
     it('should throw an exception if no main domain exists', async () => {
       domainRepository.getMainDomain.mockResolvedValue(null);
 
-      await expect(service.apply()).rejects.toThrow(ForbiddenException);
+      await expect(service.apply("b2620e07-ba9c-4402-82a6-a0fb4a885a12")).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw an exception if domain status does not allow linking', async () => {
@@ -176,7 +176,7 @@ describe('DomainsService', () => {
       domainRepository.getMainDomain.mockResolvedValue(mockDomain);
       service.getDomainStatus = jest.fn().mockResolvedValue({ canBeLinked: false });
 
-      await expect(service.apply()).rejects.toThrow(ForbiddenException);
+      await expect(service.apply("6fd8b4e9-6f8a-4f32-803c-cfae418e10ff")).rejects.toThrow(ForbiddenException);
     });
   });
 });

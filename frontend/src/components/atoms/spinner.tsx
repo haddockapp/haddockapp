@@ -9,4 +9,11 @@ const HaddockSpinner: FC = () => (
   </div>
 );
 
+const HaddockLoader: FC = () => (
+  <div className="h-screen items-center justify-center flex flex-col">
+    <HaddockSpinner />
+  </div>
+);
+
 export default HaddockSpinner;
+export { HaddockLoader };

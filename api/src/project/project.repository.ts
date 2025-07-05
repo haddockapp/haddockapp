@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma, Project, Service } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { VmProvider } from '../types/vm.enum';
 import { CreateProjectDto } from './dto/CreateProject.dto';
-import { Project } from '@prisma/client';
-import { UpdateProjectDto } from './dto/UpdateProject.dto';
 import { PersistedProjectDto } from './dto/project.dto';
-import { VmProvider, VmState } from '../types/vm.enum';
 import pirateShips from './pirateShips';
+import { ServiceDto } from 'src/compose/model/Service';
+import { EnvironmentVar } from './dto/environmentVar';
+import { ServiceStatus } from 'src/types/service.enum';
 
 @Injectable()
 export class ProjectRepository {
@@ -31,6 +33,7 @@ export class ProjectRepository {
         vm: true,
         source: true,
         networkConnections: true,
+        services: true,
       },
     });
   }
@@ -44,10 +47,7 @@ export class ProjectRepository {
     return `${prefix} ${suffix}`;
   }
 
-  async createProject(
-    data: CreateProjectDto,
-    authorizationId: string,
-  ): Promise<Project> {
+  async createProject(data: CreateProjectDto): Promise<Project> {
     return this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
@@ -66,52 +66,30 @@ export class ProjectRepository {
               organization: data.repository_organisation,
               repository: data.repository_name,
               branch: data.repository_branch,
-              composeName: data.compose_name,
+              composePath: data.compose_path,
             },
-            authorization: {
-              connect: { id: authorizationId },
-            },
+            ...(data.authorization_id
+              ? {
+                  authorization: {
+                    connect: { id: data.authorization_id },
+                  },
+                }
+              : {}),
           },
         },
       },
     });
   }
 
-  async updateProject(
-    projectId: string,
-    data: UpdateProjectDto,
-  ): Promise<Project> {
-    const project = await this.prismaService.project.findUnique({
-      where: {
-        id: projectId,
-      },
-      include: {
-        source: true,
-      },
-    });
+  async updateProject(params: {
+    where: Prisma.ProjectWhereUniqueInput;
+    data: Prisma.ProjectUpdateInput;
+  }): Promise<Project> {
+    const { where, data } = params;
 
     return this.prismaService.project.update({
-      where: {
-        id: projectId,
-      },
-      data: {
-        name: data.name,
-        description: data.description,
-        vm: {
-          update: {
-            cpus: data.cpus,
-            memory: data.memory,
-          },
-        },
-        source: {
-          update: {
-            ...project.source, // Spread the entire 'source' object
-            settings: {
-              repository: data.repository_branch,
-            },
-          },
-        },
-      },
+      data: data,
+      where,
     });
   }
 
@@ -119,6 +97,123 @@ export class ProjectRepository {
     return this.prismaService.project.delete({
       where: {
         id: projectId,
+      },
+    });
+  }
+
+  async addServiceToProject(projectId: string, service: ServiceDto) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          create: {
+            ...service,
+            environment: JSON.stringify(service.environment),
+            user: JSON.stringify(service.user),
+            deployment: JSON.stringify(service.deployment),
+          },
+        },
+      },
+    });
+  }
+
+  async setServicesToProject(projectId: string, services: ServiceDto[]) {
+    return this.prismaService.$transaction([
+      this.prismaService.service.deleteMany({
+        where: { projectId },
+      }),
+      this.prismaService.project.update({
+        where: { id: projectId },
+        data: {
+          services: {
+            createMany: {
+              data: services.map((service) => ({
+                ...service,
+                environment: JSON.stringify(service.environment),
+                user: JSON.stringify(service.user),
+                deployment: JSON.stringify(service.deployment),
+              })),
+            },
+          },
+        },
+      }),
+    ]);
+  }
+
+  async removeServiceFromProject(projectId: string, serviceId: string) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          delete: {
+            id: serviceId,
+          },
+        },
+      },
+    });
+  }
+
+  async getProjectServices(projectId: string): Promise<Service[]> {
+    return this.prismaService.service.findMany({
+      where: {
+        projectId,
+      },
+    });
+  }
+
+  async getProjectService(
+    projectId: string,
+    serviceId: string,
+  ): Promise<Service | null> {
+    return this.prismaService.service.findFirst({
+      where: {
+        projectId,
+        id: serviceId,
+      },
+    });
+  }
+
+  async updateServiceStatus(
+    projectId: string,
+    serviceId: string,
+    status: ServiceStatus,
+  ) {
+    await this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        services: {
+          update: {
+            where: {
+              id: serviceId,
+            },
+            data: {
+              status: status,
+              statusTimeStamp: new Date(),
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async updateEnvironmentVars(
+    projectId: string,
+    environmentVars: EnvironmentVar[],
+  ) {
+    return this.prismaService.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        environmentVars: {
+          set: environmentVars,
+        },
       },
     });
   }

@@ -6,6 +6,7 @@ export enum VmProvider {
 export enum VmState {
   Starting = "starting",
   Running = "running",
+  Stopping = "stopping",
   Stopped = "stopped",
 }
 

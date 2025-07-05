@@ -1,11 +1,4 @@
-import { backendApi } from ".";
-
-export interface ServiceDto {
-  name: string;
-  image: string;
-  icon: string;
-  ports: string[];
-}
+import { backendApi, QueryKeys } from ".";
 
 export interface ServiceUser {
   uid: string;
@@ -23,9 +16,32 @@ export interface ServiceInformationDto {
   ports: string[];
   networks: string[];
   depends_on: string[];
-  environment: string[];
+  environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;
+}
+
+export interface ServiceStatusDetails {
+  State: string;
+  Command: string;
+  Created: number;
+  ExitCode: number;
+  Health: string;
+  ID: string;
+  Image: string;
+  Name: string;
+  Project: string;
+  Service: string;
+  Status: string;
+}
+
+export interface ServiceDto extends ServiceInformationDto {
+  id: string;
+  icon: string;
+  status: string;
+  statusTimeStamp: Date;
+  // statusDetails is injected by the websocket
+  statusDetails?: ServiceStatusDetails;
 }
 
 const servicesApi = backendApi.injectEndpoints({
@@ -35,15 +51,17 @@ const servicesApi = backendApi.injectEndpoints({
         url: `/project/${projectId}/service`,
         method: "GET",
       }),
+      providesTags: [QueryKeys.Projects],
     }),
     getServiceInformations: builder.query<
       ServiceInformationDto,
-      { projectId: string; serviceName: string }
+      { projectId: string; serviceId: string }
     >({
-      query: ({ projectId, serviceName }) => ({
-        url: `/project/${projectId}/service/${serviceName}`,
+      query: ({ projectId, serviceId }) => ({
+        url: `/project/${projectId}/service/${serviceId}`,
         method: "GET",
       }),
+      providesTags: [QueryKeys.Projects],
     }),
   }),
 });

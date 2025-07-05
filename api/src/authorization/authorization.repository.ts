@@ -1,26 +1,37 @@
 import { Injectable } from "@nestjs/common";
 import { Authorization } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
+import { AuthorizationDTO } from "./dto/authorization.dto";
 
 @Injectable()
 export class AuthorizationRepository {
-    constructor(private prismaService: PrismaService) { }
+    constructor(
+        private readonly prismaService: PrismaService,
+    ) { }
 
-    async findByUserId(userId: string): Promise<Authorization | null> {
-        return this.prismaService.authorization.findUnique({
-            where: {
-                userId,
+    async findById(id: string): Promise<Authorization> {
+        return this.prismaService.authorization.findUniqueOrThrow({
+            where: { id },
+        });
+    }
+
+    async findAll(): Promise<Authorization[]> {
+        return this.prismaService.authorization.findMany();
+    }
+
+    async createAuthorization(authorization: AuthorizationDTO): Promise<Authorization | null> {
+        return this.prismaService.authorization.create({
+            data: {
+                name: authorization.name,
+                type: authorization.type,
+                value: authorization.data,
             },
         });
     }
 
-    async createAuthorization(accessToken: string, userId: string, type = 'oauth'): Promise<Authorization | null> {
-        return this.prismaService.authorization.create({
-            data: {
-                type,
-                value: accessToken,
-                userId
-            },
+    async delete(id: string): Promise<void> {
+        await this.prismaService.authorization.delete({
+            where: { id },
         });
     }
 }

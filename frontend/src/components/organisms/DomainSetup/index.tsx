@@ -1,5 +1,5 @@
 import { DomainResponseDto } from "@/services/backendApi/domains";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import DomainNameForm from "./DomainNameForm";
 import DomainSetupStep from "./DomainSetupStep";
 import steps from "./domainSteps";
@@ -83,23 +83,34 @@ interface DomainAccordionProps {
   domains: DomainResponseDto[];
 }
 const DomainAccordion: FC<DomainAccordionProps> = ({ domains }) => {
+  const incompleteDomain = useMemo(
+    () => domains.find((d) => !d.linked),
+    [domains]
+  );
+
   const [openedAccordions, setOpenedAccordions] = useState<string[]>(["new"]);
+
+  useEffect(() => {
+    if (incompleteDomain) setOpenedAccordions([incompleteDomain.id]);
+  }, [domains, incompleteDomain]);
 
   return (
     <Accordion type="multiple" value={openedAccordions}>
-      {[...domains, undefined].map((d) => (
-        <DomainAccordionItem
-          key={d?.id ?? "new"}
-          onToggle={(id: string) => {
-            setOpenedAccordions((prev) => {
-              if (prev.includes(id)) return prev.filter((v) => v !== id);
-              return [...prev, id];
-            });
-          }}
-          isMain={d?.main || domains.length === 0}
-          d={d}
-        />
-      ))}
+      {(domains.every((d) => d.linked) ? [...domains, undefined] : domains).map(
+        (d) => (
+          <DomainAccordionItem
+            key={d?.id ?? "new"}
+            onToggle={(id: string) => {
+              setOpenedAccordions((prev) => {
+                if (prev.includes(id)) return prev.filter((v) => v !== id);
+                return [...prev, id];
+              });
+            }}
+            isMain={d?.main || domains.length === 0}
+            d={d}
+          />
+        )
+      )}
     </Accordion>
   );
 };

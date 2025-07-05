@@ -11,7 +11,7 @@ import { WebSocketService } from './websocket.service';
 import { WebsocketConnectDto } from './dto/connect.dto';
 import { ProjectEventDto } from './dto/project-event.dto';
 
-@WebSocketGateway(3001, {
+@WebSocketGateway(+process.env.WS_PORT, {
   cors: {
     origin: '*',
   },
@@ -38,7 +38,12 @@ export class WSGateway implements OnGatewayDisconnect {
   async handleMetricsSubscribe(
     @MessageBody() data: ProjectEventDto,
     @ConnectedSocket() client: Socket,
-  ) {
-    await this.websocketService.protectService(client, data);
+  ): Promise<ProjectEventDto> {
+    if (data.subscribe === false) {
+      await this.websocketService.handleUnsubscribe(client, data);
+    } else {
+      await this.websocketService.handleSubscribe(client, data);
+    }
+    return data;
   }
 }

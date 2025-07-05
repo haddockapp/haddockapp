@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { SourceDto } from '../../dto/source.dto';
 import { CreateGithubSourceDto, CreateSourceDto } from '../../dto/create-source.dto';
 import { Source } from '@prisma/client';
+import { AuthorizationEnum } from '../../../authorization/types/authorization.enum';
 
 export const generateCreateGithubSourceDto = (): CreateGithubSourceDto => ({
   type: 'github',
@@ -11,9 +12,11 @@ export const generateCreateGithubSourceDto = (): CreateGithubSourceDto => ({
   branch: faker.git.branch(),
   authorization: {
     id: faker.string.uuid(),
-    type: 'oauth',
-    userId: faker.string.uuid(),
-    value: faker.string.alphanumeric(32),
+    name: faker.company.name(),
+    type: AuthorizationEnum.OAUTH,
+    value: {
+      token: faker.string.alphanumeric(32)
+    }
   },
 });
 
@@ -38,9 +41,10 @@ export const generateSourceFromDto = (createDto: CreateGithubSourceDto) => ({
   authorizationId: createDto.authorization.id,
   authorization: {
     id: createDto.authorization.id,
-    type: 'oauth',
-    userId: createDto.authorization.userId,
-    value: createDto.authorization.value,
+    type: AuthorizationEnum.OAUTH,
+    value: {
+      token: createDto.authorization.value,
+    }
   },
   project: {
     id: faker.string.uuid(),

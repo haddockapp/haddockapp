@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Card, CardContent } from "../ui/card";
-import { VmState } from "@/services/backendApi/projects";
+import { VmState } from "@/types/vm/vm";
 
 interface ServiceCardProps {
   name: string;
@@ -10,12 +10,14 @@ interface ServiceCardProps {
 }
 
 const ServiceStateLabel = {
+  [VmState.Stopping]: "Stopping",
   [VmState.Stopped]: "Stopped",
   [VmState.Running]: "Running",
   [VmState.Starting]: "Starting",
 };
 
 const ServiceStateColor = {
+  [VmState.Stopping]: "orange-500",
   [VmState.Starting]: "orange-500",
   [VmState.Stopped]: "red-500",
   [VmState.Running]: "green-500",
