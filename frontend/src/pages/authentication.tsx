@@ -15,7 +15,7 @@ const Authentication: FC = () => {
         <div className="mx-auto w-36">
           <img className="rounded-full" src="./haddock.png" />
         </div>
-        <h1 className="text-">Welcome back !</h1>
+        <h1 className="text-">Welcome to Haddock !</h1>
       </div>
       <div className="justify-between w-3/4 m-auto text-center space-y-8">
         <AuthenticationOptions />

@@ -36,7 +36,7 @@ const formSchema = z.object({
 const EmailAuthentication: FC = () => {
   const navigate = useNavigate();
 
-  const [type, setType] = useState<"log-in" | "sign-up">("log-in");
+  const [type, setType] = useState<"log-in" | "sign-up">("sign-up");
 
   const dispatch = useAppDispatch();
 
