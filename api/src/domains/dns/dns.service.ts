@@ -4,6 +4,8 @@ import { Domain } from '@prisma/client';
 import { promises as dns } from 'dns';
 
 const DEFAULT_DNS_SERVERS = [
+  '127.0.0.1',
+  '::1',
   '8.8.8.8',
   '1.1.1.1',
   '[2001:4860:4860::8888]',
@@ -14,7 +16,9 @@ const DEFAULT_DNS_SERVERS = [
 export class DnsService {
   constructor(
     private readonly bindingService: BindingService,
-  ) { }
+  ) {
+    dns.setServers(DEFAULT_DNS_SERVERS);
+  }
 
 
   private async resolveNsIp(ns: string): Promise<string | null> {
