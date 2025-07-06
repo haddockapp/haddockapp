@@ -159,7 +159,7 @@ const useWebsockets = () => {
                   if (project.vm.status === VmState.Running) {
                     subscribe();
                   } else {
-                    if (project.vm.status === VmState.Stopped && projectId) {
+                    if (project.vm.status === VmState.Stopping && projectId) {
                       unsubscribe(projectId);
                     }
                   }
