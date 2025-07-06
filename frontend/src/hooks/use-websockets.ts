@@ -38,7 +38,7 @@ const useWebsockets = () => {
 
     if (!unsubscribeProjectId) return;
 
-    console.log("UNSUBSCRIBE");
+    console.log(`UNSUBSCRIBE ${unsubscribeProjectId}`);
     socket.emit("project", {
       projectId: unsubscribeProjectId,
       services: [
@@ -57,7 +57,7 @@ const useWebsockets = () => {
     if (!me) return;
     if (!projectId) return;
 
-    console.log("SUBSCRIBE");
+    console.log(`SUBSCRIBE ${projectId}`);
     await handleProjectSubcription<MetricsSocketType>(
       {
         projectId,
@@ -192,7 +192,7 @@ const useWebsockets = () => {
       socket.disconnect();
       socket.off("message");
     };
-  }, [dispatch, me, socketUrl]);
+  }, [dispatch, me, socketUrl, projectId]);
 
   useEffect(() => {
     if (!projectId && oldProjectId) {
