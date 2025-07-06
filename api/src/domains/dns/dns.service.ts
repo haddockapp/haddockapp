@@ -4,7 +4,7 @@ import { Domain } from '@prisma/client';
 import { promises as dns } from 'dns';
 
 const DEFAULT_DNS_SERVERS = [
-  '127.0.1',
+  '127.0.0.1',
   '::1',
   '8.8.8.8',
   '1.1.1.1',
