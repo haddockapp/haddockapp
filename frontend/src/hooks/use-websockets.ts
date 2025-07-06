@@ -15,6 +15,8 @@ import {
 } from "@/services/websockets";
 import { ServiceDto } from "@/services/backendApi/services";
 import { setMetrics, setLogs } from "@/services/metricSlice";
+import { ServiceState } from "@/types/services/services";
+import { updateServiceStatus } from "@/services/backendApi/projects";
 
 type SocketMessage = {
   event: string;
@@ -166,26 +168,21 @@ const useWebsockets = () => {
             }
           )
         );
-      if (msg.scope === "service" && msg.event === "status_change")
-        dispatch(
-          backendApi.util.updateQueryData(
-            "getServicesByProjectId" as never,
-            projectId as never,
-            (draftPosts) => {
-              (draftPosts as unknown as ServiceDto[]).map((service) => {
-                const data = msg.data as { service: string; status: string };
-                if (service.id !== data.service) return;
-                const isDirty =
-                  JSON.stringify(data.status) !==
-                  JSON.stringify(service.status);
+      if (msg.scope === "service" && msg.event === "status_change") {
+        const { service: serviceId, status: newStatus } = msg.data as {
+          service: string;
+          status: ServiceState;
+        };
 
-                if (isDirty) {
-                  service.status = data.status;
-                }
-              });
-            }
-          )
-        );
+        setTimeout(() => {
+          updateServiceStatus({
+            dispatch,
+            projectId: msg.target,
+            serviceId,
+            newStatus,
+          });
+        }, 100);
+      }
     });
 
     return () => {
