@@ -1,11 +1,47 @@
+import { ThunkDispatch, UnknownAction } from "@reduxjs/toolkit";
 import { backendApi, QueryKeys } from "..";
+import { ServiceDto } from "../services";
 import {
   CreateProjectDto,
   EnvironmentVariableDto,
   ProjectDto,
   ServiceAction,
+  serviceActionToStatus,
   UpdateProjectDto,
 } from "./projects.dto";
+import { ServiceState } from "@/types/services/services";
+
+export const updateServiceStatus = ({
+  dispatch,
+  projectId,
+  serviceId,
+  newStatus,
+}: {
+  dispatch: ThunkDispatch<any, any, UnknownAction>;
+  projectId: string;
+  serviceId: string;
+  newStatus: ServiceState;
+}) =>
+  dispatch(
+    backendApi.util.updateQueryData(
+      "getServicesByProjectId" as never,
+      projectId as never,
+      (draft) => {
+        // Finding the service in the draft
+        const services = draft as unknown as ServiceDto[];
+        const service = services.find((s) => s.id === serviceId);
+
+        if (!service) return;
+
+        // Updating status if dirty
+        if (service && service.status !== newStatus) {
+          service.status = newStatus;
+          // discarding websocket-injected data
+          service.statusDetails = undefined;
+        }
+      }
+    )
+  );
 
 const projectsApi = backendApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -88,6 +124,14 @@ const projectsApi = backendApi.injectEndpoints({
         method: "POST",
         body: { service: serviceId, action },
       }),
+      onQueryStarted({ projectId, serviceId, action }, { dispatch }) {
+        updateServiceStatus({
+          dispatch,
+          projectId,
+          serviceId,
+          newStatus: serviceActionToStatus[action],
+        });
+      },
       invalidatesTags: [QueryKeys.Projects],
     }),
     startProject: builder.mutation<void, string>({
