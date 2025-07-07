@@ -99,6 +99,13 @@ export class WebSocketService {
         eventData.projectId
       ].clients.find((c) => c.client.userId === eventData.userId);
 
+      if (!subscribed) {
+        this.logger.warn(
+          `Client ${eventData.userId} tried to unsubscribe from project ${eventData.projectId} but was not subscribed`,
+        );
+        return;
+      }
+
       this.handleUnsubscriptions(subscribed, eventData.projectId);
 
       subscribed.subscriptions = subscribed.subscriptions.filter(
