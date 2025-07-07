@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/card";
 import type { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import ProjectActionConfirmDialog from "./ProjectActionConfirmDialog";
+import { QueryKeys, backendApi } from "@/services/backendApi";
+import { useAppDispatch } from "@/hooks/useStore";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
@@ -29,6 +31,7 @@ type ActionType = "start" | "stop" | "pull" | "recreate" | null;
 const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   project,
 }) => {
+  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [currentAction, setCurrentAction] = useState<ActionType>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -81,6 +84,10 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           break;
         case "pull":
           await pullProject(project.id).unwrap();
+          console.log(new Date());
+          setTimeout(() => {
+            dispatch(backendApi.util.invalidateTags([QueryKeys.Projects]));
+          }, 1000);
           toast({
             title: "Project updated",
             description:
@@ -89,6 +96,9 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           break;
         case "recreate":
           await recreateProject(project.id).unwrap();
+          setTimeout(() => {
+            dispatch(backendApi.util.invalidateTags([QueryKeys.Projects]));
+          }, 1000);
           toast({
             title: "Project recreating",
             description:
