@@ -1,3 +1,4 @@
+import { ServiceState } from "@/types/services/services";
 import { Source } from "@/types/source";
 import { VMInfos } from "@/types/vm/vm";
 
@@ -6,6 +7,12 @@ export enum ServiceAction {
   STOP = "stop",
   RESTART = "restart",
 }
+
+export const serviceActionToStatus: Record<ServiceAction, ServiceState> = {
+  [ServiceAction.START]: ServiceState.Running,
+  [ServiceAction.STOP]: ServiceState.Stopped,
+  [ServiceAction.RESTART]: ServiceState.Starting,
+};
 
 export type CreateProjectDto = {
   repository_organisation: string;

@@ -1,3 +1,4 @@
+import { ServiceState } from "@/types/services/services";
 import { backendApi, QueryKeys } from ".";
 
 export interface ServiceUser {
@@ -38,7 +39,7 @@ export interface ServiceStatusDetails {
 export interface ServiceDto extends ServiceInformationDto {
   id: string;
   icon: string;
-  status: string;
+  status: ServiceState;
   statusTimeStamp: Date;
   // statusDetails is injected by the websocket
   statusDetails?: ServiceStatusDetails;

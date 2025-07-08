@@ -153,7 +153,7 @@ export class ProjectService {
 
   async serviceEntityToDto(service: Service): Promise<ProjectServiceDto> {
     const result: ProjectServiceDto = {
-      icon: 'https://i.imgur.com/ZMxf3Iy.png',
+      icon: 'https://img.icons8.com/?size=48&id=cdYUlRaag9G9&format=png',
       ...service,
       environment: JSON.parse(service.environment),
       user: JSON.parse(service.user),
