@@ -6,7 +6,7 @@ interface StepTitleProps {
   title: string;
 }
 const StepTitle: FC<StepTitleProps> = ({ step, title, total }) => (
-  <div className="select-none justify-center flex items-center space-x-2">
+  <div className="text-typography/90 select-none justify-center flex items-center space-x-2">
     <h1 className="text-primary">
       <span className="text-3xl">{step}</span>
       <span className="text-2xl">/{total}</span>

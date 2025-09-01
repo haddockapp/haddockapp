@@ -61,10 +61,10 @@ const DomainAccordionItem: FC<DomainAccordionItemProps> = ({
         <div className="flex items-center space-x-4">
           <Haddot completed={d?.linked} size={30} />
           <div className="text-start">
-            <h1 className="text-xl text-gray-700">
+            <h1 className="text-xl text-typography/70">
               Setup {isMain ? "main" : "secondary"} domain
             </h1>
-            <p className="text-gray-400">{d?.domain}</p>
+            <p className="text-typography/40">{d?.domain}</p>
           </div>
         </div>
       </AccordionTrigger>

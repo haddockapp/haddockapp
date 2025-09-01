@@ -21,9 +21,9 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
     content: React.ReactNode
   ) => (
     <section className="space-y-3">
-      <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+      <h3 className="text-sm font-medium text-typography/70">{title}</h3>
       {isEmpty ? (
-        <p className="text-sm text-gray-500 italic">{emptyMessage}</p>
+        <p className="text-sm text-typography/50 italic">{emptyMessage}</p>
       ) : (
         content
       )}
@@ -101,7 +101,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
                   <span className="font-medium">
                     {serviceInformations.deployment?.cpus}
                   </span>
-                  <span className="text-gray-500 ml-1">%</span>
+                  <span className="text-typography/50 ml-1">%</span>
                 </TableCell>
               </TableRow>
               <TableRow className="hover:bg-gray-50">
@@ -110,7 +110,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
                   <span className="font-medium">
                     {serviceInformations.deployment?.memory}
                   </span>
-                  <span className="text-gray-500 ml-1">MB</span>
+                  <span className="text-typography/50 ml-1">MB</span>
                 </TableCell>
               </TableRow>
             </TableBody>

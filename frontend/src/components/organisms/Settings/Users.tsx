@@ -23,7 +23,7 @@ const UsersSettings: FC = () => {
 
   return (
     <div className="flex flex-col space-y-4">
-      <span className="text-gray-800">
+      <span className="text-typography/80">
         Below is the list of users that have access to the platform, with their
         informations and roles. You can manage current users or invite new ones.
       </span>

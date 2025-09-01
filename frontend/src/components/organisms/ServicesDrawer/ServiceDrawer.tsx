@@ -119,7 +119,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                   className="w-10 h-10 object-contain"
                 />
                 <div>
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-typography/90">
                     {service.name}
                   </h3>
                   <div className="flex items-center gap-2 text-sm">
@@ -130,7 +130,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                       {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-typography/50">
                     {service.statusDetails?.Status ??
                       getRelativeTimeLabel(
                         service.statusTimeStamp,
@@ -148,7 +148,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                 <X size={16} />
               </Button>
             </div>
-            <p className="text-sm text-gray-500 mt-2 truncate">
+            <p className="text-sm text-typography/50 mt-2 truncate">
               {service.image}
             </p>
           </div>
@@ -203,7 +203,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                 {service ? (
                   <ConfigTab serviceInformations={service} />
                 ) : (
-                  <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="flex items-center justify-center h-32 text-typography/50">
                     No configuration found
                   </div>
                 )}
@@ -219,7 +219,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                     projectId={projectId}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="flex items-center justify-center h-32 text-typography/50">
                     No networks found
                   </div>
                 )}
@@ -229,7 +229,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Select a service to view details</p>
+          <p className="text-typography/50">Select a service to view details</p>
         </div>
       )}
     </div>

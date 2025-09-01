@@ -77,9 +77,9 @@ const NetworksTab: FC<NetworksTabProps> = ({
     content: React.ReactNode
   ) => (
     <section className="space-y-3">
-      <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+      <h3 className="text-sm font-medium text-typography/70">{title}</h3>
       {isEmpty ? (
-        <p className="text-sm text-gray-500 italic">{emptyMessage}</p>
+        <p className="text-sm text-typography/50 italic">{emptyMessage}</p>
       ) : (
         content
       )}
@@ -134,7 +134,9 @@ const NetworksTab: FC<NetworksTabProps> = ({
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700">Redirections</h3>
+          <h3 className="text-sm font-medium text-typography/70">
+            Redirections
+          </h3>
           <Dialog open={isCreateModalOpen} onOpenChange={onCreateModalToggle}>
             <DialogTrigger asChild>
               <Button size="sm" className="h-8">
@@ -145,7 +147,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
             <DialogContent className="sm:max-w-[500px] p-6">
               <DialogHeader>
                 <DialogTitle>Create a new redirection</DialogTitle>
-                <DialogDescription className="text-sm text-gray-500">
+                <DialogDescription className="text-sm text-typography/50">
                   Connect your service port to a domain to make it accessible
                   from the internet
                 </DialogDescription>
@@ -160,7 +162,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
         </div>
 
         {serviceRedirections.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
+          <p className="text-sm text-typography/50 italic">
             No redirections configured
           </p>
         ) : (
@@ -202,10 +204,10 @@ const NetworksTab: FC<NetworksTabProps> = ({
                             </DialogTitle>
                             <DialogDescription className="text-center">
                               Are you sure you want to delete this redirection?
-                              <p className="mt-2 font-medium text-gray-900">
+                              <p className="mt-2 font-medium text-typography/90">
                                 {redirection.domain}
                               </p>
-                              <p className="mt-1 text-sm text-gray-500">
+                              <p className="mt-1 text-sm text-typography/50">
                                 This action is irreversible and will immediately
                                 remove the redirection.
                               </p>

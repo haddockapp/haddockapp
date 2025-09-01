@@ -25,9 +25,9 @@ import {
   Form,
   FormMessage,
 } from "@/components/ui/form";
-import Select from "react-select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Select from "@/components/molecules/select";
 
 const formSchema = z.object({
   authorization: z
@@ -124,7 +124,7 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
             {`Edit ${project?.name ?? "this project"}`}
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className="text-gray-600 text-sm">
+        <DialogDescription className="text-typography/60 text-sm">
           <Form {...methods}>
             <form
               onSubmit={handleSubmit(onSubmit)}

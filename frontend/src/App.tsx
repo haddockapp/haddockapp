@@ -12,10 +12,18 @@ import AuthenticatedGuard from "./components/wrappers/authenticated-guard";
 import Authentication from "./pages/authentication";
 import LoadingPage from "./pages/loading";
 import AutologinPage from "./pages/autologin";
+import { useEffect } from "react";
+import { useAppSelector } from "./hooks/useStore";
 
 function App() {
   useWebsockets();
   useConfig();
+
+  const selectedTheme = useAppSelector((state) => state.settings.theme);
+
+  useEffect(() => {
+    document.body.classList.add(selectedTheme);
+  }, [selectedTheme]);
 
   return (
     <TooltipProvider>

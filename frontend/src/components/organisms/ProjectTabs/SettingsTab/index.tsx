@@ -22,8 +22,8 @@ const SettingsTabAction: FC<PropsWithChildren<SettingsTabActionProps>> = ({
   return (
     <div className="flex flex-row justify-between items-center border-b pb-4 mt-4 px-4">
       <div className="flex flex-col space-y-2">
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
+        <h3 className="text-lg font-semibold text-typography/80">{title}</h3>
+        <p className="text-sm text-typography/60">{description}</p>
       </div>
       {children}
     </div>

@@ -22,7 +22,9 @@ const LogsSection: FC<LogsSectionProps> = ({ lines }) => {
     <div className="space-y-2">
       <div className="flex flex-row items-center space-x-2">
         <ScrollTextIcon />
-        <h3 className="text-lg font-semibold text-gray-800">Docker Logs</h3>
+        <h3 className="text-lg font-semibold text-typography/80">
+          Docker Logs
+        </h3>
       </div>
       <div className="w-full h-96">
         <ScrollFollow

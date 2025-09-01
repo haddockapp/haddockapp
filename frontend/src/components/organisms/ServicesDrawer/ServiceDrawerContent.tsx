@@ -49,10 +49,10 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               alt="Icon of the service"
             />
             <div className="flex flex-col">
-              <p className="text-xl font-semibold text-gray-900 line-clamp-1">
+              <p className="text-xl font-semibold text-typography/90 line-clamp-1">
                 {service.name}
               </p>
-              <p className="text-gray-600">{service.image}</p>
+              <p className="text-typography/60">{service.image}</p>
             </div>
           </div>
           <div className="w-full flex">
@@ -68,7 +68,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                     className={
                       selectedTab === TabsValue.Status
                         ? "underline"
-                        : "text-black-500"
+                        : "text-typography-500"
                     }
                   >
                     Status
@@ -81,7 +81,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                     className={
                       selectedTab === TabsValue.Config
                         ? "underline"
-                        : "text-black-500"
+                        : "text-typography-500"
                     }
                   >
                     Configuration
@@ -94,7 +94,7 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                     className={
                       selectedTab === TabsValue.Networks
                         ? "underline"
-                        : "text-black-500"
+                        : "text-typography-500"
                     }
                   >
                     Networks
