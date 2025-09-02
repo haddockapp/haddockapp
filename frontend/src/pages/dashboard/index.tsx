@@ -21,7 +21,7 @@ const Projects: FC = () => {
           Content={CreateProjectForm}
           Trigger={({ onOpen }) => (
             <Button onClick={onOpen} className="gap-2">
-              <PackagePlus className="dark:text-primary text-primary-foreground/50" />
+              <PackagePlus className="text-primary-foreground/50" />
               <span>Deploy a project</span>
             </Button>
           )}
