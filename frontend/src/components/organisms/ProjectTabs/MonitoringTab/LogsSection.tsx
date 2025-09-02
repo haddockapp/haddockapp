@@ -31,6 +31,7 @@ const LogsSection: FC<LogsSectionProps> = ({ lines }) => {
           startFollowing={true}
           render={({ follow, onScroll }) => (
             <LazyLog
+              style={{ backgroundColor: "transparent" }}
               selectableLines
               enableSearch
               text={logText}

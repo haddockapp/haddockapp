@@ -21,9 +21,9 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
       case VmState.Running:
         return {
           label: "Running",
-          bgColor: "bg-emerald-100",
-          textColor: "text-emerald-700",
-          borderColor: "border-emerald-200",
+          bgColor: "dark:bg-emerald-700 bg-emerald-100",
+          textColor: "dark:text-white text-emerald-700",
+          borderColor: "dark:border-emerald-900 border-emerald-200",
           icon: <CheckCircle className="h-4 w-4" />,
         };
       case VmState.Starting:

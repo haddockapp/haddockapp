@@ -104,13 +104,13 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   return (
     <div
       className={cn(
-        "w-[500px] border-l border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out",
+        "w-[500px] border-l  shadow-lg transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
       {service ? (
         <div className="flex flex-col h-full">
-          <div className="border-b border-gray-200 p-4">
+          <div className="border-b border-border p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
@@ -160,22 +160,22 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               onValueChange={(value) => setSelectedTab(value as TabsValue)}
               className="p-4"
             >
-              <TabsList className="w-full grid grid-cols-3 mb-6 bg-gray-50 p-1 rounded-lg">
+              <TabsList className="w-full grid grid-cols-3 mb-6 p-1 rounded-lg">
                 <TabsTrigger
                   value={TabsValue.Status}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Status
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Config}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Configuration
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Networks}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Networks
                 </TabsTrigger>
@@ -183,7 +183,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Status}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service && (
                   <StatusTab
@@ -198,7 +198,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Config}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service ? (
                   <ConfigTab serviceInformations={service} />
@@ -211,7 +211,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Networks}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service ? (
                   <NetworksTab

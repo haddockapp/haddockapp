@@ -95,13 +95,13 @@ const NetworksTab: FC<NetworksTabProps> = ({
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card">
                 <TableHead className="font-medium">Port Value</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {serviceInformations.ports.map((port) => (
-                <TableRow key={port} className="hover:bg-gray-50">
+                <TableRow key={port}>
                   <TableCell>{port}</TableCell>
                 </TableRow>
               ))}
@@ -117,13 +117,13 @@ const NetworksTab: FC<NetworksTabProps> = ({
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card">
                 <TableHead className="font-medium">Network name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {serviceInformations.networks.map((network) => (
-                <TableRow key={network} className="hover:bg-gray-50">
+                <TableRow key={network}>
                   <TableCell>{network}</TableCell>
                 </TableRow>
               ))}
@@ -169,7 +169,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
           <div className="rounded-md border">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
+                <TableRow className="bg-card">
                   <TableHead className="w-1/4 font-medium">Port</TableHead>
                   <TableHead className="font-medium">Domain</TableHead>
                   <TableHead className="w-24"></TableHead>
@@ -177,7 +177,7 @@ const NetworksTab: FC<NetworksTabProps> = ({
               </TableHeader>
               <TableBody>
                 {serviceRedirections.map((redirection) => (
-                  <TableRow key={redirection.id} className="hover:bg-gray-50">
+                  <TableRow key={redirection.id}>
                     <TableCell>{redirection.port}</TableCell>
                     <TableCell className="font-medium">
                       {redirection.domain}

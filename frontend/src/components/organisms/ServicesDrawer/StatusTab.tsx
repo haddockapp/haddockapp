@@ -47,21 +47,21 @@ const StatusTab: FC<StatusTabProps> = ({
         return {
           color: "text-emerald-600",
           bg: "bg-emerald-500",
-          bgLight: "bg-emerald-50",
+          bgLight: "bg-emerald-50 dark:bg-background/80",
           icon: <Play className="h-5 w-5 text-emerald-600" />,
         };
       case ServiceState.Starting:
         return {
           color: "text-amber-600",
           bg: "bg-amber-500",
-          bgLight: "bg-amber-50",
+          bgLight: "bg-amber-50 dark:bg-background/80",
           icon: <RefreshCw className="h-5 w-5 text-amber-600 animate-spin" />,
         };
       default:
         return {
           color: "text-red-600",
           bg: "bg-red-500",
-          bgLight: "bg-red-50",
+          bgLight: "bg-red-50 bg-background/80",
           icon: <Square className="h-5 w-5 text-red-600" />,
         };
     }
