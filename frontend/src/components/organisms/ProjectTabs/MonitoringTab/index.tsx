@@ -2,12 +2,10 @@ import { FC } from "react";
 import LogsSection from "./LogsSection";
 import UsageCharts from "./UsageCharts";
 import Histograms from "./Histograms";
-import { useAppSelector } from "@/hooks/useStore";
+import useMetrics from "@/hooks/use-metrics";
 
 const MonitoringTab: FC = () => {
-  const { cpuUsage, memoryUsage, diskUsage, logs } = useAppSelector(
-    (state) => state.metrics
-  );
+  const { cpuUsage, memoryUsage, diskUsage, logs } = useMetrics();
 
   return (
     <div className="px-8 space-y-8">
