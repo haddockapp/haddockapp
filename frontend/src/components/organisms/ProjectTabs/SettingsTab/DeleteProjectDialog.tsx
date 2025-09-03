@@ -46,20 +46,17 @@ const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="text-red-500 font-bold border-red-500 hover:bg-red-100 mt-4"
-        >
+        <Button variant="destructive">
           <Trash className="mr-2" size={15} />
           Delete Project
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="self-center mb-2 text-red-600">
+          <DialogTitle className="self-center mb-2 text-destructive">
             Are you sure you want to delete this project?
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-700">
+          <DialogDescription className="text-sm text-destructive/70">
             Once deleted, all data related to this project will be permanently
             erased. This action is irreversible, so please proceed with caution.
           </DialogDescription>

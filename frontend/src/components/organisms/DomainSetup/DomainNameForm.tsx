@@ -86,8 +86,8 @@ const DomainNameForm: FC<DomainNameFormProps> = ({ domain, main }) => {
                   />
                 </FormControl>
                 <FormLabel
-                  className={`text-gray-700 text-sm min-w-14 ${
-                    field.value === undefined ? "text-gray-400" : ""
+                  className={`text-typography/70 text-sm min-w-14 ${
+                    field.value === undefined ? "text-typography/40" : ""
                   }`}
                 >
                   {field.value === true

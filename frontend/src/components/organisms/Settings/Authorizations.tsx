@@ -184,10 +184,10 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
                       <FormLabel
                         className={cn(
                           !field.value
-                            ? `text-black`
+                            ? `text-typography`
                             : field.value === a
                             ? `text-primary`
-                            : `text-gray-500`,
+                            : `text-typography/50`,
                           "duration-500"
                         )}
                       >
@@ -281,7 +281,7 @@ const CreateNewAuthorization: FC<CreateNewAuthorizationProps> = ({
                 reason={GithubAuthReason.CREATE_AUTHORIZATION}
               />
             </div>
-            <span className="text-[0.8rem] text-gray-500">
+            <span className="text-[0.8rem] text-typography/50">
               Learn more about OAuth by visiting the{" "}
               <a
                 className="text-primary hover:underline"
@@ -359,7 +359,7 @@ const Authorizations: FC = () => {
                   <Trash
                     className={
                       isDeleting
-                        ? "text-gray-500"
+                        ? "text-typography/50"
                         : "text-destructive group-hover:fill-destructive/30"
                     }
                     size="18px"

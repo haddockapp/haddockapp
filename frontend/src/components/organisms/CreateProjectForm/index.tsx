@@ -14,7 +14,7 @@ import {
   AuthorizationEnum,
   useGetAllAuthorizationsQuery,
 } from "@/services/backendApi/authorizations";
-import Select from "react-select";
+import Select from "@/components/molecules/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -267,7 +267,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>CPUs</span>
-                    <span className="text-gray-400">{field.value}</span>
+                    <span className="text-typography/40">{field.value}</span>
                   </Label>
                   <FormControl>
                     <Slider
@@ -290,7 +290,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>Memory</span>
-                    <span className="text-gray-400">{field.value} MB</span>
+                    <span className="text-typography/40">{field.value} MB</span>
                   </Label>
                   <FormControl>
                     <Slider
@@ -313,7 +313,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>Disk</span>
-                    <span className="text-gray-400">{field.value} MB</span>
+                    <span className="text-typography/40">{field.value} MB</span>
                   </Label>
                   <FormControl>
                     <Slider

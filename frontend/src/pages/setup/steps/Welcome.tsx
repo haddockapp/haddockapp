@@ -21,7 +21,7 @@ const Welcome: FC = () => {
   );
 
   return (
-    <div className="flex flex-col space-y-12 text-center items-center w-full text-gray-700">
+    <div className="flex flex-col space-y-12 text-center items-center w-full text-typography/70">
       {isGithubAppConfirmed && (
         <>
           <p className="flex flex-col">

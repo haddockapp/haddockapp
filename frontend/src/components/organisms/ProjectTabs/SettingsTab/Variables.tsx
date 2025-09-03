@@ -22,7 +22,7 @@ const Variables: FC<VariablesProps> = ({ projectId }) => {
         onValueChange={setAccordionOpen}
       >
         <AccordionItem value="item-1">
-          <AccordionTrigger className="text-lg font-semibold text-gray-800">
+          <AccordionTrigger className="text-lg font-semibold text-typography/80">
             Manage environment variables
           </AccordionTrigger>
           <AccordionContent className="px-8">

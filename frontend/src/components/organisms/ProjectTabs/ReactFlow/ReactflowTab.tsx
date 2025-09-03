@@ -23,6 +23,8 @@ import SwitchWithText from "@/components/molecules/text-switch";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import ServiceDrawer from "../../ServicesDrawer/ServiceDrawer";
+import { useAppSelector } from "@/hooks/useStore";
+import { Theme } from "@/services/settingsSlice";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -35,6 +37,8 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     isFetching,
     refetch,
   } = useGetServicesByProjectIdQuery(projectId ?? "");
+
+  const theme = useAppSelector((state) => state.settings.theme);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -185,16 +189,22 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
             onNodeClick={onNodeClick}
             onNodeDragStop={onNodeDragStop}
             nodeTypes={nodeTypes}
+            colorMode={theme === Theme.DARK ? "dark" : "light"}
             fitView
-            className="bg-gray-50"
+            className="bg-background"
           >
-            <Background color="#9ca3af" gap={16} size={1} />
+            <Background
+              color="hsl(var(--typography)/0.5)"
+              bgColor="hsl(var(--background))"
+              gap={16}
+              size={1}
+            />
             <Controls className="m-2" />
-            <MiniMap className="m-2" nodeColor="#6366f1" />
+            <MiniMap className="m-2" />
 
             <Panel
               position="top-left"
-              className="bg-white p-2 rounded-md shadow-md m-2"
+              className="bg-card border border-border py-2 px-6 rounded-md shadow-md m-2"
             >
               <div className="flex flex-col gap-2">
                 <SwitchWithText

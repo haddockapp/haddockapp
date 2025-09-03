@@ -36,7 +36,7 @@ const Setup: FC = () => {
           total={stepsCount}
           title={steps[stepCount].title}
         />
-        <p className="text-gray-500 text-center">
+        <p className="text-typography/50 text-center">
           {steps[stepCount].description}
         </p>
       </div>

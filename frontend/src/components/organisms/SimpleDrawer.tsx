@@ -32,10 +32,7 @@ const SimpleDrawer: FC<SimpleDrawerProps> = ({ Content, Trigger, title }) => {
         <DrawerHeader>
           <DrawerTitle className="flex flex-row items-center space-x-1">
             <Button onClick={onToggle} variant="ghost" className="group p-2">
-              <ArrowRight
-                strokeWidth={3}
-                className="stroke-primary/70 group-hover:stroke-primary duration-1000"
-              />
+              <ArrowRight className="text-primary/70 group-hover:text-primary duration-500" />
             </Button>
             <span>{title}</span>
           </DrawerTitle>

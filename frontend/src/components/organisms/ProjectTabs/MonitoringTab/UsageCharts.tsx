@@ -17,7 +17,7 @@ const UsageChart: FC<{
   <div className="flex flex-col space-y-2 w-64">
     <div className="flex flex-row items-center space-x-2 justify-center">
       {icon}
-      <h3 className="text-lg font-semibold text-gray-800 select-none">
+      <h3 className="text-lg font-semibold text-typography/80 select-none">
         {title}
       </h3>
     </div>

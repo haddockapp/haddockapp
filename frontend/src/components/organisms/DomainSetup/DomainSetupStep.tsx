@@ -19,8 +19,8 @@ const DomainSetupStep: FC<DomainSetupStepProps> = ({
     </div>
     <div className="space-y-2 w-full">
       <div className="text-start">
-        <h1 className="text-lg text-gray-700">{step.title}</h1>
-        <p className="text-gray-400">{step.subtitle}</p>
+        <h1 className="text-lg text-typography/70">{step.title}</h1>
+        <p className="text-typography/40">{step.subtitle}</p>
       </div>
       <CopiableField value={value} />
     </div>

@@ -47,21 +47,21 @@ const StatusTab: FC<StatusTabProps> = ({
         return {
           color: "text-emerald-600",
           bg: "bg-emerald-500",
-          bgLight: "bg-emerald-50",
+          bgLight: "bg-emerald-50 dark:bg-background/80",
           icon: <Play className="h-5 w-5 text-emerald-600" />,
         };
       case ServiceState.Starting:
         return {
           color: "text-amber-600",
           bg: "bg-amber-500",
-          bgLight: "bg-amber-50",
+          bgLight: "bg-amber-50 dark:bg-background/80",
           icon: <RefreshCw className="h-5 w-5 text-amber-600 animate-spin" />,
         };
       default:
         return {
           color: "text-red-600",
           bg: "bg-red-500",
-          bgLight: "bg-red-50",
+          bgLight: "bg-red-50 bg-background/80",
           icon: <Square className="h-5 w-5 text-red-600" />,
         };
     }
@@ -88,7 +88,9 @@ const StatusTab: FC<StatusTabProps> = ({
                 {statusInfo.icon}
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Current Status</h3>
+                <h3 className="font-medium text-typography/90">
+                  Current Status
+                </h3>
                 <div className="flex items-center gap-2 mt-1">
                   <div className={cn("h-2 w-2 rounded-full", statusInfo.bg)} />
                   {skeletonStatus ? (
@@ -155,11 +157,15 @@ const StatusTab: FC<StatusTabProps> = ({
 
       <Card>
         <CardContent className="p-6">
-          <h3 className="font-medium text-gray-900 mb-3">Image Information</h3>
+          <h3 className="font-medium text-typography/90 mb-3">
+            Image Information
+          </h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-gray-700 min-w-24">Image:</span>
-              <span className="text-gray-600">{image}</span>
+              <span className="font-medium text-typography/70 min-w-24">
+                Image:
+              </span>
+              <span className="text-typography/60">{image}</span>
             </div>
           </div>
         </CardContent>
