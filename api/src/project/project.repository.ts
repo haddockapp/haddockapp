@@ -77,6 +77,13 @@ export class ProjectRepository {
               : {}),
           },
         },
+        ...(data.workspace_id !== undefined
+          ? {
+              workspace: {
+                connect: { id: data.workspace_id },
+              },
+            }
+          : {}),
       },
     });
   }

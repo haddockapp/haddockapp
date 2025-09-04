@@ -50,6 +50,13 @@ export class ProjectService {
       data: {
         name: data.name,
         description: data.description,
+        ...(data.workspace_id !== undefined
+          ? {
+              workspace: {
+                connect: { id: data.workspace_id },
+              },
+            }
+          : {}),
         ...(data.authorization_id !== undefined
           ? {
               source: {
