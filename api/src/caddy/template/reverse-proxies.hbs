@@ -6,7 +6,9 @@
 {{#if frontend}}
 {{frontend.hostname}} {
 {{#if frontend.https}}
-    reverse_proxy * {{frontend.ip}}:{{frontend.port}}
+    reverse_proxy * {{frontend.ip}}:{{frontend.port}} {
+        header_up Host {upstream_hostport}
+    }
 {{else}}
     root * {{frontend.root}}
     try_files {path} /index.html
