@@ -29,25 +29,25 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
       case VmState.Starting:
         return {
           label: "Starting",
-          bgColor: "bg-amber-400",
+          bgColor: "dark:bg-amber-600 bg-amber-400",
           textColor: "text-white",
-          borderColor: "border-amber-500",
+          borderColor: "dark:border-amber-900 border-amber-500",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopping:
         return {
           label: "Stopping",
-          bgColor: "bg-amber-400",
+          bgColor: "dark:bg-amber-600 bg-amber-400",
           textColor: "text-white",
-          borderColor: "border-amber-500",
+          borderColor: "dark:border-amber-900 border-amber-500",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopped:
         return {
           label: "Stopped",
-          bgColor: "bg-slate-400",
+          bgColor: "dark:bg-slate-800 bg-slate-400",
           textColor: "text-white",
-          borderColor: "border-slate-500",
+          borderColor: "dark:border-slate-900 border-slate-500",
           icon: <Clock className="h-4 w-4" />,
         };
       default:
