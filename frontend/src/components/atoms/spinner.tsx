@@ -1,10 +1,10 @@
 import { FC } from "react";
 
 const HaddockSpinner: FC = () => (
-  <div className="w-36">
+  <div className="w-36 mx-auto">
     <img
       className="animate-spin ease-in-out origin-center rounded-full"
-      src="./haddock.png"
+      src="/haddock.png"
     />
   </div>
 );

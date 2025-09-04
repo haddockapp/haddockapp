@@ -14,12 +14,16 @@ import { Trash } from "lucide-react";
 
 interface DeleteProjectDialogProps {
   onDelete: () => void;
+  isDisabled?: boolean;
 }
 
-const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
+const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({
+  onDelete,
+  isDisabled,
+}) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
   const [countdown, setCountdown] = useState(3);
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [isCountingDown, setIsCountingDown] = useState(true);
   const handleDelete = () => {
     onDelete();
     onClose();
@@ -28,14 +32,14 @@ const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
   useEffect(() => {
     if (isOpen) {
       setCountdown(3);
-      setIsDisabled(true);
+      setIsCountingDown(true);
 
       const timer = setInterval(() => {
         setCountdown((prev) => prev - 1);
       }, 1000);
 
       setTimeout(() => {
-        setIsDisabled(false);
+        setIsCountingDown(false);
         clearInterval(timer);
       }, 3000);
 
@@ -45,7 +49,7 @@ const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
-      <DialogTrigger asChild>
+      <DialogTrigger disabled={isDisabled} asChild>
         <Button variant="destructive">
           <Trash className="mr-2" size={15} />
           Delete Project
@@ -73,11 +77,11 @@ const DeleteProjectDialog: FC<DeleteProjectDialogProps> = ({ onDelete }) => {
           <Button
             type="submit"
             variant="destructive"
-            disabled={isDisabled}
+            disabled={isCountingDown}
             onClick={handleDelete}
             className="w-28"
           >
-            {isDisabled ? `${countdown}` : "Delete Project"}
+            {isCountingDown ? `${countdown}` : "Delete Project"}
           </Button>
         </DialogFooter>
       </DialogContent>

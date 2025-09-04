@@ -42,9 +42,13 @@ const formSchema = z.object({
 
 interface EditProjectDialogProps {
   project: ProjectDto | undefined;
+  isDisabled?: boolean;
 }
 
-const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
+const EditProjectDialog: FC<EditProjectDialogProps> = ({
+  project,
+  isDisabled,
+}) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
   const [editProject] = useUpdateProjectMutation();
   const { toast } = useToast();
@@ -112,7 +116,7 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
-      <DialogTrigger asChild>
+      <DialogTrigger disabled={isDisabled} asChild>
         <Button variant="default" className="font-bold mt-4">
           <Pencil className="mr-2" size={15} />
           Edit this project

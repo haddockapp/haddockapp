@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import CreateSelect from "@/components/molecules/create-select";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   authorization: z
@@ -56,6 +57,7 @@ interface CreateProjectFormProps {
 }
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,13 +128,14 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             : undefined,
         })
           .unwrap()
-          .then(() => {
+          .then((res) => {
             toast({
               title: "Project created !",
               duration: 1000,
             });
             reset();
             onClose?.();
+            navigate(`/project/${res.id}`);
             setFormStep(0);
           })
           .catch(() => {
