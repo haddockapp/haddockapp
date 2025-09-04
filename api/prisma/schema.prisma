@@ -55,6 +55,7 @@ model Project {
     networkConnections NetworkConnection[]
     services           Service[]
     environmentVars    Json[]
+    tokens             ProjectToken[]
 }
 
 model Vm {
@@ -117,4 +118,22 @@ model Service {
 
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
     projectId String
+}
+
+model ProjectToken {
+    id          String   @id @default(uuid())
+    name        String
+    token       String   @unique
+    permissions String[] // Array of permissions like ["start", "stop", "deploy", "read"]
+    isActive    Boolean  @default(true)
+    lastUsedAt  DateTime?
+    expiresAt   DateTime?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId   String
+
+    @@index([token])
+    @@index([projectId])
 }

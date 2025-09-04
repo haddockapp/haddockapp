@@ -18,6 +18,8 @@ import { HealthModule } from './health/health.module';
 import { VMManagerModule } from './vm-manager/vm.manager.module';
 import { InvitationModule } from './invitation/invitation.module';
 import { AutologinsModule } from './autologins/autologins.module';
+import { TokensModule } from './tokens/tokens.module';
+import { CliModule } from './cli/cli.module';
 import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
@@ -45,6 +47,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     VMManagerModule,
     InvitationModule,
     AutologinsModule,
+    TokensModule,
+    CliModule,
   ],
   controllers: [AppController],
   providers: [AppService],

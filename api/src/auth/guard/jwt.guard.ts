@@ -32,12 +32,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return isPublicConfig && (!config || (config && config.value === false));
   }
 
-  public async canActivate(context: ExecutionContext) {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.isPublicEndpoint(context);
     const isAppConfigured = await this.isAppConfigured(context);
 
     if (isPublic) return true;
     if (isAppConfigured) return true;
+    
+    const request = context.switchToHttp().getRequest();
+    if (request.url && request.url.startsWith('/cli')) {
+      return true;
+    }
+    
     return super.canActivate(context) as boolean;
   }
 }

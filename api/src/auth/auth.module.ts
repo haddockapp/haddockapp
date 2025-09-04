@@ -11,10 +11,13 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt.guard';
 import { GithubStrategy } from './strategy/github.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
+
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { LocalStrategy } from './strategy/local.strategy';
+import { TokensModule } from '../tokens/tokens.module';
 import { InvitationModule } from 'src/invitation/invitation.module';
 import { AccessGuard } from './guard/access.guard';
+import { TokenAuthGuard } from './guard/token.guard';
 
 @Module({
   imports: [
@@ -31,12 +34,14 @@ import { AccessGuard } from './guard/access.guard';
     ConfigurationModule,
     UserModule,
     InvitationModule,
+    TokensModule,
   ],
   providers: [
     AuthService,
     JwtStrategy,
     GithubStrategy,
     LocalStrategy,
+    TokenAuthGuard,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

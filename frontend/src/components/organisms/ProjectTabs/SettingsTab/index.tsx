@@ -7,6 +7,7 @@ import {
 import DeleteProjectDialog from "./DeleteProjectDialog";
 import EditProjectDialog from "./EditProjectDialog";
 import Variables from "./Variables";
+import Tokens from "./Tokens";
 import { useToast } from "@/hooks/use-toast";
 
 type SettingsTabActionProps = {
@@ -74,6 +75,7 @@ const SettingsTab: FC = () => {
         <DeleteProjectDialog onDelete={handleDeleteProject} />
       </SettingsTabAction>
       <Variables projectId={projectId ?? ""} />
+      <Tokens projectId={projectId ?? ""} />
     </div>
   );
 };

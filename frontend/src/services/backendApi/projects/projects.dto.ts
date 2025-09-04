@@ -47,3 +47,39 @@ export type EnvironmentVariableDto = {
   value: string;
   isSecret: boolean;
 };
+
+export enum TokenPermission {
+  READ = 'read',
+  START = 'start', 
+  STOP = 'stop',
+  DEPLOY = 'deploy',
+  RECREATE = 'recreate',
+  MANAGE_SERVICES = 'manage_services',
+  MANAGE_ENVIRONMENT = 'manage_environment',
+}
+
+export type CreateProjectTokenDto = {
+  name: string;
+  permissions: TokenPermission[];
+  expiresAt?: string;
+};
+
+export type UpdateProjectTokenDto = {
+  name?: string;
+  permissions?: TokenPermission[];
+  isActive?: boolean;
+  expiresAt?: string;
+};
+
+export type ProjectTokenDto = {
+  id: string;
+  name: string;
+  token?: string; // Only included when creating
+  permissions: TokenPermission[];
+  isActive: boolean;
+  lastUsedAt?: string;
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  projectId: string;
+};

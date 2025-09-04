@@ -42,6 +42,11 @@ export class AccessGuard implements CanActivate {
     if (isAppConfigured) return true;
 
     const request = context.switchToHttp().getRequest();
+    
+    if (request.url && request.url.startsWith('/cli')) {
+      return true;
+    }
+
     const user = request.user;
 
     if (!user || !user.isActive) {

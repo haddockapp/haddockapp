@@ -8,6 +8,9 @@ import {
   ServiceAction,
   serviceActionToStatus,
   UpdateProjectDto,
+  CreateProjectTokenDto,
+  UpdateProjectTokenDto,
+  ProjectTokenDto,
 } from "./projects.dto";
 import { ServiceState } from "@/types/services/services";
 
@@ -162,6 +165,45 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Projects],
     }),
+    // Project Token endpoints
+    getProjectTokens: builder.query<ProjectTokenDto[], string>({
+      query: (projectId) => ({
+        url: `/project/${projectId}/tokens`,
+      }),
+      providesTags: [QueryKeys.ProjectTokens],
+    }),
+    createProjectToken: builder.mutation<
+      ProjectTokenDto,
+      { projectId: string; body: CreateProjectTokenDto }
+    >({
+      query: ({ projectId, body }) => ({
+        url: `/project/${projectId}/tokens`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [QueryKeys.ProjectTokens],
+    }),
+    updateProjectToken: builder.mutation<
+      ProjectTokenDto,
+      { projectId: string; tokenId: string; body: UpdateProjectTokenDto }
+    >({
+      query: ({ projectId, tokenId, body }) => ({
+        url: `/project/${projectId}/tokens/${tokenId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [QueryKeys.ProjectTokens],
+    }),
+    deleteProjectToken: builder.mutation<
+      void,
+      { projectId: string; tokenId: string }
+    >({
+      query: ({ projectId, tokenId }) => ({
+        url: `/project/${projectId}/tokens/${tokenId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [QueryKeys.ProjectTokens],
+    }),
   }),
 });
 
@@ -179,4 +221,8 @@ export const {
   useStopProjectMutation,
   usePullProjectMutation,
   useRecreateProjectMutation,
+  useGetProjectTokensQuery,
+  useCreateProjectTokenMutation,
+  useUpdateProjectTokenMutation,
+  useDeleteProjectTokenMutation,
 } = projectsApi;
