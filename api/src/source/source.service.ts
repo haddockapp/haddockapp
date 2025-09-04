@@ -11,20 +11,20 @@ export class SourceService {
     @InjectQueue('deploys') private readonly deployQueue: Queue,
     private readonly sourceFactory: SourceFactory,
     private readonly sourceRepository: SourceRepository,
-  ) {}
+  ) { }
 
   async registerSource(createSourceDto: CreateSourceDto) {
     const source = this.sourceFactory.createSource(createSourceDto);
     return this.sourceRepository.createSource(source);
   }
 
-  async deploySource(sourceId: string) {
+  async deploySource(sourceId: string, startAfterDeploy: boolean = true) {
     const source = await this.sourceRepository.findById(sourceId);
     if (!source) {
       throw new NotFoundException('Source not found');
     }
 
-    await this.deployQueue.add('deploy', source);
+    await this.deployQueue.add('deploy', { source, startAfterDeploy });
   }
 
   async deleteSource(sourceId: string) {
