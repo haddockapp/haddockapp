@@ -33,7 +33,7 @@ export class DeployConsumer {
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
     private readonly composeService: ComposeService,
-  ) { }
+  ) {}
 
   @OnQueueFailed()
   onError(job: Job<any>, error: any) {
@@ -65,8 +65,8 @@ export class DeployConsumer {
 
     const authorizationType: AuthorizationEnum = source.authorizationId
       ? await this.authorizationService.getAuthorizationType(
-        source.authorizationId,
-      )
+          source.authorizationId,
+        )
       : AuthorizationEnum.NONE;
 
     switch (authorizationType) {
@@ -182,10 +182,11 @@ export class DeployConsumer {
   }
 
   @Process('deploy')
-  async deploy(job: Job<{ source: PersistedSourceDto, startAfterDeploy: boolean }>) {
-    const { source, startAfterDeploy } = job.data
+  async deploy(
+    job: Job<{ source: PersistedSourceDto; startAfterDeploy: boolean }>,
+  ) {
+    const { source, startAfterDeploy } = job.data;
     this.logger.log(`Deploying source for project ${source.project.id}`);
-
 
     try {
       const deployPath: string = await this.getDeployPath(source);

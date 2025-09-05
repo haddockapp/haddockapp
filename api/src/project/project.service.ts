@@ -25,6 +25,10 @@ import { ServiceStatus } from 'src/types/service.enum';
 import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { SecurityAdvicesDto } from 'src/project/dto/securityAdvices.dto';
+import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
+import { getSettings } from 'src/source/utils/get-settings';
+import { ComposeService } from 'src/compose/compose.service';
 
 @Injectable()
 export class ProjectService {
@@ -39,6 +43,7 @@ export class ProjectService {
     private readonly webSocketService: WebSocketService,
     private readonly dockerService: DockerService,
     @InjectQueue('deploys') private readonly deployQueue: Queue,
+    private readonly composeService: ComposeService,
   ) {}
 
   async updateProject(
@@ -432,5 +437,51 @@ export class ProjectService {
       default:
         throw new BadRequestException('Invalid action');
     }
+  }
+
+  async getSecurityAdvices(projectId: string): Promise<SecurityAdvicesDto[]> {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) throw new NotFoundException('Project not found');
+
+    const source = await this.sourceService.findSourceById(project.sourceId);
+    if (!source) throw new NotFoundException('Source not found');
+
+    if (source.type !== 'github')
+      throw new BadRequestException('Source is not a github repository');
+
+    const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+    const composePath = `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+
+    const rawCompose = this.composeService.readComposeFile(
+      projectId,
+      composePath,
+    );
+    if (!rawCompose) throw new NotFoundException('Compose file not found');
+
+    const services = this.composeService.parseServices(rawCompose.toString());
+
+    const securityAdvices: SecurityAdvicesDto[] = [];
+
+    for (const service of services) {
+      if (!service.environment || typeof service.environment !== 'object')
+        continue;
+
+      for (const [key, value] of Object.entries(service.environment)) {
+        // Password should be binded to an environment variable
+        if (key.includes('PASSWORD') && !/^\$[^$]/.test(value)) {
+          securityAdvices.push({
+            type: 'EXPOSED_ENV',
+            data: {
+              service: service.name,
+              variable: key,
+            },
+          });
+        }
+
+        // add more checks here...
+      }
+    }
+
+    return securityAdvices;
   }
 }
