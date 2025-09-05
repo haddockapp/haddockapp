@@ -1,7 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ComposeService } from 'src/compose/compose.service';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
-import { SecurityAdviceDto } from 'src/project/dto/securityAdvice.dto';
+import {
+  SecurityAdviceDto,
+  SecurityAdviceType,
+} from 'src/project/dto/securityAdvice.dto';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { SourceService } from 'src/source/source.service';
 import { getSettings } from 'src/source/utils/get-settings';
@@ -19,7 +26,8 @@ export class SecurityAdvicesService {
     const source = await this.sourceService.findSourceById(project.sourceId);
     if (!source) throw new Error('Source not found');
 
-    if (source.type !== 'github') throw new Error('Source type must be github');
+    if (source.type !== 'github')
+      throw new BadRequestException('Source type must be github');
 
     const settings = getSettings<GithubSourceSettingsDto>(source.settings);
     const composePath = `./${process.env.SOURCE_DIR}/${settings.composePath}`;
@@ -28,7 +36,7 @@ export class SecurityAdvicesService {
       project.id,
       composePath,
     );
-    if (!rawCompose) throw new Error('Compose file not found');
+    if (!rawCompose) throw new NotFoundException('Compose file not found');
 
     const services = this.composeService.parseServices(rawCompose.toString());
 
@@ -40,9 +48,12 @@ export class SecurityAdvicesService {
 
       for (const [key, value] of Object.entries(service.environment)) {
         // Password should be binded to an environment variable
-        if (key.includes('PASSWORD') && !/^$[^$]/.test(value)) {
+        if (
+          key.includes('PASSWORD') &&
+          !/^\$[A-Za-z_][A-Za-z0-9_]*$/.test(value)
+        ) {
           advices.push({
-            type: 'EXPOSED_ENV',
+            type: SecurityAdviceType.EXPOSED_ENV,
             data: {
               service: service.name,
               variable: key,
