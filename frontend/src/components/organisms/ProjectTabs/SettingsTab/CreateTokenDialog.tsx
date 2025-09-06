@@ -123,7 +123,7 @@ export default function CreateTokenDialog({ projectId }: CreateTokenDialogProps)
     if (!isOpen) {
       setCreatedToken(null);
       setName("");
-      setPermissions([TokenPermission.READ]);
+      setPermissions([]);
       setExpiresAt("");
     }
   };
