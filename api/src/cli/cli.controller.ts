@@ -7,182 +7,118 @@ import {
   Body,
   Param,
   UseGuards,
-  Request,
 } from '@nestjs/common';
-import { ProjectService } from '../project/project.service';
-import { ProjectRepository } from '../project/project.repository';
 import { TokenAuthGuard, TokenUser } from '../auth/guard/token.guard';
 import { RequirePermission } from '../auth/decorator/require-permission.decorator';
 import { TokenPermission } from '../project/types/token-permissions.enum';
 import { EnvironmentVar } from '../project/dto/environmentVar';
 import { ServiceActionDto } from '../project/dto/serviceAction.dto';
 import ProjectServiceDto from '../project/dto/ProjectService.dto';
+import { CurrentUser } from 'src/auth/user.context';
+import { CliService } from './cli.service';
 
 @Controller('cli')
 @UseGuards(TokenAuthGuard)
 export class CliController {
   constructor(
-    private readonly projectService: ProjectService,
-    private readonly projectRepository: ProjectRepository,
+    private readonly cliService: CliService,
   ) {}
 
   // Project information endpoints
   @Get('project')
-  @RequirePermission(TokenPermission.READ)
-  async getProject(@Request() req: any) {
-    const user = req.user as TokenUser;
-    return await this.projectRepository.findProjectById(user.projectId);
+  @RequirePermission([TokenPermission.READ])
+  async getProject(@CurrentUser() user: TokenUser) {
+    return await this.cliService.getProject(user);
   }
 
   // Project control endpoints
   @Post('project/start')
-  @RequirePermission(TokenPermission.START)
-  async startProject(@Request() req: any) {
-    const user = req.user as TokenUser;
-    await this.projectService.startProject(user.projectId);
-    return { message: 'Project started successfully', projectId: user.projectId };
+  @RequirePermission([TokenPermission.START])
+  async startProject(@CurrentUser() user: TokenUser) {
+    return await this.cliService.startProject(user);
   }
 
   @Post('project/stop')
-  @RequirePermission(TokenPermission.STOP)
-  async stopProject(@Request() req: any) {
-    const user = req.user as TokenUser;
-    await this.projectService.stopProject(user.projectId);
-    return { message: 'Project stopped successfully', projectId: user.projectId };
+  @RequirePermission([TokenPermission.STOP])
+  async stopProject(@CurrentUser() user: TokenUser) {
+    return await this.cliService.stopProject(user);
   }
 
   @Post('project/deploy')
-  @RequirePermission(TokenPermission.DEPLOY)
-  async deployProject(@Request() req: any) {
-    const user = req.user as TokenUser;
-    await this.projectService.deployProject(user.projectId);
-    return { message: 'Project deployment started', projectId: user.projectId };
+  @RequirePermission([TokenPermission.DEPLOY])
+  async deployProject(@CurrentUser() user: TokenUser) {
+    return await this.cliService.deployProject(user);
   }
 
   @Post('project/recreate')
-  @RequirePermission(TokenPermission.RECREATE)
-  async recreateProject(@Request() req: any) {
-    const user = req.user as TokenUser;
-    await this.projectService.recreateProject(user.projectId);
-    return { message: 'Project recreation started', projectId: user.projectId };
+  @RequirePermission([TokenPermission.RECREATE])
+  async recreateProject(@CurrentUser() user: TokenUser) {
+    return await this.cliService.recreateProject(user);
   }
 
   // Service management endpoints
   @Get('project/services')
-  @RequirePermission(TokenPermission.READ)
-  async getProjectServices(@Request() req: any): Promise<ProjectServiceDto[]> {
-    const user = req.user as TokenUser;
-    const project = await this.projectRepository.findProjectById(user.projectId);
-    
-    return await Promise.all(
-      project.services.map(async (service) => {
-        return this.projectService.serviceEntityToDto(service);
-      }),
-    );
+  @RequirePermission([TokenPermission.READ])
+  async getProjectServices(@CurrentUser() user: TokenUser): Promise<ProjectServiceDto[]> {
+    return await this.cliService.getProjectServices(user);
   }
 
   @Get('project/services/:serviceId')
-  @RequirePermission(TokenPermission.READ)
+  @RequirePermission([TokenPermission.READ])
   async getProjectService(
     @Param('serviceId') serviceId: string,
-    @Request() req: any,
+    @CurrentUser() user: TokenUser
   ): Promise<ProjectServiceDto> {
-    const user = req.user as TokenUser;
-    const project = await this.projectRepository.findProjectById(user.projectId);
-    
-    const service = project.services.find(
-      (service) => service.id === serviceId,
-    );
-    
-    if (!service) {
-      throw new Error('Service not found');
-    }
-    
-    return this.projectService.serviceEntityToDto(service);
+    return await this.cliService.getProjectService(serviceId, user);
   }
 
   @Post('project/services')
-  @RequirePermission(TokenPermission.MANAGE_SERVICES)
+  @RequirePermission([TokenPermission.MANAGE_SERVICES])
   async manageService(
     @Body() data: ServiceActionDto,
-    @Request() req: any,
+    @CurrentUser() user: TokenUser
   ) {
-    const user = req.user as TokenUser;
-    const result = await this.projectService.serviceAction(user.projectId, data);
-    return { 
-      message: `Service ${data.action} action initiated successfully`, 
-      projectId: user.projectId,
-      serviceId: data.service,
-      action: data.action,
-      result 
-    };
+    return await this.cliService.manageService(data, user);
   }
 
   // Environment variable endpoints
   @Get('project/environment')
-  @RequirePermission(TokenPermission.READ)
-  async getEnvironmentVars(@Request() req: any): Promise<EnvironmentVar[]> {
-    const user = req.user as TokenUser;
-    return await this.projectService.getEnvironmentVars(user.projectId);
+  @RequirePermission([TokenPermission.READ])
+  async getEnvironmentVars(@CurrentUser() user: TokenUser): Promise<EnvironmentVar[]> {
+    return await this.cliService.getEnvironmentVars(user);
   }
 
   @Post('project/environment')
-  @RequirePermission(TokenPermission.MANAGE_ENVIRONMENT)
+  @RequirePermission([TokenPermission.MANAGE_ENVIRONMENT])
   async createEnvironment(
     @Body() data: EnvironmentVar,
-    @Request() req: any,
+    @CurrentUser() user: TokenUser
   ) {
-    const user = req.user as TokenUser;
-    const result = await this.projectService.createEnvironment(user.projectId, data);
-    return { 
-      message: 'Environment variable created successfully', 
-      projectId: user.projectId,
-      variable: result 
-    };
+    return await this.cliService.createEnvironmentVar(data, user);
   }
 
   @Patch('project/environment/:key')
-  @RequirePermission(TokenPermission.MANAGE_ENVIRONMENT)
+  @RequirePermission([TokenPermission.MANAGE_ENVIRONMENT])
   async updateEnvironment(
     @Param('key') key: string,
     @Body() data: EnvironmentVar,
-    @Request() req: any,
+    @CurrentUser() user: TokenUser
   ) {
-    const user = req.user as TokenUser;
-    const result = await this.projectService.updateEnvironment(user.projectId, key, data);
-    return { 
-      message: 'Environment variable updated successfully', 
-      projectId: user.projectId,
-      key,
-      variable: result 
-    };
+    return await this.cliService.updateEnvironmentVar(key, data, user);
   }
 
   @Delete('project/environment/:key')
-  @RequirePermission(TokenPermission.MANAGE_ENVIRONMENT)
+  @RequirePermission([TokenPermission.MANAGE_ENVIRONMENT])
   async deleteEnvironment(
     @Param('key') key: string,
-    @Request() req: any,
+    @CurrentUser() user: TokenUser
   ) {
-    const user = req.user as TokenUser;
-    await this.projectService.deleteEnvironment(user.projectId, key);
-    return { 
-      message: 'Environment variable deleted successfully', 
-      projectId: user.projectId,
-      key 
-    };
+    return await this.cliService.deleteEnvironmentVar(key, user);
   }
 
   // Health check endpoint for CLI
   @Get('health')
-  async healthCheck(@Request() req: any) {
-    const user = req.user as TokenUser;
-    return {
-      status: 'ok',
-      message: 'CLI API is operational',
-      projectId: user.projectId,
-      permissions: user.permissions,
-      timestamp: new Date().toISOString(),
-    };
+  async healthCheck(@CurrentUser() user: TokenUser) {
+    return await this.cliService.healthCheck(user);
   }
 }

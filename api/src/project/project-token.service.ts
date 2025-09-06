@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectTokenDto } from './dto/CreateProjectToken.dto';
 import { UpdateProjectTokenDto } from './dto/UpdateProjectToken.dto';
 import { ProjectTokenResponse } from './dto/ProjectToken.response';
-import { TokenPermission, ALL_PERMISSIONS } from './types/token-permissions.enum';
+import { TokenPermission, PERMISSIONS } from './types/token-permissions.enum';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -19,12 +19,12 @@ export class ProjectTokenService {
 
   private validatePermissions(permissions: string[]): void {
     const invalidPermissions = permissions.filter(
-      permission => !ALL_PERMISSIONS.includes(permission as TokenPermission)
+      permission => !PERMISSIONS.includes(permission as TokenPermission)
     );
     
     if (invalidPermissions.length > 0) {
       throw new BadRequestException(
-        `Invalid permissions: ${invalidPermissions.join(', ')}. Valid permissions are: ${ALL_PERMISSIONS.join(', ')}`
+        `Invalid permissions: ${invalidPermissions.join(', ')}. Valid permissions are: ${PERMISSIONS.join(', ')}`
       );
     }
   }

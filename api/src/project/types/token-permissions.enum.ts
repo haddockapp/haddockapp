@@ -8,5 +8,5 @@ export enum TokenPermission {
   MANAGE_ENVIRONMENT = 'manage_environment',
 }
 
-export const ALL_PERMISSIONS = Object.values(TokenPermission);
+export const PERMISSIONS = Object.values(TokenPermission);
 
