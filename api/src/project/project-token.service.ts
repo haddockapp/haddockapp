@@ -113,7 +113,7 @@ export class ProjectTokenService {
       where: { id: tokenId },
       data: {
         ...data,
-        expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
+        expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
       },
     });
 
