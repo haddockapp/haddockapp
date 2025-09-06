@@ -220,7 +220,6 @@ export default function TokensList({ projectId }: TokensListProps) {
         </Table>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
