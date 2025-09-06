@@ -1,0 +1,1364 @@
+# Acceptance Test Plan – Haddock
+
+---
+
+## 1. Introduction
+
+**Project Name:** Haddock  
+**Team:** Mathias ANDRÉ, Alexandru GHERASIE, Léo DUBOSCLARD, Arthur DELBARRE, Thomas MAZAUD, Maxime DZIURA  
+**School:** EPITECH LYON 2026
+
+**General Presentation:**  
+Haddock is a modern, developer-friendly Platform-as-a-Service (PaaS) solution designed to streamline application deployment through containerization. Unlike traditional PaaS offerings, Haddock removes the need for tedious environment configuration and offers a fully automated, flexible, and self-hostable infrastructure solution.
+
+The platform focuses on providing a seamless user experience for developers, system administrators, and organizations that need a reliable way to manage their containerized projects. By integrating core services such as GitHub-based authentication, automated domain binding, real-time monitoring, and environment management, Haddock significantly reduces the complexity of deploying and operating applications.
+
+With Haddock, projects can be deployed directly from GitHub repositories or public sources, without requiring advanced DevOps knowledge. The solution abstracts infrastructure concerns while still granting granular control over virtual machine resources, services, and networking configurations. Developers can manage their applications visually through an intuitive dashboard, while administrators retain complete control over user roles, security policies, and system-wide settings.
+
+Haddock distinguishes itself with the following key aspects:
+
+- **Self-hosted PaaS**: Organizations retain full control of their infrastructure, avoiding lock-in with third-party cloud providers.
+- **Automated DNS and network redirection**: Domains and subdomains are configured and managed automatically via an embedded reverse proxy system.
+- **Real-time monitoring and logging**: CPU, memory, and disk usage, along with Docker logs, are accessible through an interactive interface.
+- **Fine-grained service management**: Each service of a project can be started, stopped, restarted, or reconfigured independently.
+- **Security and flexibility**: Multiple authentication methods (OAuth, Personal Access Token, Deploy Keys) and secret management for environment variables.
+
+Overall, Haddock’s goal is to empower small teams, freelancers, and SMEs—as well as larger enterprises needing internal PaaS capabilities—with a solution that combines **the simplicity of modern SaaS platforms** and **the control of on-premise infrastructure**.
+
+**Core Innovation:**  
+Haddock introduces a **zero-configuration deployment platform** built on top of the **Open Container Initiative (OCI)** standards. Instead of requiring custom tooling or additional configuration layers, Haddock leverages the existing **compose.yml** file as the **single source of truth** for deployments.
+
+If an application is already containerized, developers don’t need to write anything else: Haddock interprets the provided compose.yml and handles the rest—virtual machines, networking, DNS, monitoring, and lifecycle management.
+
+Each project runs inside its own **isolated virtual machine** with a hardened network stack, combining the portability of containers with the strong guarantees of VM-level security and reproducibility. This ensures a consistent deployment model across environments while reducing the operational overhead typically associated with container orchestration.
+
+---
+
+**Key Differentiators:**
+
+- **Zero Configuration Beyond Compose**  
+  The **compose.yml** file is the only configuration developers need. If the app is already dockerized, no extra manifests, YAMLs, or proprietary formats are required—Haddock takes care of provisioning and orchestration.
+
+- **Secure Isolation**  
+  Applications run in isolated VMs with hardened network layers, providing strong isolation and consistent runtime behavior.
+
+- **Self-Hostable**  
+  Haddock can be deployed entirely on-premises, giving organizations **full ownership of infrastructure and data** without cloud lock-in, while remaining open-source.
+
+- **OCI-Compliant by Design**  
+  Built on **Open Container Initiative standards**, Haddock supports the broad ecosystem of container images and runtimes, ensuring long-term compatibility and interoperability.
+
+- **Automated Networking**  
+  Reverse proxy, DNS bindings, domain and subdomain management, and port redirections are handled automatically, with no manual setup required.
+
+- **Developer-Centric Design**  
+  Developers interact with a clean dashboard that provides real-time insights into metrics, logs, and project health, while administrators retain fine-grained control over users, authorizations, and lifecycle operations.
+
+## Target Use Cases
+
+Haddock is designed to cover a wide range of user profiles and organizational needs. Below are the primary personas, with their motivations and how Haddock specifically addresses their pain points:
+
+---
+
+- **Freelancers & Independent Developers**  
+  _Profile:_ Need affordable, autonomous solutions to deploy client projects, personal apps, or MVPs without managing servers.  
+  _Why Haddock:_ Offers a **self-hosted, cost-effective PaaS** with zero-config deployment. Freelancers can focus on building apps while Haddock takes care of domains, networking, and monitoring.
+
+---
+
+- **Backend Developers (Side Projects & Personal Apps)**  
+  _Profile:_ Skilled developers who want to publish side projects quickly without setting up DevOps pipelines.  
+  _Why Haddock:_ **Compose.yml is the only config needed**—if the project is already dockerized, it’s instantly deployable. Perfect for hacking together projects and making them available online with minimal friction.
+
+---
+
+- **Confirmed Developers “Allergic to DevOps”**  
+  _Profile:_ Experienced coders who dislike dealing with infrastructure, CI/CD, or networking.  
+  _Why Haddock:_ Handles VM provisioning, DNS binding, SSL, and monitoring automatically. Developers stay focused on **coding, not configuring servers**.
+
+---
+
+- **Web & Digital Agencies**  
+  _Profile:_ Agencies managing multiple client apps with varied requirements.  
+  _Why Haddock:_ Each client project runs in its own **isolated VM with its own domain**, ensuring separation and security. Agencies benefit from fast, repeatable deployments and easy lifecycle management (start/stop/update).
+
+---
+
+- **Startups & Local Businesses**  
+  _Profile:_ Need reliable hosting for production apps or internal tools without hiring full DevOps staff.  
+  _Why Haddock:_ Provides a **self-hostable PaaS alternative** to costly cloud services. Small teams gain modern deployment workflows without needing deep infrastructure expertise.
+
+---
+
+- **Large Enterprises (Internal Projects & Intranet)**  
+  _Profile:_ Corporates deploying internal apps, intranet portals, or prototypes at scale.  
+  _Why Haddock:_ Supports **multi-user management with roles** and offers **on-premises hosting**, ensuring compliance, security, and independence from third-party clouds.
+
+---
+
+- **Public Sector IT Teams (Schools, Hospitals, City Halls, Institutions)**  
+  _Profile:_ Institutions needing reliable infrastructure for citizen-facing or internal apps, often with strict data residency rules.  
+  _Why Haddock:_ Fully **self-hostable**, with automated DNS and networking, ensuring compliance with local regulations and reducing reliance on external vendors.
+
+---
+
+- **No-Code / Low-Code Users**  
+  _Profile:_ Want to deploy apps (CMS, dashboards, collaboration tools) without coding skills.  
+  _Why Haddock:_ The **application catalog** allows instant deployment of pre-built apps (WordPress, etc.) without technical setup, while still benefiting from robust infrastructure.
+
+---
+
+- **Development Teams**  
+  _Profile:_ Teams needing consistency across development, staging, and production.  
+  _Why Haddock:_ OCI-compliant deployments guarantee **environment parity**, with a single configuration file used across all environments. Simplifies handover between devs and ops.
+
+---
+
+- **Enterprises without Technical Expertise**  
+  _Profile:_ Business units wanting to publish apps without depending on IT teams.  
+  _Why Haddock:_ Provides an **intuitive dashboard** for app lifecycle management (deploy, monitor, update) without requiring infrastructure knowledge.
+
+---
+
+- **Educational Institutions (Bootcamps, Coding Schools, Universities)**  
+  _Profile:_ Need reproducible environments for teaching DevOps, web development, or cloud practices.  
+  _Why Haddock:_ Enables **isolated training environments** where each student or group can deploy safely, with minimal setup effort from instructors.
+
+---
+
+- **Open Source Communities / Project Maintainers**  
+  _Profile:_ Maintainers who want to showcase apps, deploy staging environments, or run community tools.  
+  _Why Haddock:_ Deployments are **fast, reproducible, and transparent**—perfect for maintaining credibility and making demos accessible to contributors.
+
+---
+
+- **Teams Handling Sensitive Data (Legal, Medical, Finance)**  
+  _Profile:_ Organizations subject to strong compliance and confidentiality constraints.  
+  _Why Haddock:_ Each application runs in an **isolated VM with hardened network layers**, ensuring data separation, control, and compliance with standards.
+
+---
+
+- **Product Managers & Designers (Internal Tools)**  
+  _Profile:_ Non-DevOps profiles who still need to deploy prototypes, dashboards, or utilities for teams.  
+  _Why Haddock:_ **Simple UI + automated deployment** let them push apps live without depending on engineers, reducing time-to-feedback.
+
+**Main Functionalities:**
+
+- **Automated Installer (UNIX-based systems)**  
+  Provides a streamlined setup process that automatically detects the host environment, installs dependencies, and configures Haddock for first use.
+
+- **Onboarding with GitHub OAuth or Email Authentication**  
+  Flexible authentication system allowing both OAuth-based login with GitHub or classic email/password signup.
+
+- **Domain Setup with DNS Binding**  
+  Simplified domain management with automated generation of DNS records for **primary and secondary domains**, including wildcard and verification challenges.
+
+- **User Management**  
+  Full account lifecycle management: invite new users, activate or deactivate accounts, reset passwords, delete users, and download personal data in compliance with portability requirements.
+
+- **Project Deployment**  
+  Deploy projects directly from GitHub repositories (public or private via authorizations) or from public sources, using a single configuration file (compose.yml).
+
+- **Application Management**  
+  Complete lifecycle operations for applications: start, stop, restart, recreate, update, and delete projects from the dashboard.
+
+- **Service Configuration**  
+  Fine-grained control over deployed services: network binding, port mappings, environment variables (secret or non-secret), resource limits (CPU, RAM), and user permissions (UID/GID).
+
+- **Real-Time Monitoring**  
+  Interactive dashboards providing live metrics (CPU, RAM, disk usage) and real-time logs, with options for filtering and searching.
+
+- **Network Redirections**  
+  Advanced reverse proxy management with flexible routing rules:
+  - HTTP/HTTPS redirection
+  - Custom and wildcard subdomains
+  - Multi-domain binding
+
+---
+
+## 2. Scope
+
+The scope of this Acceptance Test Plan covers all major and minor functionalities of Haddock, organized by priority and relevance. Each category defines what will be tested, why it matters, and what the acceptance criteria should validate.
+
+---
+
+### 2.1 Critical Features
+
+These are **core functionalities** that must work flawlessly for the platform to be usable. Without them, Haddock cannot fulfill its purpose as a PaaS solution.
+
+- **Installation & Onboarding**  
+  Validation of the automated installer, initial setup steps (GitHub application, email authentication, DNS configuration). These are the foundations of the system and must be robust and repeatable.
+
+- **Authentication Methods**  
+  Support for multiple methods (OAuth, Personal Access Tokens, Deploy Keys). Ensures developers can securely connect their GitHub repositories and maintain flexibility.
+
+- **Project Deployment**  
+  Ability to select repositories, branches, and configure VM resources. These are the most critical operations that determine how quickly and reliably projects are deployed.
+
+- **Project Lifecycle Management**  
+  Functions such as start, stop, restart, recreate, update, and delete must work consistently to guarantee operational stability.
+
+- **Service Management**  
+  Granular control over individual services (start, stop, restart, monitoring, environment variables) is vital for debugging, scaling, and ensuring uptime.
+
+---
+
+### 2.2 Secondary Functions
+
+These features add value but are not strictly essential for the platform to function. They improve usability, governance, and administration.
+
+- **User Invitations and Account Lifecycle**  
+  Allow administrators to onboard users easily, deactivate/reactivate accounts, reset passwords, or remove users when needed.
+
+- **Editing GitHub App Configuration**  
+  Ability to update OAuth credentials post-setup. Important for maintenance and operational flexibility.
+
+- **Editing Project Information**  
+  Supports renaming and updating descriptions for better organization, especially in multi-project environments.
+
+- **Downloading User Data**  
+  Compliance-oriented feature that ensures GDPR and data portability requirements.
+
+- **User Topology Preferences**  
+  Allows developers to personalize the project’s visual topology. Improves ergonomics but is not mission-critical.
+
+---
+
+### 2.3 User Interface
+
+These tests validate the **ergonomics, navigation, and accessibility** of the platform. The goal is to ensure Haddock is intuitive and developer-friendly.
+
+- **Topology View with ReactFlow**  
+  A visual representation of services and dependencies, ensuring clarity and accuracy of system architecture.
+
+- **Dashboard Overview**  
+  High-level view of all projects with statuses, ensuring users can immediately understand their deployments’ state.
+
+- **Service Detail Drawers**  
+  Contextual side panels with details on service status, configuration, and networking. Must be responsive and easy to navigate.
+
+- **Interactive Network Binding & Redirection Interface**  
+  Visual tools to configure ports, subdomains, and domain bindings without editing configs manually.
+
+- **Monitoring UI**  
+  Charts and logs that update in real-time, enabling developers to debug and monitor performance effectively.
+
+---
+
+### 2.4 Compatibility
+
+These tests ensure Haddock works consistently across different environments and user contexts.
+
+- **Operating System Compatibility**  
+  Verified on **Debian 12 with Vagrant provider** as reference environment. Future tests may extend to other UNIX-based systems.
+
+- **Browser Compatibility**  
+  Platform must function across major browsers (Chrome, Firefox, Safari, Edge).
+
+- **Responsiveness & Accessibility**  
+  UI must adapt to different screen sizes and follow accessibility best practices to support all users.
+
+---
+
+## 3. Test Plan
+
+This section details all the test scenarios required to validate Haddock’s features.
+Each scenario includes: description, objective, prerequisites, steps, and expected result.
+
+#### Scenario 1: Application installation
+
+- **Role Involved:** System administrator
+- **Objective:** To verify the successful installation of the Haddock application on a Debian 12 machine using Vagrant as the provider.
+- **Prerequisites:**
+
+  - A Debian 12 machine is set up and running.
+  - The system administrator has access to the terminal with appropriate permissions.
+
+- **Steps:**
+
+  1. Open the terminal on the Debian 12 machine.
+  2. Run the installation command provided in the Haddock documentation.
+  3. When prompted, select yes for installing "vagrant" as the provider for the installation.
+  4. Monitor the installation process and wait until it completes successfully.
+
+- **Expected result:**
+  - The installer should exit automatically upon completion.
+  - The installer should display all installation steps with checkmarks indicating successful completion of each step.
+  - The installer should output a URL for accessing the installed Haddock application.
+
+---
+
+#### Scenario 2: Onboarding: Register via email
+
+- **Role Involved:** System administrator
+- **Objective:** Verify that a system administrator can successfully register via email and be redirected to the "Domain names" page.
+- **Prerequisites:**
+  - The application is up and running.
+  - The system administrator has access to the signup page.
+- **Steps:**
+  1. Open the onboarding signup page.
+  2. Enter a valid user name in the "Name" input field.
+  3. Enter a valid email address in the "E-mail" input field.
+  4. Enter a valid password in the "Password" input field.
+  5. Click on the "Signup" button.
+- **Expected result:**
+  - The system administrator should be successfully registered.
+  - The system should redirect the administrator to the "Domain names" page within the application.
+
+---
+
+#### Scenario 3: Onboarding: Setup primary domain
+
+- **Role Involved:** System Administrator
+- **Objective:** To test the functionality of setting up a primary domain during the onboarding process.
+- **Prerequisites:**
+
+  - The system administrator should have access to the onboarding platform.
+  - The system administrator must own and have control over a valid domain name.
+  - The system administrator should have access to their domain provider's interface for DNS configuration.
+
+- **Steps:**
+
+  1.  Open the onboarding onboarding Domain names page.
+  2.  Select the "Setup main domain" section.
+  3.  In the "Domain name" input, write an owned valid domain name and click on the "Confirm" button.
+  4.  Note down the three generated DNS Bind inputs (primary, wildcard, challenge).
+  5.  Use these DNS Bind inputs to set up the domain on the provider's interface.
+  6.  Click on the "Refresh" button to check the progression of the setup. The checkmark should update according to the configuration on the provider's interface.
+  7.  Repeat step 6 until all steps are marked by a checkmark.
+  8.  Once all steps are completed, the "Next" button should be enabled.
+  9.  Click on the "Save" button to save the primary domain name.
+
+- **Expected result:**
+  - After confirming the domain at the first step, 3 bind values (primary, wildcard, challenge) must be generated.
+  - The checkmark should update on refresh button click, according to the configuration on the provider's interface.
+  - The "Next" button must be disabled until all steps are completed.
+  - The "Save" button must allow you to setup a second domain name after the first one is saved.
+  - No error messages or unexpected behavior should occur during the test.
+
+#### Scenario 4: Onboarding: Setup secondary domain
+
+- **Role Involved:** System Administrator
+- **Objective:** To verify the functionality of setting up a secondary domain in the onboarding process.
+- **Prerequisites:**
+
+  - The system administrator should have access to the onboarding platform.
+  - The system administrator must have already set up a primary domain.
+  - The system administrator must own and have control over a valid domain name (different than the domain used as Primary Domain).
+  - The system administrator should have access to their domain provider's interface for DNS configuration.
+
+- **Steps:**
+
+  1.  Still on the onboarding onboarding "Domain names" page.
+  2.  Locate and click the "Setup secondary domain" section.
+  3.  Enter a new, unique domain name in the "Domain name" field that differs from the primary domain and click on the "Confirm" button.
+  4.  Note down the three generated DNS Bind inputs (primary, wildcard, challenge).
+  5.  Use these DNS Bind inputs to set up the domain on the provider's interface.
+  6.  Click on the "Refresh" button to check the progression of the setup. The checkmark should update according to the configuration on the provider's interface.
+  7.  Repeat step 6 until all steps are marked by a checkmark (note that this time, Primary Bind is optional).
+  8.  Click on the "Save" button to save the primary domain name.
+
+- **Expected result:**
+  - After confirming the domain at the first step, 3 bind values (primary, wildcard, challenge) must be generated.
+  - The checkmark should update on refresh button click, according to the configuration on the provider's interface.
+  - No error messages or unexpected behavior should occur during the test.
+
+---
+
+#### Scenario 5: Deploying a project from a public repository without an authorization method
+
+- **Role Involved:** Developer
+- **Objective:** Test deploying a public repository without any authorization method setup
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The dashboard page is open.
+- **Steps:**
+  1.  Click on the "Deploy a project" button on the top-right corner of the page.
+  2.  Select the "N/A" authorization method.
+  3.  Fill in your desired public Github repository name.
+  4.  Fill in your desired branch to deploy from.
+  5.  Enter your Docker Compose file's path inside the repository.
+  6.  Move to the next step.
+  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.
+  8.  Press the "Create" button
+- **Expected result:**
+  - A new project card should appear in the dashboard's project list.
+  - After a short wait, the project's status should become "Started" or "Error".
+
+---
+
+#### Scenario 6: Setting the github application configuration from the settings drawer
+
+- **Role Involved:** Admin
+- **Objective:** Test the functionality of setting the GitHub application configuration from the settings drawer.
+- **Prerequisites:**
+  - The system administrator did not set the GitHub application configuration yet.
+  - The administrator is logged in to the application.
+  - A valid GitHub client ID and secret exist.
+- **Steps:**
+  1. Open the settings drawer by clicking on the purple stack icon at the top-right corner of the screen.
+  2. Unfold the "GitHub Application" sub-menu.
+  3. Navigate to the GitHub website and create a new GitHub application by filling out the required fields (e.g., application name, homepage url, callback URL provided by Haddock).
+  4. Obtain the required credentials (e.g., client ID and client secret) from the GitHub application configuration.
+  5. Fill in the "Github Client ID" and "Github Client Secret" fields with valid information.
+  6. Press the "Update" button to save your changes.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform you that the configuration was updated successfully, indicating a successful setting of the GitHub application configuration.
+
+---
+
+#### Scenario 7: Adding a new authorization method - OAuth
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of adding a new OAuth authorization in the application.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The settings drawer is open.
+- **Steps:**
+  1. Unfold the "Authorizations" menu.
+  2. Press the "Add authorization" button to initiate the creation process for a new authorization method.
+  3. Fill in the desired label for the new authorization method.
+  4. Select the "OAuth" radio button.
+  5. Click the "Login with Github" button.
+  6. You are redirected to Github's OAuth setup page, on which you should approve any requests to add a new OAuth connection.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
+  - The newly added authorization is displayed in the "Authorizations" table within the previous sub-menu inside the settings drawer.
+  - The new authorization method also becomes available within the "Deploy a project" modal, allowing users to choose it for their projects.
+
+---
+
+#### Scenario 8: Adding a new authorization method - Personal Access Token
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of adding a new Personal Access Token authorization in the application.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The settings drawer is open.
+- **Steps:**
+  1. Unfold the "Authorizations" menu.
+  2. Press the "Add authorization" button to initiate the creation process for a new authorization method.
+  3. Fill in the desired label for the new authorization method.
+  4. Select the "Personal Access Token" radio button.
+  5. Fill in your desired personal access token in the text field.
+  6. Press the "Confirm" button to complete the flow.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
+  - The newly added authorization is displayed in the "Authorizations" table within the previous sub-menu inside the settings drawer.
+  - The new authorization method also becomes available within the "Deploy a project" modal, allowing users to choose it for their projects.
+
+---
+
+#### Scenario 9: Adding a new authorization method - Deploy Key
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of adding a new Deploy Key authorization in the application.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The settings drawer is open.
+- **Steps:**
+  1. Unfold the "Authorizations" menu.
+  2. Press the "Add authorization" button to initiate the creation process for a new authorization method.
+  3. Fill in the desired label for the new authorization method.
+  4. Select the "Deploy Key" radio button.
+  5. Fill in your desired deploy key in the text area.
+  6. Press the "Confirm" button to complete the flow.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
+  - The newly added authorization is displayed in the "Authorizations" table within the previous sub-menu inside the settings drawer.
+  - The new authorization method also becomes available within the "Deploy a project" modal, allowing users to choose it for their projects.
+
+---
+
+#### Scenario 10: Private repository deployment with an authorization method
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of creating and deploying a new project within the platform.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The dashboard page is open.
+- **Steps:**
+  1.  Click on the "Deploy a project" button on the top-right corner of the page.
+  2.  Select the desired authorization from the configured authorizations (e.g., Personal Access Token).
+  3.  Select a GitHub repository from the repositories available to the authorization method.
+  4.  Select a branch to deploy from.
+  5.  Enter your Docker Compose file's path inside the repository.
+  6.  Move to the next step.
+  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.
+  8.  Press the "Create" button
+- **Expected result:**
+  - A new project card should appear in the dashboard's project list.
+  - After a short wait, the project's status should become "Started" or "Error".
+
+---
+
+#### Scenario 11: User display preferencies in topology view
+
+- **Role Involved:** Developer
+- **Objective:** To test the functionality of displaying user preferences in the topology view for a Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Manipulate the nodes (services) by clicking and dragging them to rearrange them in a preferred layout within the topology view.
+  6. Test the functionality of showing or hiding connections between services by toggling this option on or off, respectively.
+  7. Refresh the page to verify the changes made.
+- **Expected result:**
+  - Upon refreshing the page, the rearranged nodes (services) should be displayed in the preferred layout selected by the developer.
+  - If the option to display connections was toggled off, there should be no visible lines connecting the services. Conversely, if the option to display connections was toggled on, all connections between the services should be clearly visible.
+
+---
+
+#### Scenario 12: Edit project informations
+
+- **Role Involved:** Developer
+- **Objective:** To test the functionality of editing project information on the Haddock platform.
+- **Prerequisites:**
+  - A developper account is set up and logged in.
+  - The project to be edited is already deployed on Haddock.
+- **Steps:**
+  1. Navigate to the dashboard.
+  2. Locate the project to be edited from the list and click on it.
+  3. In the newly opened page, navigate to the settings tab.
+  4. Click on the "Edit this Project" button that appears.
+  5. Update the name and description fields with new values.
+  6. Click the 'Edit this Project' button to save the changes.
+- **Expected result:**
+  - A toast message should be displayed on the bottom right side of the screen confirming the successful update of the project information.
+  - The updated name should be reflected in the header of the project page.
+  - The updated name and description should appear in the list of projects on the dashboard.
+
+---
+
+#### Scenario 13: Edit an existing project's authorization method
+
+- **Role Involved:** Developer
+- **Objective:** Test updating a project's authorization method.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The dashboard page is open.
+  - There is an existing deployed project available.
+- **Steps:**
+  1. On the dashboard, select an existing project from among the list of projects displayed.
+  2. Move to the "Settings" tab on the project details page by clicking on it.
+  3. Press the "Edit this project" button located at the top right corner of the settings page.
+- **Expected result:**
+  - A new toast message is generated once the edit button is pressed, confirming that the authorization method was updated successfully.
+
+---
+
+#### Scenario 14: Stop Project
+
+- **Role Involved:** Developer
+- **Objective:** To verify that the 'Stop Project' functionality stops the project and all associated services.
+- **Prerequisites:**
+  - A developper account is set up and logged in.
+  - The project to be stopped is already deployed and 'Running' on Haddock.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Select the desired 'Running' state project from the list.
+  3. Click on the 'Stop Project' button.
+  4. In the modal that appears, click on the 'Stop Project' button again to confirm the action.
+- **Expected result:**
+  - A notification with a success message about stopping the project should appear on the bottom right side of the screen.
+  - The selected project's state should change from 'Running' to 'Stopped'.
+  - All related services associated with the project should be stopped and their status updated accordingly.
+
+---
+
+#### Scenario 15: Start a Project
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of starting a Haddock project that is either stopped or in error.
+- **Prerequisites:**
+  - A user account with appropriate permissions to start a project.
+  - The project to be started is already deployed on Haddock.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list, which is currently either stopped or in an error state.
+  3. Click on the project name to open its details page.
+  4. Find and click the "Start" button located near the status of the project.
+- **Expected result:**
+  - A notification message should appear on the bottom right side of the screen saying that the project is now starting.
+  - The project status should change to "Starting".
+  - After a short delay, the project status should change to "Running". This indicates that the feature works correctly and the project has successfully started or resumed.
+
+---
+
+#### Scenario 16: Update Project
+
+- **Role Involved:** Developer
+- **Objective:** To verify that a Haddock project can be updated from its GitHub source, and the changes are reflected in the deployed application.
+- **Prerequisites:**
+  - A Haddock project is already deployed and accessible.
+  - The project's source code resides on a GitHub repository.
+  - Developer has necessary access rights to make commits on the GitHub repository.
+  - The deployment system is configured to pull updates from GitHub automatically or manually.
+- **Steps:**
+  1. Navigate to the GitHub repository hosting the Haddock project's source code.
+  2. Make a commit containing desired changes, ensuring that the changes are relevant to the project and do not break any existing functionality.
+  3. Navigate to the dashboard page.
+  4. Locate the desired project on the list
+  5. Click on the project name to open its details page.
+  6. Find and click the "Update" button located near the status of the project.
+  7. Confirm the update by clicking on the appropriate modal or dialog box, as prompted by the system.
+- **Expected result:**
+  - A notification message should appear on the bottom right side of the screen saying that the update process has started.
+  - The project will begin to recompile and restart, incorporating the new modifications from the committed changes in the GitHub repository.
+  - Once the project is fully updated, it should now be running with the new modifications applied.
+
+---
+
+#### Scenario 17: Recreate Project
+
+- **Role Involved:** Developer
+- **Objective:** To verify the functionality of recreating a stopped or error Haddock project from its page.
+- **Prerequisites:**
+  - A Haddock project is already deployed and accessible.
+  - The project is currently in a stopped or error state.
+  - A user account with appropriate permissions to recreate the project.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list, which is currently either stopped or in an error state.
+  3. Click on the project name to open its details page.
+  4. Find and click the "Recreate" button located near the status of the project.
+  5. Confirm the recreation action in the appearing modal.
+- **Expected result:**
+  - A notification appears on the right bottom side of the screen, confirming the start of project recreation process.
+  - The project status should change to "Starting".
+  - After a short delay, the project status should change to "Running". This indicates that the feature works correctly and the project has successfully been recreated.
+
+---
+
+#### Scenario 18: Monitoring a deployed project
+
+- **Role Involved:** Developer
+- **Objective:** Test the ability to monitor CPU, Memory, and Disk Usages for a deployed project, as well as view the project's docker logs.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The project's details page should be open.
+- **Steps:**
+  1. Click on the "Monitoring" tab to move to that section.
+  2. Check that the CPU, Memory, and Disk Usages are displayed as a percentage ring chart and a detailed histogram for each metric.
+  3. Verify that the charts are updated in real-time to reflect the current status of the project.
+  4. Scroll down to view the project's docker logs at the bottom of the page.
+- **Expected result:**
+  - The project details page and the "Monitoring" tab should be accessible for the selected project.
+  - The CPU, Memory, and Disk Usages are displayed as a percentage ring chart and a histogram for each metric.
+  - The charts should update in real-time to reflect the current status of the project.
+  - The project's docker logs can be viewed at the bottom of the page.
+
+---
+
+#### Scenario 19: Service View
+
+- **Role Involved:** Developer
+- **Objective:** Verify that the Service View of a deployed Haddock project correctly displays all services in a React Flow.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines services in it.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Verify that the React Flow visualization is loaded on the Topology tab
+- **Expected result:**
+  - The entire list of services from the Compose file should be displayed in the Flow representation.
+  - Each service node should be clickable and provide additional information when clicked.
+
+---
+
+#### Scenario 20: Service Status
+
+- **Role Involved:** Developer
+- **Objective:** To verify that the Service Status is correctly displayed for a deployed Haddock project with at least one service.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. Ensure that the drawer on the right side of the screen is opened to display the details of the chosen service
+- **Expected result:**
+  - The drawer should open on the right side of the screen, revealing the details of the selected service.
+  - The status of the service should be displayed in the drawer.
+  - The image of the service should be visible in the drawer.
+
+---
+
+#### Scenario 21: Service Configuration: environment variable
+
+- **Role Involved:** Developer
+- **Objective:** Testing that environment variables defined in a Compose file for a Haddock project service are correctly displayed in the "Environment Variables" section on the configuration page.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should have environment variables defined in the compose file.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the configuration tab.
+- **Expected result:**
+  - The environment variable defined in the Compose file should be correctly displayed under the "Environment Variables" section in the configuration page.
+  - The displayed value should match the actual value defined within the Compose file.
+
+---
+
+#### Scenario 22: Service Configuration: depends on
+
+- **Role Involved:** Developer
+- **Objective:** Verify that the "depends_on" services listed in the compose for a specific service are correctly displayed on the configuration page of the Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should have depends_on defined in the compose file.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the configuration tab.
+  7. Locate the "depends on" section on the configuration page.
+- **Expected result:**
+  - All the services listed as "depends_on" in the compose for that service should be displayed correctly under the "depends on" section on the configuration page.
+
+---
+
+#### Scenario 23: Service Configuration: ressource limits
+
+- **Role Involved:** Developer
+- **Objective:** Test the display of resource limits in the service configuration for a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should have resource limits defined in the compose file.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the configuration tab.
+  7. Locate the "resource limits" section in the configuration page.
+- **Expected result:**
+  - The resource limits (memory, CPU, etc.) specified in the service's Compose file should be correctly displayed within the resource limits section of the service's configuration settings.
+
+---
+
+#### Scenario 24: Service Configuration: User
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of displaying user information in the Service Configuration tab for a given service within a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should be configured to have user defined with UID and GID.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the configuration tab.
+  7. Locate the "user" section on the configuration page.
+- **Expected result:**
+  - The user information provided in the Compose file (UID, GID) is correctly displayed in the Service Configuration's User section.
+
+---
+
+#### Scenario 25: Service network: Ports list
+
+- **Role Involved:** Developer
+- **Objective:** Test the display of all ports defined in the compose file under the "Ports" section for a targeted service.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The compose file should define ports for that specific service.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Network tab.
+  7. Locate the "Ports" section.
+- **Expected result:**
+  - The "Ports" section should be visible in the Networks tab for the selected service.
+  - The list of all the ports defined in the compose file should be displayed correctly in the "Ports" section.
+
+---
+
+#### Scenario 26: Service Network: Network list
+
+- **Role Involved:** Developer
+- **Objective:** Testing that the defined networks in a Haddock project's compose file are displayed under the Networks tab of the targeted service.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The compose file should define networks for that specific service.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Network tab.
+  7. Locate the "Networks" section.
+- **Expected result:**
+  - The "Networks" section should be visible in the Networks tab for the selected service.
+  - The list of all the networks defined in the compose file should be displayed correctly in the "Networks" section.
+
+---
+
+#### Scenario 27: Service network redirections: No subdomain
+
+- **Role Involved:** Developer
+- **Objective:** To test the functionality of creating a network redirection without a subdomain in a Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The compose file should define ports for that specific service.
+  - At least two domains must be pre-configured in the system to use in the redirection.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Network tab.
+  7. Locate the Redirections section.
+  8. Click on the "Add redirection" button.
+  9. Choose a port from the available options in the dialog box.
+  10. Leave the subdomain field empty and fill in one of the pre-configured domains.
+  11. Click on the "Create" button to save the redirection settings.
+- **Expected result:**
+  - It must not be possible to choose the primary domain.
+  - A notification message should be displayed, confirming that the redirection has been created successfully.
+  - The newly created redirection should appear in the list of network redirections with the specified port and domain.
+  - By accessing the Internet using the filled-in domain, you should be able to reach the targeted service via the created network redirection.
+
+---
+
+#### Scenario 29: Service Networks redirections: With subdomain
+
+- **Role Involved:** Developer
+- **Objective:** To test the functionality of creating a network redirection with a subdomain in a Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The compose file should define ports for that specific service.
+  - One or more domains should be pre-configured in the system to use in the redirection.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Network tab.
+  7. Locate the Redirections section.
+  8. Click on the "Add redirection" button.
+  9. Choose a port from the available options in the dialog box.
+  10. Fill in the subdomain field with a valid subdomain.
+  11. Click on the "Create" button to save the redirection settings.
+- **Expected result:**
+  - A notification message should be displayed, confirming that the redirection has been created successfully.
+  - The newly created redirection should appear in the list of network redirections with the specified port and full domain.
+  - By accessing the Internet using the filled-in domain, you should be able to reach the targeted service via the created network redirection.
+
+---
+
+#### Scenario 30: Service Network redirection: Delete redirection
+
+- **Role Involved:** Developer
+- **Objective:** Test the successful deletion of a service network redirection in a Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service already has an active redirection.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Network tab.
+  7. Locate the Redirections section.
+  8. Click on the trash button next to the selected redirection.
+  9. Click on the delete button in the dialog.
+- **Expected result:**
+  - A notification should be displayed saying that the redirection has been successfully deleted.
+  - The deleted redirection should no longer appear in the Redirections list.
+  - It should no longer be possible to access the service on the internet using the previous domain associated with the deleted redirection.
+
+---
+
+#### Scenario 30: Start a service
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality to start a service in a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should be in a stopped or error state.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Status tab (default one).
+  7. Identify the 3 dots action button in the "Current Status" section and click on it.
+  8. Click on the "Start" button that appears after clicking the 3 dots action button.
+- **Expected result:**
+  - The service should transition from a stopped or error state to a running state.
+  - A notification should be displayed, confirming that the service is now running.
+
+---
+
+#### Scenario 31: Restart service
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality to restart a service in a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should be in a running state.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Status tab (default one).
+  7. Identify the 3 dots action button in the "Current Status" section and click on it.
+  8. Click on the "Restart" button that appears after clicking the 3 dots action button.
+- **Expected result:**
+  - The selected service should restart successfully.
+  - A notification should be displayed confirming that the service has been restarted.
+
+---
+
+#### Scenario 32: Stop a service
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality to stop a service in a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+  - That project should have a compose file inside that defines at least one service in it.
+  - The service should be in a running state.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Locate the Topology tab (default one).
+  5. Click on the selected service node.
+  6. In the drawer, navigate to and open the Status tab (default one).
+  7. Identify the 3 dots action button in the "Current Status" section and click on it.
+  8. Click on the "Stop" button that appears after clicking the 3 dots action button.
+- **Expected result:**
+- The service should now be in a stopped state.
+- A notification should be displayed, confirming that the service is now stopped.
+
+---
+
+#### Scenario 33: Display project environment variable
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality to display project environment variables in a Haddock-deployed project.
+- **Prerequisites:**
+  - A project has been deployed using Haddock with a .env file containing some environment variables.
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+- **Expected result:**
+  - Upon clicking on the "Manage Environment Variables," the developer should see all the environment variables defined in the .env file associated with the tested project.
+
+---
+
+#### Scenario 34: Add an environment variable
+
+- **Role Involved:** Developer
+- **Objective:** To add an environment variable to a deployed Haddock project and verify that it appears in the list and within the VM environment.
+- **Prerequisites:**
+  - A valid Haddock account is set up.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Fill out the form by providing a key and value for the new environment variable, ensuring it is not marked as secret.
+  7. Click on the "Add" button to submit the new environment variable
+  8. Stop and Start the project to apply the modifications.
+- **Expected result:**
+  - The new environment variable should be created successfully.
+  - The newly added environment variable should be displayed in the list within the "Manage environment variables" section.
+  - The newly added environment variable should be successfully applied and accessible in the VM environment when running the project.
+  - Since it's not secret, the value of the variable should clearly be displayed within the list without any obfuscation or masking.
+
+---
+
+#### Scenario 35: Add a secret environment variable
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of creating a secret environment variable for a deployed Haddock project.
+- **Prerequisites:**
+  - A valid Haddock account is set up.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Fill out the form by providing a key and value for the new environment variable.
+  7. Check the box marked 'Secret'.
+  8. Click on the 'Add' button to create the new environment variable.
+  9. Stop and Start the project to apply the modifications.
+- **Expected result:**
+  - The new environment variable should be created successfully.
+  - The newly added environment variable should be successfully applied and accessible in the VM environment when running the project.
+  - The newly added environment variable should be displayed in the list within the "Manage environment variables" section.
+  - Since the variable is secret, the value should not be visible within the project settings page.
+
+---
+
+#### Scenario 36: Edit non secret environment variable
+
+- **Role Involved:** Developer
+- **Objective:** To test the functionality of editing a non-secret environment variable in the Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Identify the environment variable that will be edited.
+  7. Replace both the key and the value of the selected environment variable with new values.
+  8. Click the 'Save' button to save the changes
+- **Expected result:**
+  - The edited environment variable should be updated on the list.
+  - The updated environment variable should be reflected in the VM environment for the deployed Haddock project.
+
+---
+
+#### Scenario 37: Change environment variable from non secret to secret
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of changing an environment variable from non-secret to secret within a project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Check on the secret state for the variable you want to edit.
+  7. Save the updated environment variable settings.
+- **Expected result:**
+  - The environment variable should be saved and updated as a secret variable.
+  - The value of the environment variable shouldn't be displayed anymore.
+  - The checkbox "Secret" should be checked.
+
+---
+
+#### Scenario 38: Edit secret environment variable
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of editing a secret environment variable in a deployed Haddock project.
+- **Prerequisites:**
+  - The developer should be logged into the Haddock platform and have access to the specified project.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Identify the secret environment variable that will be edited.
+  7. Update the key and value of the variable as desired.
+  8. Click the 'Save' button to save the changes
+- **Expected result:**
+  - The key and value of the identified secret environment variable should be updated with the new values provided by the developer.
+  - Since the variable is secret, the updated value cannot be viewed. However, the key and the fact that it is a secret variable should remain visible.
+  - Since the variable is secret, the "Secret" checkbox should be checked and cannot be changed.
+
+---
+
+#### Scenario 39: Delete environment variable
+
+- **Role Involved:** Developer
+- **Objective:** Test the ability to delete an environment variable in a deployed project on the platform.
+- **Prerequisites:**
+  - A Haddock-deployed project is accessible and active.
+  - The project has at least one environment variable set.
+- **Steps:**
+  1. Navigate to the dashboard page.
+  2. Locate the desired project on the list.
+  3. Click on the project name to open its details page.
+  4. Go to the "Settings" tab within the project page.
+  5. Locate and expand the "Manage Environment Variables" section.
+  6. Identify the environment variable to be deleted.
+  7. Click on the "Delete" button associated with the selected environment variable.
+- **Expected result:**
+  - A notification should appear on the right bottom side of the screen confirming that the action was successful.
+  - The deleted environment variable should no longer be visible in the list of environment variables under the "Manage Environment Variables" section.
+
+#### Scenario 40: Editing the github application configuration
+
+- **Role Involved:** Administrator
+- **Objective:** Test the functionality of editing the GitHub application configuration.
+- **Prerequisites:**
+  - The administrator is logged in to the application.
+  - A valid GitHub client ID and secret exist.
+- **Steps:**
+  1. Open the settings drawer by clicking on the purple stack icon at the top-right corner of the screen.
+  2. Unfold the "GitHub Application" sub-menu.
+  3. Fill in the new "Github Client ID" and "Github Client Secret" fields with valid information.
+  4. Press the "Update" button to save your changes.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform you that the configuration was updated successfully, indicating a successful edit of the GitHub application configuration.
+
+---
+
+#### Scenario 41: Inviting a new user
+
+- **Role Involved:** Admin
+- **Objective:** To test the functionality of inviting a new user to the platform.
+- **Prerequisites:**
+  - A valid email address for the invited user
+  - Be logged in with an active admin account
+- **Steps:**
+  1. Open the settings drawer by clicking on the purple stack icon at the top-right corner of the dashboard.
+  2. Unfold the “Users” sub-menu and click on it to view the list of existing users.
+  3. Press the “Invite User” button to invite a new user.
+  4. Inside the “Invite User” modal, enter the user’s email.
+  5. Press the “Send invitation button” to invite the user.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen informing you that the user has been invited successfully.
+  - The invited user appears in the list of users with a "invited" Role.
+
+---
+
+#### Scenario 42: Downloading a user's personal data
+
+- **Role Involved:** Admin
+- **Objective:** Test the functionality of downloading a user's personal data from the system.
+- **Prerequisites:**
+  - The user is logged in to their admin account.
+  - The settings drawer is open.
+  - There are existing users in the system.
+- **Steps:**
+  1. Unfold the "Users" menu.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  3. Click the "Download personal data" option.
+- **Expected result:**
+  - A JSON file is downloaded to the admin's machine.
+  - The downloaded JSON file should contain all the necessary personal data of the selected user (e.g., name, email, roles, etc.).
+  - The file format should be valid JSON and the content inside should not have any syntax errors.
+
+---
+
+#### Scenario 43: Delete an authorization method
+
+- **Role Involved:** Developer
+- **Objective:** Test the functionality of deleting an authorization method in the application settings.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+  - The settings drawer is open.
+  - There is at least one existing authorization method already set up.
+- **Steps:**
+  1. Unfold the "Authorizations" menu.
+  2. Click on the red bin icon next to an existing authorization method.
+- **Expected result:**
+  - The authorization method is removed from the list and no longer visible in the Authorizations section.
+  - A prompt or message indicating successful deletion of the authorization method appears.
+
+---
+
+#### Scenario 44: Deactivate a user
+
+- **Role Involved:** Admin
+- **Objective:** Test deactivation of a user's account
+- **Prerequisites:**
+  - The user is logged in to their admin account.
+  - The settings drawer is open.
+  - A test user with "Member" role and active status exists in the system.
+- **Steps:**
+  1. Unfold the "Users" menu.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  3. Click the "Deactivate" option to deactivate the selected user's account.
+- **Expected result:**
+  - The selected user's status in the list should change from green checked circle to a red circle with a dash, indicating that their account has been deactivated.
+  - Attempting to connect as the deactivated user should result in an error.
+
+---
+
+#### Scenario 45: Activate a user
+
+- **Role Involved:** Admin
+- **Objective:** Test activation of a user's account
+- **Prerequisites:**
+  - The user is logged in to their admin account.
+  - The settings drawer is open.
+  - A test user with "Member" role and inactive status exists in the system.
+- **Steps:**
+  1. Unfold the "Users" menu.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  3. Click the "Activate" option to activate the selected user's account.
+- **Expected result:**
+  - The selected user's status in the list should change from red circle with a dash to a green checked circle, indicating that their account has been activated.
+  - Attempting to connect as the activated user should succeed.
+
+---
+
+#### Scenario 46: Change a user's password
+
+- **Role Involved:** Admin
+- **Objective:** Test changing a user's password
+- **Prerequisites:**
+  - The user is logged in to their admin account.
+  - The settings drawer is open.
+  - A test user with "Member" role and active status exists in the system.
+- **Steps:**
+  1. Unfold the "Users" menu.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  3. Click the "Reset Password" option to open the password change dialog.
+  4. A dialog prompts you to select a new password for the user.
+  5. Click the "Change Password" button.
+- **Expected result:**
+  - Attempting to connect as the selected user with the old password should throw an error.
+  - Attempting to connect as the selected user with the new password should work as a normal login.
+
+---
+
+#### Scenario 47: Delete a user
+
+- **Role Involved:** Admin
+- **Objective:** Test deletion of a user's account
+- **Prerequisites:**
+  - The user is logged in to their admin account.
+  - The settings drawer is open.
+  - A test user with "Member" role and active status exists in the system.
+- **Steps:**
+  1. Unfold the "Users" menu.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  3. Click the "Delete" option to delete the selected user's account.
+- **Expected result:**
+  - The selected user should dissapear from the user list.
+  - Attempting to connect as the deactivated user should throw an error.
+
+---
+
+#### Scenario 48: Delete project
+
+- **Role Involved:** Developer
+- **Objective:** To verify that a project can be successfully deleted and the user is redirected to the dashboard page where the deleted project is no longer displayed.
+- **Prerequisites:**
+
+  - A developper account is set up and logged in.
+  - The project to be deleted is already deployed on Haddock.
+
+- **Steps:**
+  1.  Navigate to the Dashboard page.
+  2.  Identify the desired project on the dashboard.
+  3.  Click on the project to access its details page.
+  4.  Locate and click on the 'Settings' tab.
+  5.  Find the 'Delete Project' button, then click on it.
+  6.  Wait for 3 seconds after the modal appears.
+  7.  Click on the 'Delete Project' button in the modal.
+- **Expected result:**
+  - The developer should be redirected to the Dashboard page.
+  - The deleted project should no longer appear on the Dashboard.
+  - There should be a confirmation message indicating that the project has been successfully deleted.
+
+---
+
+#### Scenario 49: Logout
+
+- **Role Involved:** Developer
+- **Objective:** Test the logout feature
+- **Prerequisites:**
+  - The user is logged in to their account.
+  - The settings drawer is open.
+- **Steps:**
+  1. Click the "Logout" button at the bottom of the drawer.
+- **Expected result:**
+  - The user should be redirected to the login page and lose access to the dashboard and other account-specific features.
+
+---
+
+## 3.2. Data Sets
+
+For testing Haddock, different data sets will be used:
+
+### 3.2.1 Valid Data
+
+_Any provided data mentioned here are valid and can be found in the **Appendices** section._
+
+- You'll need a machine which Haddock can be installed on (e.g. Debian 12). We provided you an already deployed Haddock instance on our demo environment.
+- You'll need an email to register a new account.
+- You'll need another email to invite a new user and login as them.
+- You'll need a valid github account if you want to use GitHub OAuth, or create your own personal access token or deploy key.
+- If you cannot have any github account, we provided you a valid github deploy key that you can use to deploy a project. But you cannot have autocompletion on the repositories list and branches list. For thoses reasons, we also provided you a demo repository name with different branches to deploy from.
+- If you want to try the domain setup, you'll need a valid domain name that you can access.
+- If you cannot have any domain, you can use the haddock account on our demo environment and skip the register / onboarding / domain setup.
+- You need a valid compose file to deploy a project. Although we provided valids compose files that contains valid services and everything to run the tests. Feel free to use the one you prefer but we do recommend to use the one we provided to avoid any mistakes.
+
+### 3.2.2 Invalid Data
+
+- A machine which Haddock cannot be installed on (e.g. MacOS).
+- An invalid github account, personal access token or deploy key.
+- An invalid domain name.
+- An invalid compose file that doesn't build and run.
+- If you invite a new user, an invalid email.
+
+### 3.2.3 Borderline Cases
+
+- Nothing for now.
+
+---
+
+## 4. Acceptance Criteria
+
+A test scenario is **validated** if:
+
+- All expected results are obtained.
+- No blocking/critical anomalies are encountered.
+- The system behaves consistently without crashes.
+
+---
+
+## 5. Appendices
+
+### 5.1 Provided Data Sets
+
+The following items required for the acceptance tests are provided (without details here):
+
+- Machine with Haddock pre-installed (demo environment)
+- Pre-installed and configured Haddock instance on the demo environment
+- Deploy key
+- Demo repository name
+- List of branches for the demo repository
+- Valid compose files for project deployment (with valid services and everything to run the tests)
+
+All details and credentials for these items can be found in the zip file containing every information that you need.
+
+---
