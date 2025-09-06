@@ -240,7 +240,6 @@ export default function TokensList({ projectId }: TokensListProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Token Dialog */}
       {selectedToken && (
         <EditTokenDialog
           projectId={projectId}
