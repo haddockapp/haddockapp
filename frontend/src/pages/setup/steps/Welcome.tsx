@@ -39,7 +39,7 @@ const Welcome: FC = () => {
       <div>
         <Button
           variant="link"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/workspaces")}
           className="space-x-2"
         >
           <CircleGauge size="16px" />

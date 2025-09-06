@@ -112,7 +112,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             toast({ title: "Project created !", duration: 1000 });
             reset();
             onClose?.();
-            navigate(`/workspace/${workspaceId}/project/${res.id}`);
+            navigate(`/workspaces/${workspaceId}/projects/${res.id}`);
             setFormStep(0);
           })
           .catch(() => {

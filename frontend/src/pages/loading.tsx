@@ -17,7 +17,7 @@ const LoadingPage: FC = () => {
 
   if (!isSetupComplete) return <Navigate to="/setup?step=domains" />;
 
-  return <Navigate to="/dashboard" />;
+  return <Navigate to="/workspaces" />;
 };
 
 export default LoadingPage;

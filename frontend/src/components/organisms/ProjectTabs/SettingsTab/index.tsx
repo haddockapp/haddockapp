@@ -35,7 +35,7 @@ const SettingsTabAction: FC<PropsWithChildren<SettingsTabActionProps>> = ({
 const SettingsTab: FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { projectId } = useParams();
+  const { projectId, workspaceId } = useParams();
   const project = useGetProjectsQuery().data?.find(
     (project) => project.id === projectId
   );
@@ -50,7 +50,7 @@ const SettingsTab: FC = () => {
           description: "The project has been deleted successfully.",
           variant: "default",
         });
-        navigate("/dashboard");
+        navigate(`/workspaces/${workspaceId}/projects`);
       })
       .catch(() => {
         toast({
@@ -67,7 +67,7 @@ const SettingsTab: FC = () => {
       <Dialog
         open={isLoadingDelete}
         onOpenChange={() => {
-          navigate("/dashboard");
+          navigate("/workspaces");
         }}
       >
         <DialogContent className="justify-center">

@@ -68,7 +68,7 @@ const GithubCallback: FC = () => {
                 description:
                   "You can now use this authorization to access your repositories.",
               });
-              navigate("/dashboard");
+              navigate("/workspaces");
             });
           break;
       }

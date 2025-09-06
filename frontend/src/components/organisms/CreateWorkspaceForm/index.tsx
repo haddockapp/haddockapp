@@ -40,11 +40,11 @@ const CreateWorkspaceForm: FC<CreateWorkspaceFormProps> = ({ onClose }) => {
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     triggerCreateWorkspace({ name: data.name, description: data.description })
       .unwrap()
-      .then(() => {
+      .then((res) => {
         toast({ title: "Workspace created !", duration: 1000 });
         reset();
         onClose?.();
-        navigate(`/dashboard`);
+        navigate(`/workspaces/${res.id}/projects`);
       })
       .catch(() =>
         toast({

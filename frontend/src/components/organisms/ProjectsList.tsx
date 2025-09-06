@@ -31,7 +31,7 @@ const ProjectsList: FC<ProjectsListProps> = ({ isLoading, projects }) => {
               project={project}
               onClick={() =>
                 navigate(
-                  `/workspace/${project.workspaceId}/project/${project.id}`
+                  `/workspaces/${project.workspaceId}/projects/${project.id}`
                 )
               }
             />

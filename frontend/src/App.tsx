@@ -38,9 +38,12 @@ function App() {
             <Route index element={<Authentication />} />
             <Route path="setup" element={<Setup />} />
             <Route element={<AuthenticatedGuard />}>
-              <Route path="dashboard" element={<WorkspacesPage />} />
-              <Route path="workspace/:workspaceId" element={<Projects />} />
-              <Route path="workspace/:workspaceId/project/*">
+              <Route path="workspaces" element={<WorkspacesPage />} />
+              <Route
+                path="workspaces/:workspaceId/projects"
+                element={<Projects />}
+              />
+              <Route path="workspaces/:workspaceId/projects/*">
                 <Route path=":projectId" element={<ProjectDetails />} />
               </Route>
             </Route>
