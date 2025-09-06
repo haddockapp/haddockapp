@@ -23,6 +23,7 @@ export type CreateProjectDto = {
   vm_cpus: number;
   compose_path: string;
   authorization_id?: string;
+  workspace_id?: string;
 };
 
 export type ProjectDto = {
@@ -34,6 +35,7 @@ export type ProjectDto = {
   vmId: string;
   vm: VMInfos;
   source: Source;
+  workspaceId?: string;
 };
 
 export type UpdateProjectDto = {

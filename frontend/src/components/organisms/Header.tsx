@@ -7,6 +7,7 @@ import SimpleDrawer from "./SimpleDrawer";
 import Settings from "./Settings";
 import { setTheme, Theme } from "@/services/settingsSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
+import { useGetWorkspacesQuery } from "@/services/backendApi/workspaces";
 
 const pathTranslations: Record<string, string> = {
   ["/"]: "/ authentication",
@@ -16,13 +17,18 @@ const pathTranslations: Record<string, string> = {
 };
 
 const Header: FC = () => {
-  const { projectId } = useParams();
+  const { projectId, workspaceId } = useParams();
   const dispatch = useAppDispatch();
   const selectedTheme = useAppSelector((state) => state.settings.theme);
   const navigate = useNavigate();
 
+  const { data: workspaces } = useGetWorkspacesQuery();
   const { data: projects } = useGetProjectsQuery();
 
+  const workspaceName = useMemo(
+    () => workspaces?.find((w) => w.id === workspaceId)?.name,
+    [workspaces, workspaceId]
+  );
   const projectName = useMemo(
     () => projects?.find((p) => p.id === projectId)?.name,
     [projects, projectId]
@@ -38,7 +44,9 @@ const Header: FC = () => {
         />
         <h3 className="text-typography text-2xl ml-2">
           {projectId
-            ? `/ project / ${projectName}`
+            ? `/ ${workspaceName} / ${projectName}`
+            : workspaceId
+            ? `/ ${workspaceName}`
             : pathTranslations[window.location.pathname] ??
               window.location.pathname}
         </h3>

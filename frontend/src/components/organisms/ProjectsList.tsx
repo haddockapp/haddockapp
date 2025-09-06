@@ -29,7 +29,11 @@ const ProjectsList: FC<ProjectsListProps> = ({ isLoading, projects }) => {
             <ProjectCard
               key={project.id}
               project={project}
-              onClick={() => navigate(`/project/${project.id}`)}
+              onClick={() =>
+                navigate(
+                  `/workspace/${project.workspaceId}/project/${project.id}`
+                )
+              }
             />
           ))
         )}

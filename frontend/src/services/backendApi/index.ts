@@ -12,12 +12,13 @@ const baseQuery = fetchBaseQuery({
 });
 
 export enum QueryKeys {
-  Projects = "Projects",
+  Users = "Users",
   Domains = "Domains",
+  Projects = "Projects",
+  Workspaces = "Workspaces",
   Redirections = "Redirections",
   Configurations = "Configurations",
   Authorizations = "Authorizations",
-  Users = "Users",
   EnvironmentVariables = "EnvironmentVariables",
 }
 

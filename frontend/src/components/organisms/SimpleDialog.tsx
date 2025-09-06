@@ -17,6 +17,7 @@ interface SimpleDialogProps {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
+  isOpenDefault?: boolean;
 }
 const SimpleDialog: FC<SimpleDialogProps> = ({
   Trigger,
@@ -24,10 +25,15 @@ const SimpleDialog: FC<SimpleDialogProps> = ({
   title,
   description,
   isOpen,
+  isOpenDefault = false,
   onOpen,
   onClose,
 }) => (
-  <Dialog onOpenChange={(open) => (open ? onOpen() : onClose())} open={isOpen}>
+  <Dialog
+    defaultOpen={isOpenDefault}
+    onOpenChange={(open) => (open ? onOpen() : onClose())}
+    open={isOpen}
+  >
     <DialogTrigger asChild>
       <Trigger onOpen={onOpen} />
     </DialogTrigger>

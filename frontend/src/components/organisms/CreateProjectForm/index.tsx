@@ -25,27 +25,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import CreateSelect from "@/components/molecules/create-select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const formSchema = z.object({
-  authorization: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .optional(),
-  repository: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .required(),
-  branch: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .required(),
+  authorization: z.object({ label: z.string(), value: z.string() }).optional(),
+  repository: z.object({ label: z.string(), value: z.string() }).required(),
+  branch: z.object({ label: z.string(), value: z.string() }).required(),
   memory: z.number().int().min(512).max(8192),
   disk: z.number().int().min(256).max(2048),
   vcpus: z.number().int().min(1).max(8),
@@ -58,6 +43,7 @@ interface CreateProjectFormProps {
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { workspaceId } = useParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,20 +75,13 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
-      {
-        authorization: watchAuthorization!,
-      },
+      { authorization: watchAuthorization! },
       { skip: !watchAuthorization || !canFetchReposAndBranches }
     );
   const { currentData: branches, isFetching: isFetchingBranches } =
     useGetAllBranchesByRepositoryQuery(
-      {
-        repository: watchRepository,
-        authorization: watchAuthorization!,
-      },
-      {
-        skip: !watchRepository || !canFetchReposAndBranches,
-      }
+      { repository: watchRepository, authorization: watchAuthorization! },
+      { skip: !watchRepository || !canFetchReposAndBranches }
     );
 
   const [createProject] = useCreateProjectMutation();
@@ -126,16 +105,14 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               ? data.authorization?.value
               : undefined
             : undefined,
+          workspace_id: workspaceId ?? undefined,
         })
           .unwrap()
           .then((res) => {
-            toast({
-              title: "Project created !",
-              duration: 1000,
-            });
+            toast({ title: "Project created !", duration: 1000 });
             reset();
             onClose?.();
-            navigate(`/project/${res.id}`);
+            navigate(`/workspace/${workspaceId}/project/${res.id}`);
             setFormStep(0);
           })
           .catch(() => {
@@ -169,11 +146,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   );
 
   const branchesOptions = useMemo(
-    () =>
-      branches?.map((branch) => ({
-        label: branch,
-        value: branch,
-      })) ?? [],
+    () => branches?.map((branch) => ({ label: branch, value: branch })) ?? [],
     [branches]
   );
 

@@ -7,13 +7,13 @@ import { WorkspacesRepository } from 'src/workspaces/workspaces.repository';
 export class WorkspacesService {
   constructor(private readonly workspacesRepository: WorkspacesRepository) {}
 
-  async findAll(): Promise<Workspace[]> {
+  async findAll(): Promise<(Workspace & { _count: { projects: number } })[]> {
     return await this.workspacesRepository.findAllWorkspaces();
   }
 
-  async createNewWorkspace({ name }: CreateWorkspaceDto): Promise<Workspace> {
+  async createNewWorkspace(body: CreateWorkspaceDto): Promise<Workspace> {
     try {
-      return await this.workspacesRepository.createWorkspace(name);
+      return await this.workspacesRepository.createWorkspace(body);
     } catch (error) {
       throw new BadRequestException('Workspace already exists');
     }

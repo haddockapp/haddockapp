@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 *.tsbuildinfo
+ 
+!/src/services/backendApi/workspaces
 
 # Editor directories and files
 .vscode/*

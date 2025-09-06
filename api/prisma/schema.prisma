@@ -61,10 +61,11 @@ model Project {
 }
 
 model Workspace {
-    id   String @id @default(uuid())
-    name String @unique
+    id          String  @id @default(uuid())
+    name        String  @unique
+    description String?
 
-    Project Project[]
+    projects Project[]
 }
 
 model Vm {

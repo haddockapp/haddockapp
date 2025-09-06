@@ -19,7 +19,7 @@ import { VMManagerModule } from './vm-manager/vm.manager.module';
 import { InvitationModule } from './invitation/invitation.module';
 import { AutologinsModule } from './autologins/autologins.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { WorkspacesModule } from 'src/workspaces/workspaces.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @Module({
   imports: [

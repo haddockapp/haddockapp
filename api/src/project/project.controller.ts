@@ -12,8 +12,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthorizationService } from 'src/authorization/authorization.service';
-import { ComposeService } from 'src/compose/compose.service';
-import { DockerService } from 'src/docker/docker.service';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import { SourceService } from '../source/source.service';
