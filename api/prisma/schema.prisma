@@ -55,18 +55,28 @@ model Project {
     networkConnections NetworkConnection[]
     services           Service[]
     environmentVars    Json[]
+
+    workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+    workspaceId String?
+}
+
+model Workspace {
+    id   String @id @default(uuid())
+    name String @unique
+
+    Project Project[]
 }
 
 model Vm {
-    id        String   @id @default(uuid())
-    ip        String?  @unique
-    status    String   @default("stopped")
+    id              String    @id @default(uuid())
+    ip              String?   @unique
+    status          String    @default("stopped")
     statusTimeStamp DateTime? @default(now())
-    memory    Int
-    disk      Int
-    cpus      Int
-    provider  String
-    createdAt DateTime @default(now())
+    memory          Int
+    disk            Int
+    cpus            Int
+    provider        String
+    createdAt       DateTime  @default(now())
 
     project Project?
 }
@@ -112,7 +122,7 @@ model Service {
     user        String
     deployment  String
 
-    status      String   @default("stopped")
+    status          String    @default("stopped")
     statusTimeStamp DateTime? @default(now())
 
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)

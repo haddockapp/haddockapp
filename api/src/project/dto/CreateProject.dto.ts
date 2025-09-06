@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { AllowedValues } from '../validator/AllowedValues.validator';
 
 export class CreateProjectDto {
@@ -33,4 +40,8 @@ export class CreateProjectDto {
   @IsUUID()
   @IsOptional()
   authorization_id: string | null;
+
+  @IsUUID()
+  @IsOptional()
+  workspace_id: string | null;
 }
