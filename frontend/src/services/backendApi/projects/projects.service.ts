@@ -165,7 +165,6 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Projects],
     }),
-    // Project Token endpoints
     getProjectTokens: builder.query<ProjectTokenDto[], string>({
       query: (projectId) => ({
         url: `/project/${projectId}/tokens`,
