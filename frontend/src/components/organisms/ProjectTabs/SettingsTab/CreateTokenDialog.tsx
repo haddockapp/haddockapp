@@ -93,7 +93,7 @@ export default function CreateTokenDialog({ projectId }: CreateTokenDialogProps)
       const result = await createToken({ projectId, body: createData }).unwrap();
       setCreatedToken(result.token || null);
       setName("");
-      setPermissions([TokenPermission.READ]);
+      setPermissions([]);
       setExpiresAt("");
       
       toast({
