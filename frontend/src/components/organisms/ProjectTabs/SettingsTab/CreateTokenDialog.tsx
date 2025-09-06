@@ -121,7 +121,6 @@ export default function CreateTokenDialog({ projectId }: CreateTokenDialogProps)
   const handleClose = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-      // Reset form when closing
       setCreatedToken(null);
       setName("");
       setPermissions([TokenPermission.READ]);
