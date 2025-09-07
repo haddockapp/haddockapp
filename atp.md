@@ -158,7 +158,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 **You will find:**
 
 - ✅ A valid GitHub deploy key
-- ✅ Valid projects, each with a working compose file that builds and runs (ready for deployment)
 
 **_Do not proceed without reviewing these files!_**  
 They contain everything you need to successfully test the application and we highly recommend to use them to avoid any mistakes.
@@ -302,7 +301,8 @@ They contain everything you need to successfully test the application and we hig
   3. Press the "Add authorization" button to initiate the creation process for a new authorization method.
   4. Fill in the desired label for the new authorization method.
   5. Select the "Deploy Key" radio button.
-  6. Fill in your desired deploy key in the text area. _If you are testing on the `demo.haddock.ovh` environment, use the deploy key provided in the appendices zip files._
+  6. Fill in your desired deploy key in the text area.  
+     _If you are testing on the `demo.haddock.ovh` environment, use the deploy key provided in the appendices zip files._
   7. Press the "Confirm" button to complete the flow.
 - **Expected result:**
   - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
@@ -375,17 +375,15 @@ They contain everything you need to successfully test the application and we hig
 
 #### Scenario 10: Private repository deployment with an authorization method
 
-> **Note:**  
-> If you are testing on the `demo.haddock.ovh` environment, we provided you a private repository ready to be deployed with the previous deploy key we provided you.
-
 - **Objective:** Test the functionality of creating and deploying a new project within the platform.
 - **Prerequisites:**
   - The user is logged in to their developer account.
-  - The dashboard page is open.
+  - The dashboard page is open.  
+    -_If you are testing on the `demo.haddock.ovh` environment, you need to have completed the scenarios about the deploy key authorization method._
 - **Steps:**
   1.  Click on the "Deploy a project" button on the top-right corner of the page.
   2.  Select the desired authorization from the configured authorizations (e.g., Personal Access Token).  
-      _If you are testing on the `demo.haddock.ovh` environment, use the deploy key we provided you._
+      _If you are testing on the `demo.haddock.ovh` environment, use the deploy key previously added._
   3.  Select a GitHub repository from the repositories available to the authorization method.  
       _If you are testing on the `demo.haddock.ovh` environment, fill out the `haddockapp/demo_project` repository. Since you're using the deploy key, you cannot have autocompletion for the repository name._
   4.  Select a branch to deploy from.  
@@ -393,7 +391,7 @@ They contain everything you need to successfully test the application and we hig
   5.  Enter your Docker Compose file's path inside the repository.  
       _If you are testing on the `demo.haddock.ovh` environment, use the `compose.yml` file._
   6.  Move to the next step.
-  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.
+  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.  
       _If you are testing on the `demo.haddock.ovh` environment, use the `2` for CPUs, `2048` for Memory and `512` for Disk._
   8.  Press the "Create" button
 - **Expected result:**
@@ -615,7 +613,7 @@ They contain everything you need to successfully test the application and we hig
      _If you are testing on the `demo.haddock.ovh` environment, choose the `private repository` project._
   3. Click on the project name to open its details page.
   4. Locate the Topology tab (default one).
-  5. Click on the selected service node.
+  5. Click on the selected service node.  
      _If you are testing on the `demo.haddock.ovh` environment, use the service `nginx`._
   6. Ensure that the drawer on the right side of the screen is opened to display the details of the chosen service
 - **Expected result:**
@@ -669,8 +667,8 @@ They contain everything you need to successfully test the application and we hig
   6. In the drawer, navigate to and open the configuration tab.
   7. Locate the "depends on" section on the configuration page.
 - **Expected result:**
-  - All the services listed as "depends_on" in the compose for that service should be displayed correctly under the "depends on" section on the configuration page.  
-    If you are testing on the `demo.haddock.ovh` environment and selected the service `fastapi`, you'll see the services: `fastpi` and `redis` listed as "depends_on".
+  - All the services listed as `depends_on` in the compose for that service should be displayed correctly under the "depends on" section on the configuration page.  
+    _If you are testing on the `demo.haddock.ovh` environment and selected the service `fastapi`, you'll see the services: `fastpi` and `redis` listed as `depends_on`._
 
 ---
 
@@ -828,7 +826,7 @@ They contain everything you need to successfully test the application and we hig
 - **Expected result:**
   - A notification message should be displayed, confirming that the redirection has been created successfully.
   - The newly created redirection should appear in the list of network redirections with the specified port and full domain.
-  - By accessing the Internet using the filled-in domain, you should be able to reach the targeted service via the created network redirection.
+  - By accessing the Internet using the filled-in domain, you should be able to reach the targeted service via the created network redirection.  
     _If you are testing on the `demo.haddock.ovh` environment, you should see the fastapi service._
 
 ---
@@ -846,7 +844,7 @@ They contain everything you need to successfully test the application and we hig
      _If you are testing on the `demo.haddock.ovh` environment, choose the `private repository` project._
   3. Click on the project name to open its details page.
   4. Locate the Topology tab (default one).
-  5. Click on the selected service node.
+  5. Click on the selected service node.  
      _If you are testing on the `demo.haddock.ovh` environment, select the service `fastapi`._
   6. In the drawer, navigate to and open the Status tab (default one).
   7. Identify the 3 dots action button in the "Current Status" section and click on it.
@@ -896,7 +894,7 @@ They contain everything you need to successfully test the application and we hig
      _If you are testing on the `demo.haddock.ovh` environment, choose the `private repository` project._
   3. Click on the project name to open its details page.
   4. Locate the Topology tab (default one).
-  5. Click on the selected service node.
+  5. Click on the selected service node.  
      _If you are testing on the `demo.haddock.ovh` environment, select the service `fastapi`._
   6. In the drawer, navigate to and open the Status tab (default one).
   7. Identify the 3 dots action button in the "Current Status" section and click on it.
@@ -911,7 +909,7 @@ They contain everything you need to successfully test the application and we hig
 
 - **Objective:** To add an environment variable to a deployed Haddock project and verify that it appears in the list and within the VM environment.
 - **Prerequisites:**
-  - A valid Haddock account is set up.
+  - A valid Haddock account is set up.  
   - _If you are testing on the `demo.haddock.ovh` environment, you need to have completed the scenario about redirection and have the redirection active and working._
 - **Steps:**
   1. Navigate to the dashboard page.
@@ -937,7 +935,7 @@ They contain everything you need to successfully test the application and we hig
 
 - **Objective:** Test the functionality of creating a secret environment variable for a deployed Haddock project.
 - **Prerequisites:**
-  - A valid Haddock account is set up.
+  - A valid Haddock account is set up.  
   - _If you are testing on the `demo.haddock.ovh` environment, you need to have completed the scenario about redirection and have the redirection active and working._
 - **Steps:**
   1. Navigate to the dashboard page.
@@ -978,7 +976,7 @@ They contain everything you need to successfully test the application and we hig
   8. Click the 'Save' button to save the changes
 - **Expected result:**
   - The edited environment variable should be updated on the list.
-  - The updated environment variable should be reflected in the VM environment for the deployed Haddock project.
+  - The updated environment variable should be reflected in the VM environment for the deployed Haddock project.  
     _If you are testing on the `demo.haddock.ovh` environment, you can go on the myapi.demo.haddock.ovh domain and you should see the `CLEAR_ENV` value that is set to `clear_value_edited`._
 
 ---
@@ -1047,7 +1045,7 @@ They contain everything you need to successfully test the application and we hig
   7. Click on the "Delete" button associated with the selected environment variable.
 - **Expected result:**
   - A notification should appear on the right bottom side of the screen confirming that the action was successful.
-  - The deleted environment variable should no longer be visible in the list of environment variables under the "Manage Environment Variables" section.
+  - The deleted environment variable should no longer be visible in the list of environment variables under the "Manage Environment Variables" section.  
     _If you are testing on the `demo.haddock.ovh` environment, you can go on the myapi.demo.haddock.ovh domain and you should see the `SECRET_ENV` value that is not set anymore._
 
 #### Scenario 38: Editing the github application configuration
@@ -1104,7 +1102,7 @@ They contain everything you need to successfully test the application and we hig
   3. Click the "Download personal data" option.
 - **Expected result:**
   - A JSON file is downloaded to the admin's machine.
-  - The downloaded JSON file should contain all the necessary personal data of the selected user (e.g., name, email, roles, etc.).
+  - The downloaded JSON file should contain all the necessary personal data of the selected user (e.g., name, email, roles, etc.).  
     _If you are testing on the `demo.haddock.ovh` environment, the downloaded JSON file should contain the user `test@haddock.ovh` with the name `test` and the email `test@haddock.ovh`._
   - The file format should be valid JSON and the content inside should not have any syntax errors.
 
@@ -1143,7 +1141,7 @@ They contain everything you need to successfully test the application and we hig
   3. Click the "Deactivate" option to deactivate the selected user's account.
 - **Expected result:**
   - The selected user's status in the list should change from green checked circle to a red circle with a dash, indicating that their account has been deactivated.
-  - Attempting to connect as the deactivated user should result in an error.
+  - Attempting to connect as the deactivated user should result in an error.  
     _If you are testing on the `demo.haddock.ovh` environment, you should not be able to connect with the deactivated user with the email: 'test@haddock.ovh' and username: 'test' and the password "haddockpassword"._
 
 ---
@@ -1162,7 +1160,7 @@ They contain everything you need to successfully test the application and we hig
      _If you are testing on the `demo.haddock.ovh` environment, select the user `test@haddock.ovh`._
 - **Expected result:**
   - The selected user's status in the list should change from red circle with a dash to a green checked circle, indicating that their account has been activated.
-  - Attempting to connect as the activated user should succeed.
+  - Attempting to connect as the activated user should succeed.  
     _If you are testing on the `demo.haddock.ovh` environment, you should be able to connect with the activated user with the email: `test@haddock.ovh` and username: `test` and the password `haddockpassword`._
 
 ---
@@ -1176,7 +1174,7 @@ They contain everything you need to successfully test the application and we hig
   - A test user with "Member" role and active status exists in the system.
 - **Steps:**
   1. Unfold the "Users" menu.
-  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.  
      _If you are testing on the `demo.haddock.ovh` environment, select the user `test@haddock.ovh`._
   3. Click the "Reset Password" option to open the password change dialog.
   4. A dialog prompts you to select a new password for the user.
@@ -1197,7 +1195,7 @@ They contain everything you need to successfully test the application and we hig
   - A test user with "Member" role and active status exists in the system.
 - **Steps:**
   1. Unfold the "Users" menu.
-  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.
+  2. Select the desired test user with the "Member" role by clicking the three purple dots at the start of their row.  
      _If you are testing on the `demo.haddock.ovh` environment, select the user `test@haddock.ovh`._
   3. Click the "Delete" option to delete the selected user's account.
 - **Expected result:**
@@ -1217,20 +1215,20 @@ They contain everything you need to successfully test the application and we hig
 - **Steps:**
   1. Navigate to the dashboard page.
   2. Locate the desired project on the list.
-  3. Click on the project name to open its details page.
+  3. Click on the project name to open its details page.  
      _If you are testing on the `demo.haddock.ovh` environment, choose the `private repository` project._
   4. Locate the Topology tab (default one).
-  5. Click on the selected service node.
+  5. Click on the selected service node.  
      _If you are testing on the `demo.haddock.ovh` environment, select the service `nginx`._
   6. In the drawer, navigate to and open the Network tab.
   7. Locate the Redirections section.
-  8. Click on the trash button next to the selected redirection.
+  8. Click on the trash button next to the selected redirection.  
      _If you are testing on the `demo.haddock.ovh` environment, select the redirection `myapi.demo.haddock.ovh`._
   9. Click on the delete button in the dialog.
 - **Expected result:**
   - A notification should be displayed saying that the redirection has been successfully deleted.
   - The deleted redirection should no longer appear in the Redirections list.
-  - It should no longer be possible to access the service on the internet using the previous domain associated with the deleted redirection.
+  - It should no longer be possible to access the service on the internet using the previous domain associated with the deleted redirection.  
     _If you are testing on the `demo.haddock.ovh` environment, you should not be able to access the service on the internet using the previous domain associated with the deleted redirection._
 
 ---
@@ -1245,7 +1243,7 @@ They contain everything you need to successfully test the application and we hig
 
 - **Steps:**
   1.  Navigate to the Dashboard page.
-  2.  Identify the desired project on the dashboard.
+  2.  Identify the desired project on the dashboard.  
       _If you are testing on the `demo.haddock.ovh` environment, choose the `public repository` project._
   3.  Click on the project to access its details page.
   4.  Locate and click on the 'Settings' tab.
@@ -1255,7 +1253,7 @@ They contain everything you need to successfully test the application and we hig
 - **Expected result:**
   - The developer should be redirected to the Dashboard page.
   - The deleted project should no longer appear on the Dashboard.
-  - There should be a confirmation message indicating that the project has been successfully deleted.
+  - There should be a confirmation message indicating that the project has been successfully deleted.  
     _If you are testing on the `demo.haddock.ovh` environment, the public repository project should not be displayed anymore on the dashboard._
 
 ---
