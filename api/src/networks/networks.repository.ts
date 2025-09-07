@@ -46,6 +46,7 @@ export class NetworksRepository {
 
   async createNetworkConnection(
     data: CreateNetworkConnectionDto,
+    domain: string,
     https: boolean,
   ): Promise<NetworkConnection> {
     const project = await this.prismaService.project.findUnique({
@@ -56,7 +57,7 @@ export class NetworksRepository {
 
     return this.prismaService.networkConnection.create({
       data: {
-        domain: data.domain,
+        domain: `${data.prefix}.${domain}`,
         port: data.port,
         projectId: project.id,
         https

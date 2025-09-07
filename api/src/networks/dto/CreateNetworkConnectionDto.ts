@@ -1,8 +1,12 @@
-import { IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class CreateNetworkConnectionDto {
+  @IsUUID()
+  domainId: string;
+
   @IsString()
-  domain: string;
+  @IsNotEmpty()
+  prefix: string;
 
   @IsNumber()
   port: number;
