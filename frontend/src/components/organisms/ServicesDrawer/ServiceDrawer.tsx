@@ -160,22 +160,22 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               onValueChange={(value) => setSelectedTab(value as TabsValue)}
               className="p-4"
             >
-              <TabsList className="w-full grid grid-cols-3 mb-6 p-1 rounded-lg">
+              <TabsList className="w-full">
                 <TabsTrigger
                   value={TabsValue.Status}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
+                  className="w-full py-1 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Status
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Config}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
+                  className="w-full py-1 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Configuration
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Networks}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
+                  className="w-full py-1 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Networks
                 </TabsTrigger>

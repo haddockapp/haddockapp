@@ -82,6 +82,11 @@
   word-break: break-word;
 }
 
+dark,
+.service-name {
+  color: hsl(var(--typography));
+}
+
 /* Handle styling */
 .custom-handle {
   width: 8px;
