@@ -37,38 +37,27 @@ export class NetworksService {
     });
   }
 
-  private extractRootDomain(input: string): string | null {
-    try {
-      const url = new URL(input.includes("://") ? input : `http://${input}`);
-      const hostname = url.hostname;
-
-      const parts = hostname.split('.');
-
-      if (parts.length >= 2) {
-        return parts.slice(-2).join('.');
-      }
-
-      return hostname;
-    } catch {
-      return null;
+  private validateDomain(prefix: string, isAppliedOnMainDomain: boolean) {
+    if (isAppliedOnMainDomain && prefix === "api") {
+      throw new BadRequestException('The prefix "api" is reserved and cannot be used.');
+    }
+    const regex = /^([a-zA-Z0-9]+\.)*[a-zA-Z0-9]+$/;
+    if (!regex.test(prefix)) {
+      throw new BadRequestException('Invalid domain format');
     }
   }
 
   async createNetworkConnection(
     data: CreateNetworkConnectionDto,
   ): Promise<NetworkConnection> {
-    const domainName = this.extractRootDomain(data.domain);
+    const domainName = await this.domainRepository.findDomainById(data.domainId);
     if (!domainName) {
-      throw new BadRequestException('Invalid domain name');
-    }
-
-    const existingDomain = await this.domainRepository.findDomainByName(domainName);
-    if (!existingDomain) {
       throw new BadRequestException('Domain does not exist');
     }
+    this.validateDomain(data.prefix, domainName.main);
 
     const networkconnection =
-      await this.networksRepository.createNetworkConnection(data, existingDomain.https);
+      await this.networksRepository.createNetworkConnection(data, domainName.domain, domainName.https);
 
     await this.updateNetworksfile();
 
