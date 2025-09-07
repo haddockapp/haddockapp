@@ -68,18 +68,24 @@ export class DnsService {
     );
   }
 
+  private getNsDomain(domain: string) {
+    const parts = domain.split('.').filter(Boolean);
+    if (parts.length <= 2) return domain;
+    return parts.slice(1).join('.');
+  }
+
   async getPrimaryStatus(domain: Domain) {
-    const aRecords = await this.getARecords(domain.domain, domain.domain);
+    const aRecords = await this.getARecords(domain.domain, this.getNsDomain(domain.domain));
     return aRecords.includes(this.bindingService.getServerIPv4());
   }
 
   async getWildcardStatus(domain: Domain) {
-    const aRecords = await this.getARecords(`*.${domain.domain}`, domain.domain);
+    const aRecords = await this.getARecords(`*.${domain.domain}`, this.getNsDomain(domain.domain));
     return aRecords.includes(this.bindingService.getServerIPv4());
   }
 
   async getChallengeStatus(domain: Domain) {
-    const txtRecords = await this.getChallengeRecords(domain, domain.domain);
+    const txtRecords = await this.getChallengeRecords(domain, this.getNsDomain(domain.domain));
     return txtRecords.some(e => e.includes(domain.challenge));
   }
 }
