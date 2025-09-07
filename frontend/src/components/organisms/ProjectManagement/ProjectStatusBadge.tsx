@@ -29,33 +29,33 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
       case VmState.Starting:
         return {
           label: "Starting",
-          bgColor: "dark:bg-amber-600 bg-amber-400",
-          textColor: "text-white",
-          borderColor: "dark:border-amber-900 border-amber-500",
+          bgColor: "dark:bg-amber-600 bg-amber-100",
+          textColor: "dark:text-white text-amber-700",
+          borderColor: "dark:border-amber-900 border-amber-200",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopping:
         return {
           label: "Stopping",
-          bgColor: "dark:bg-amber-600 bg-amber-400",
-          textColor: "text-white",
-          borderColor: "dark:border-amber-900 border-amber-500",
+          bgColor: "dark:bg-amber-600 bg-amber-100",
+          textColor: "dark:text-white text-amber-700",
+          borderColor: "dark:border-amber-900 border-amber-200",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopped:
         return {
           label: "Stopped",
-          bgColor: "dark:bg-slate-800 bg-slate-400",
-          textColor: "text-white",
-          borderColor: "dark:border-slate-900 border-slate-500",
+          bgColor: "dark:bg-slate-800 bg-slate-100",
+          textColor: "dark:text-white text-slate-700",
+          borderColor: "dark:border-slate-900 border-slate-200",
           icon: <Clock className="h-4 w-4" />,
         };
       default:
         return {
           label: "Error",
-          bgColor: "dark:bg-red-800 bg-red-400",
-          textColor: "dark:text-red-300 text-white",
-          borderColor: "dark:border-red-900 border-red-500",
+          bgColor: "dark:bg-red-800 bg-red-100",
+          textColor: "dark:text-white text-red-700",
+          borderColor: "dark:border-red-900 border-red-200",
           icon: <AlertCircle className="h-4 w-4" />,
         };
     }

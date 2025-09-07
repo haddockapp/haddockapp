@@ -51,6 +51,16 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [isActuallyRefreshing, setIsActuallyRefreshing] = useState(false);
 
   useEffect(() => {
+    if (!services) return;
+
+    if (services.length === 0) {
+      setTimeout(() => {
+        refetch();
+      }, 2000);
+    }
+  }, [services, refetch]);
+
+  useEffect(() => {
     if (isFetching) {
       setIsActuallyRefreshing(true);
 

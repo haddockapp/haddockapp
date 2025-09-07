@@ -165,7 +165,9 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-xl">Project Management</CardTitle>
+            <CardTitle className="text-xl text-typography">
+              Project Management
+            </CardTitle>
             <CardDescription>
               Manage the lifecycle of your project
             </CardDescription>
