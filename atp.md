@@ -4,175 +4,59 @@
 
 ## 1. Introduction
 
-**Project Name:** Haddock  
-**Team:** Mathias ANDRÉ, Alexandru GHERASIE, Léo DUBOSCLARD, Arthur DELBARRE, Thomas MAZAUD, Maxime DZIURA  
-**School:** EPITECH LYON 2026
+### Haddock in a Nutshell
 
-**General Presentation:**  
-Haddock is a modern, developer-friendly Platform-as-a-Service (PaaS) solution designed to streamline application deployment through containerization. Unlike traditional PaaS offerings, Haddock removes the need for tedious environment configuration and offers a fully automated, flexible, and self-hostable infrastructure solution.
-
-The platform focuses on providing a seamless user experience for developers, system administrators, and organizations that need a reliable way to manage their containerized projects. By integrating core services such as GitHub-based authentication, automated domain binding, real-time monitoring, and environment management, Haddock significantly reduces the complexity of deploying and operating applications.
-
-With Haddock, projects can be deployed directly from GitHub repositories or public sources, without requiring advanced DevOps knowledge. The solution abstracts infrastructure concerns while still granting granular control over virtual machine resources, services, and networking configurations. Developers can manage their applications visually through an intuitive dashboard, while administrators retain complete control over user roles, security policies, and system-wide settings.
-
-Haddock distinguishes itself with the following key aspects:
-
-- **Self-hosted PaaS**: Organizations retain full control of their infrastructure, avoiding lock-in with third-party cloud providers.
-- **Automated DNS and network redirection**: Domains and subdomains are configured and managed automatically via an embedded reverse proxy system.
-- **Real-time monitoring and logging**: CPU, memory, and disk usage, along with Docker logs, are accessible through an interactive interface.
-- **Fine-grained service management**: Each service of a project can be started, stopped, restarted, or reconfigured independently.
-- **Security and flexibility**: Multiple authentication methods (OAuth, Personal Access Token, Deploy Keys) and secret management for environment variables.
-
-Overall, Haddock’s goal is to empower small teams, freelancers, and SMEs—as well as larger enterprises needing internal PaaS capabilities—with a solution that combines **the simplicity of modern SaaS platforms** and **the control of on-premise infrastructure**.
-
-**Core Innovation:**  
-Haddock introduces a **zero-configuration deployment platform** built on top of the **Open Container Initiative (OCI)** standards. Instead of requiring custom tooling or additional configuration layers, Haddock leverages the existing **compose.yml** file as the **single source of truth** for deployments.
-
-If an application is already containerized, developers don’t need to write anything else: Haddock interprets the provided compose.yml and handles the rest—virtual machines, networking, DNS, monitoring, and lifecycle management.
-
-Each project runs inside its own **isolated virtual machine** with a hardened network stack, combining the portability of containers with the strong guarantees of VM-level security and reproducibility. This ensures a consistent deployment model across environments while reducing the operational overhead typically associated with container orchestration.
+Haddock is a **self-hosted Platform-as-a-Service (PaaS)** designed to make app deployment effortless **and secure by default**.  
+It interprets your existing **compose.yml** and automates the rest—virtual machines, DNS, networking, monitoring, and lifecycle management.  
+Unlike heavy orchestrators or cloud-locked PaaS solutions, Haddock combines **developer simplicity** with **VM-level security**.
 
 ---
 
-**Key Differentiators:**
+### Who We Built It For
 
-- **Zero Configuration Beyond Compose**  
-  The **compose.yml** file is the only configuration developers need. If the app is already dockerized, no extra manifests, YAMLs, or proprietary formats are required—Haddock takes care of provisioning and orchestration.
-
-- **Secure Isolation**  
-  Applications run in isolated VMs with hardened network layers, providing strong isolation and consistent runtime behavior.
-
-- **Self-Hostable**  
-  Haddock can be deployed entirely on-premises, giving organizations **full ownership of infrastructure and data** without cloud lock-in, while remaining open-source.
-
-- **OCI-Compliant by Design**  
-  Built on **Open Container Initiative standards**, Haddock supports the broad ecosystem of container images and runtimes, ensuring long-term compatibility and interoperability.
-
-- **Automated Networking**  
-  Reverse proxy, DNS bindings, domain and subdomain management, and port redirections are handled automatically, with no manual setup required.
-
-- **Developer-Centric Design**  
-  Developers interact with a clean dashboard that provides real-time insights into metrics, logs, and project health, while administrators retain fine-grained control over users, authorizations, and lifecycle operations.
-
-## Target Use Cases
-
-Haddock is designed to cover a wide range of user profiles and organizational needs. Below are the primary personas, with their motivations and how Haddock specifically addresses their pain points:
+- **Freelancers & Indie Devs** – Deploy client projects quickly, with built-in isolation and safe defaults.
+- **Agencies & Startups** – Run multiple apps securely, each in its own VM and domain.
+- **SMEs & Enterprises** – Host internal apps or intranets on-premises with controlled access.
+- **Public Sector IT Teams** – Meet compliance requirements with self-hosting and robust security practices.
+- **No-Code / Low-Code Users** – Launch WordPress or catalog apps without setup, safely sandboxed.
+- **Developers & Teams** – Ensure consistent, secure environments from dev to production.
 
 ---
 
-- **Freelancers & Independent Developers**  
-  _Profile:_ Need affordable, autonomous solutions to deploy client projects, personal apps, or MVPs without managing servers.  
-  _Why Haddock:_ Offers a **self-hosted, cost-effective PaaS** with zero-config deployment. Freelancers can focus on building apps while Haddock takes care of domains, networking, and monitoring.
+### The Pain We’re Solving
+
+Modern app deployment is often:
+
+- **Complex** – Multiple config files, CI/CD pipelines, and orchestration layers.
+- **Fragile** – DNS and reverse proxies manually configured, prone to errors.
+- **Risky** – Weak defaults, no isolation, or costly reliance on external providers.
+- **Unsafe** – No security by default, no isolation, no control over the infrastructure.
+
+Haddock removes these barriers with a **secure-by-design PaaS** where developers can focus on **building, not firefighting infrastructure**.
 
 ---
 
-- **Backend Developers (Side Projects & Personal Apps)**  
-  _Profile:_ Skilled developers who want to publish side projects quickly without setting up DevOps pipelines.  
-  _Why Haddock:_ **Compose.yml is the only config needed**—if the project is already dockerized, it’s instantly deployable. Perfect for hacking together projects and making them available online with minimal friction.
+### How Haddock Works Behind the Scenes
+
+- **One-Line Installer** – Sets up Haddock on UNIX systems with all dependencies.
+- **Smart Onboarding** – GitHub OAuth or email login, automated DNS binding.
+- **Seamless Deployment** – Just point to your repo and compose.yml.
+- **Total Control** – Start, stop, restart, update, or delete projects instantly.
+- **Granular Service Management** – Networks, ports, environment variables (with support for **secrets**), and resource limits.
+- **Live Insights** – Real-time CPU, RAM, disk metrics, and service logs.
+- **Plug-and-Play Networking** – Automatic reverse proxy, domains, subdomains, HTTPS.
+- **Security Practices Built-In** – Haddock analyzes projects for **container best practices** (exposed ports, resource limits, env vars) and highlights misconfigurations.
 
 ---
 
-- **Confirmed Developers “Allergic to DevOps”**  
-  _Profile:_ Experienced coders who dislike dealing with infrastructure, CI/CD, or networking.  
-  _Why Haddock:_ Handles VM provisioning, DNS binding, SSL, and monitoring automatically. Developers stay focused on **coding, not configuring servers**.
+### Why Haddock Stands Out
 
----
-
-- **Web & Digital Agencies**  
-  _Profile:_ Agencies managing multiple client apps with varied requirements.  
-  _Why Haddock:_ Each client project runs in its own **isolated VM with its own domain**, ensuring separation and security. Agencies benefit from fast, repeatable deployments and easy lifecycle management (start/stop/update).
-
----
-
-- **Startups & Local Businesses**  
-  _Profile:_ Need reliable hosting for production apps or internal tools without hiring full DevOps staff.  
-  _Why Haddock:_ Provides a **self-hostable PaaS alternative** to costly cloud services. Small teams gain modern deployment workflows without needing deep infrastructure expertise.
-
----
-
-- **Large Enterprises (Internal Projects & Intranet)**  
-  _Profile:_ Corporates deploying internal apps, intranet portals, or prototypes at scale.  
-  _Why Haddock:_ Supports **multi-user management with roles** and offers **on-premises hosting**, ensuring compliance, security, and independence from third-party clouds.
-
----
-
-- **Public Sector IT Teams (Schools, Hospitals, City Halls, Institutions)**  
-  _Profile:_ Institutions needing reliable infrastructure for citizen-facing or internal apps, often with strict data residency rules.  
-  _Why Haddock:_ Fully **self-hostable**, with automated DNS and networking, ensuring compliance with local regulations and reducing reliance on external vendors.
-
----
-
-- **No-Code / Low-Code Users**  
-  _Profile:_ Want to deploy apps (CMS, dashboards, collaboration tools) without coding skills.  
-  _Why Haddock:_ The **application catalog** allows instant deployment of pre-built apps (WordPress, etc.) without technical setup, while still benefiting from robust infrastructure.
-
----
-
-- **Development Teams**  
-  _Profile:_ Teams needing consistency across development, staging, and production.  
-  _Why Haddock:_ OCI-compliant deployments guarantee **environment parity**, with a single configuration file used across all environments. Simplifies handover between devs and ops.
-
----
-
-- **Enterprises without Technical Expertise**  
-  _Profile:_ Business units wanting to publish apps without depending on IT teams.  
-  _Why Haddock:_ Provides an **intuitive dashboard** for app lifecycle management (deploy, monitor, update) without requiring infrastructure knowledge.
-
----
-
-- **Educational Institutions (Bootcamps, Coding Schools, Universities)**  
-  _Profile:_ Need reproducible environments for teaching DevOps, web development, or cloud practices.  
-  _Why Haddock:_ Enables **isolated training environments** where each student or group can deploy safely, with minimal setup effort from instructors.
-
----
-
-- **Open Source Communities / Project Maintainers**  
-  _Profile:_ Maintainers who want to showcase apps, deploy staging environments, or run community tools.  
-  _Why Haddock:_ Deployments are **fast, reproducible, and transparent**—perfect for maintaining credibility and making demos accessible to contributors.
-
----
-
-- **Teams Handling Sensitive Data (Legal, Medical, Finance)**  
-  _Profile:_ Organizations subject to strong compliance and confidentiality constraints.  
-  _Why Haddock:_ Each application runs in an **isolated VM with hardened network layers**, ensuring data separation, control, and compliance with standards.
-
----
-
-- **Product Managers & Designers (Internal Tools)**  
-  _Profile:_ Non-DevOps profiles who still need to deploy prototypes, dashboards, or utilities for teams.  
-  _Why Haddock:_ **Simple UI + automated deployment** let them push apps live without depending on engineers, reducing time-to-feedback.
-
-**Main Functionalities:**
-
-- **Automated Installer (UNIX-based systems)**  
-  Provides a streamlined setup process that automatically detects the host environment, installs dependencies, and configures Haddock for first use.
-
-- **Onboarding with GitHub OAuth or Email Authentication**  
-  Flexible authentication system allowing both OAuth-based login with GitHub or classic email/password signup.
-
-- **Domain Setup with DNS Binding**  
-  Simplified domain management with automated generation of DNS records for **primary and secondary domains**, including wildcard and verification challenges.
-
-- **User Management**  
-  Full account lifecycle management: invite new users, activate or deactivate accounts, reset passwords, delete users, and download personal data in compliance with portability requirements.
-
-- **Project Deployment**  
-  Deploy projects directly from GitHub repositories (public or private via authorizations) or from public sources, using a single configuration file (compose.yml).
-
-- **Application Management**  
-  Complete lifecycle operations for applications: start, stop, restart, recreate, update, and delete projects from the dashboard.
-
-- **Service Configuration**  
-  Fine-grained control over deployed services: network binding, port mappings, environment variables (secret or non-secret), resource limits (CPU, RAM), and user permissions (UID/GID).
-
-- **Real-Time Monitoring**  
-  Interactive dashboards providing live metrics (CPU, RAM, disk usage) and real-time logs, with options for filtering and searching.
-
-- **Network Redirections**  
-  Advanced reverse proxy management with flexible routing rules:
-  - HTTP/HTTPS redirection
-  - Custom and wildcard subdomains
-  - Multi-domain binding
+- **Compose.yml is Enough** – If your app is dockerized, it runs. No extra YAMLs, no custom DSLs.
+- **VM-Powered Security** – Each project is fully sandboxed in its own VM with hardened networking, reducing attack surface compared to container-only PaaS.
+- **Self-Hostable & Open Source** – Full ownership of infrastructure and data, no vendor lock-in.
+- **Secure by Default** – Embedded checks on deployment configs help enforce **good security hygiene** automatically.
+- **Made for Developers** – A clean, real-time dashboard instead of endless CLI scripts.
+- **Ecosystem-Ready** – 100% OCI-compliant, works with any container image.
 
 ---
 
@@ -265,9 +149,23 @@ These tests ensure Haddock works consistently across different environments and 
 This section details all the test scenarios required to validate Haddock’s features.
 Each scenario includes: description, objective, prerequisites, steps, and expected result.
 
+⚠️ **IMPORTANT!** ⚠️
+
+**If you are testing Haddock on the `demo.haddock.ovh` environment, _all required information and credentials are provided in the appendices zip files_.**
+
+**You will find:**
+
+- ✅ A valid GitHub deploy key
+- ✅ Valid projects, each with a working compose file that builds and runs (ready for deployment)
+
+**_Do not proceed without reviewing these files!_**  
+They contain everything you need to successfully test the application and we highly recommend to use them to avoid any mistakes.
+
 #### Scenario 1: Application installation
 
-- **Role Involved:** System administrator
+> **Note:**  
+> If you are testing on the `demo.haddock.ovh` environment, you can skip scenarios 1–4 and proceed directly to **Scenario 5**. The demo environment is already pre-installed, pre-configured, and ready for use.
+
 - **Objective:** To verify the successful installation of the Haddock application on a Debian 12 machine using Vagrant as the provider.
 - **Prerequisites:**
 
@@ -290,7 +188,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 2: Onboarding: Register via email
 
-- **Role Involved:** System administrator
 - **Objective:** Verify that a system administrator can successfully register via email and be redirected to the "Domain names" page.
 - **Prerequisites:**
   - The application is up and running.
@@ -309,7 +206,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 3: Onboarding: Setup primary domain
 
-- **Role Involved:** System Administrator
 - **Objective:** To test the functionality of setting up a primary domain during the onboarding process.
 - **Prerequisites:**
 
@@ -338,7 +234,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 4: Onboarding: Setup secondary domain
 
-- **Role Involved:** System Administrator
 - **Objective:** To verify the functionality of setting up a secondary domain in the onboarding process.
 - **Prerequisites:**
 
@@ -367,7 +262,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 5: Deploying a project from a public repository without an authorization method
 
-- **Role Involved:** Developer
 - **Objective:** Test deploying a public repository without any authorization method setup
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -375,11 +269,15 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 - **Steps:**
   1.  Click on the "Deploy a project" button on the top-right corner of the page.
   2.  Select the "N/A" authorization method.
-  3.  Fill in your desired public Github repository name.
-  4.  Fill in your desired branch to deploy from.
-  5.  Enter your Docker Compose file's path inside the repository.
+  3.  Fill in your desired public Github repository name.  
+      _If you are testing on the `demo.haddock.ovh` environment, you can use the `haddockapp/demo_public` repository._
+  4.  Fill in your desired branch to deploy from.  
+      _If you are testing on the `demo.haddock.ovh` environment, you can use the `main` branch._
+  5.  Enter your Docker Compose file's path inside the repository.  
+      _If you are testing on the `demo.haddock.ovh` environment, you can use the `compose.yml` file._
   6.  Move to the next step.
-  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.
+  7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.  
+      _If you are testing on the `demo.haddock.ovh` environment, you can use the `2` for CPUs, `2048` for Memory and `512` for Disk._
   8.  Press the "Create" button
 - **Expected result:**
   - A new project card should appear in the dashboard's project list.
@@ -387,9 +285,34 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 6: Setting the github application configuration from the settings drawer
+#### Scenario 6: Adding a new authorization method - Deploy Key
 
-- **Role Involved:** Admin
+> **Note:**  
+> If you are testing on the `demo.haddock.ovh` environment, we provided you a valid deploy key in the appendices zip files.
+
+- **Objective:** Test the functionality of adding a new Deploy Key authorization in the application.
+- **Prerequisites:**
+  - The user is logged in to their developer account.
+- **Steps:**
+  1. Open the settings drawer by clicking on the purple stack icon at the top-right corner of the screen.
+  2. Unfold the "Authorizations" menu.
+  3. Press the "Add authorization" button to initiate the creation process for a new authorization method.
+  4. Fill in the desired label for the new authorization method.
+  5. Select the "Deploy Key" radio button.
+  6. Fill in your desired deploy key in the text area. _If you are testing on the `demo.haddock.ovh` environment, use the deploy key provided in the appendices zip files._
+  7. Press the "Confirm" button to complete the flow.
+- **Expected result:**
+  - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
+  - The newly added authorization is displayed in the "Authorizations" table within the previous sub-menu inside the settings drawer.
+  - The new authorization method also becomes available within the "Deploy a project" modal, allowing users to choose it for their projects.
+
+---
+
+#### Scenario 7: Setting the github application configuration from the settings drawer
+
+> **Note:**  
+> If you are testing on the `demo.haddock.ovh` environment, you can skip scenarios 7-9 and proceed directly to **Scenario 10**. The github application configuration is already set up.
+
 - **Objective:** Test the functionality of setting the GitHub application configuration from the settings drawer.
 - **Prerequisites:**
   - The system administrator did not set the GitHub application configuration yet.
@@ -407,9 +330,8 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 7: Adding a new authorization method - OAuth
+#### Scenario 8: Adding a new authorization method - OAuth
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of adding a new OAuth authorization in the application.
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -428,9 +350,8 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 8: Adding a new authorization method - Personal Access Token
+#### Scenario 9: Adding a new authorization method - Personal Access Token
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of adding a new Personal Access Token authorization in the application.
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -449,42 +370,28 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 9: Adding a new authorization method - Deploy Key
-
-- **Role Involved:** Developer
-- **Objective:** Test the functionality of adding a new Deploy Key authorization in the application.
-- **Prerequisites:**
-  - The user is logged in to their developer account.
-  - The settings drawer is open.
-- **Steps:**
-  1. Unfold the "Authorizations" menu.
-  2. Press the "Add authorization" button to initiate the creation process for a new authorization method.
-  3. Fill in the desired label for the new authorization method.
-  4. Select the "Deploy Key" radio button.
-  5. Fill in your desired deploy key in the text area.
-  6. Press the "Confirm" button to complete the flow.
-- **Expected result:**
-  - A toast message appears at the bottom of the screen to inform the user that the new authorization has been created successfully.
-  - The newly added authorization is displayed in the "Authorizations" table within the previous sub-menu inside the settings drawer.
-  - The new authorization method also becomes available within the "Deploy a project" modal, allowing users to choose it for their projects.
-
----
-
 #### Scenario 10: Private repository deployment with an authorization method
 
-- **Role Involved:** Developer
+> **Note:**  
+> If you are testing on the `demo.haddock.ovh` environment, we provided you a private repository ready to be deployed with the previous deploy key we provided you.
+
 - **Objective:** Test the functionality of creating and deploying a new project within the platform.
 - **Prerequisites:**
   - The user is logged in to their developer account.
   - The dashboard page is open.
 - **Steps:**
   1.  Click on the "Deploy a project" button on the top-right corner of the page.
-  2.  Select the desired authorization from the configured authorizations (e.g., Personal Access Token).
-  3.  Select a GitHub repository from the repositories available to the authorization method.
-  4.  Select a branch to deploy from.
-  5.  Enter your Docker Compose file's path inside the repository.
+  2.  Select the desired authorization from the configured authorizations (e.g., Personal Access Token).  
+      _If you are testing on the `demo.haddock.ovh` environment, use the deploy key we provided you._
+  3.  Select a GitHub repository from the repositories available to the authorization method.  
+      _If you are testing on the `demo.haddock.ovh` environment, fill out the `haddockapp/demo_project` repository. Since you're using the deploy key, you cannot have autocompletion for the repository name._
+  4.  Select a branch to deploy from.  
+      _If you are testing on the `demo.haddock.ovh` environment, use the `multiple-services` branch. For the same reason, you cannot have autocompletion for the branch name._
+  5.  Enter your Docker Compose file's path inside the repository.  
+      _If you are testing on the `demo.haddock.ovh` environment, use the `compose.yml` file._
   6.  Move to the next step.
   7.  Use the sliders to set your desired allocations for CPUs, Memory and Disk.
+      _If you are testing on the `demo.haddock.ovh` environment, use the `2` for CPUs, `2048` for Memory and `512` for Disk._
   8.  Press the "Create" button
 - **Expected result:**
   - A new project card should appear in the dashboard's project list.
@@ -494,7 +401,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 11: User display preferencies in topology view
 
-- **Role Involved:** Developer
 - **Objective:** To test the functionality of displaying user preferences in the topology view for a Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -502,9 +408,11 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 - **Steps:**
   1. Navigate to the dashboard page.
   2. Locate the desired project on the list.
-  3. Click on the project name to open its details page.
+  3. Click on the project name to open its details page.  
+     _If you are testing on the `demo.haddock.ovh` environment, click on the last project you created._
   4. Locate the Topology tab (default one).
-  5. Manipulate the nodes (services) by clicking and dragging them to rearrange them in a preferred layout within the topology view.
+  5. Manipulate the nodes (services) by clicking and dragging them to rearrange them in a preferred layout within the topology view.  
+     _If you are testing on the `demo.haddock.ovh` environment, you will see 4 services: nginx, fastpi, db, redis._
   6. Test the functionality of showing or hiding connections between services by toggling this option on or off, respectively.
   7. Refresh the page to verify the changes made.
 - **Expected result:**
@@ -515,7 +423,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 12: Edit project informations
 
-- **Role Involved:** Developer
 - **Objective:** To test the functionality of editing project information on the Haddock platform.
 - **Prerequisites:**
   - A developper account is set up and logged in.
@@ -536,7 +443,17 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 13: Edit an existing project's authorization method
 
-- **Role Involved:** Developer
+> **Note:**  
+> If you are testing on the `demo.haddock.ovh` environment, you can skip this scenario and proceed directly to **Scenario 14**. Since you don't have any others authorization methods set up, you cannot edit the authorization method of the project.
+
+- **Objective:** Test updating a project's authorization method.
+- **Prerequisites:**
+
+  - The user is logged in to their developer account.
+  - The dashboard page is open.
+  - There is an existing deployed project available.
+  - The project is already deployed with the previous authorization method we provided you.
+
 - **Objective:** Test updating a project's authorization method.
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -553,7 +470,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 14: Stop Project
 
-- **Role Involved:** Developer
 - **Objective:** To verify that the 'Stop Project' functionality stops the project and all associated services.
 - **Prerequisites:**
   - A developper account is set up and logged in.
@@ -572,7 +488,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 15: Start a Project
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of starting a Haddock project that is either stopped or in error.
 - **Prerequisites:**
   - A user account with appropriate permissions to start a project.
@@ -591,7 +506,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 16: Update Project
 
-- **Role Involved:** Developer
 - **Objective:** To verify that a Haddock project can be updated from its GitHub source, and the changes are reflected in the deployed application.
 - **Prerequisites:**
   - A Haddock project is already deployed and accessible.
@@ -615,7 +529,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 17: Recreate Project
 
-- **Role Involved:** Developer
 - **Objective:** To verify the functionality of recreating a stopped or error Haddock project from its page.
 - **Prerequisites:**
   - A Haddock project is already deployed and accessible.
@@ -636,7 +549,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 18: Monitoring a deployed project
 
-- **Role Involved:** Developer
 - **Objective:** Test the ability to monitor CPU, Memory, and Disk Usages for a deployed project, as well as view the project's docker logs.
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -656,7 +568,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 19: Service View
 
-- **Role Involved:** Developer
 - **Objective:** Verify that the Service View of a deployed Haddock project correctly displays all services in a React Flow.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -675,7 +586,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 20: Service Status
 
-- **Role Involved:** Developer
 - **Objective:** To verify that the Service Status is correctly displayed for a deployed Haddock project with at least one service.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -696,7 +606,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 21: Service Configuration: environment variable
 
-- **Role Involved:** Developer
 - **Objective:** Testing that environment variables defined in a Compose file for a Haddock project service are correctly displayed in the "Environment Variables" section on the configuration page.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -717,7 +626,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 22: Service Configuration: depends on
 
-- **Role Involved:** Developer
 - **Objective:** Verify that the "depends_on" services listed in the compose for a specific service are correctly displayed on the configuration page of the Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -738,7 +646,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 23: Service Configuration: ressource limits
 
-- **Role Involved:** Developer
 - **Objective:** Test the display of resource limits in the service configuration for a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -759,7 +666,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 24: Service Configuration: User
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of displaying user information in the Service Configuration tab for a given service within a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -780,7 +686,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 25: Service network: Ports list
 
-- **Role Involved:** Developer
 - **Objective:** Test the display of all ports defined in the compose file under the "Ports" section for a targeted service.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -802,7 +707,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 26: Service Network: Network list
 
-- **Role Involved:** Developer
 - **Objective:** Testing that the defined networks in a Haddock project's compose file are displayed under the Networks tab of the targeted service.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -824,7 +728,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 27: Service network redirections: No subdomain
 
-- **Role Involved:** Developer
 - **Objective:** To test the functionality of creating a network redirection without a subdomain in a Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -851,9 +754,8 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 29: Service Networks redirections: With subdomain
+#### Scenario 28: Service Networks redirections: With subdomain
 
-- **Role Involved:** Developer
 - **Objective:** To test the functionality of creating a network redirection with a subdomain in a Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -879,9 +781,8 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 ---
 
-#### Scenario 30: Service Network redirection: Delete redirection
+#### Scenario 29: Service Network redirection: Delete redirection
 
-- **Role Involved:** Developer
 - **Objective:** Test the successful deletion of a service network redirection in a Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -906,7 +807,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 30: Start a service
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality to start a service in a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -929,7 +829,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 31: Restart service
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality to restart a service in a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -952,7 +851,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 32: Stop a service
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality to stop a service in a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -975,7 +873,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 33: Display project environment variable
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality to display project environment variables in a Haddock-deployed project.
 - **Prerequisites:**
   - A project has been deployed using Haddock with a .env file containing some environment variables.
@@ -993,7 +890,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 34: Add an environment variable
 
-- **Role Involved:** Developer
 - **Objective:** To add an environment variable to a deployed Haddock project and verify that it appears in the list and within the VM environment.
 - **Prerequisites:**
   - A valid Haddock account is set up.
@@ -1016,7 +912,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 35: Add a secret environment variable
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of creating a secret environment variable for a deployed Haddock project.
 - **Prerequisites:**
   - A valid Haddock account is set up.
@@ -1040,7 +935,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 36: Edit non secret environment variable
 
-- **Role Involved:** Developer
 - **Objective:** To test the functionality of editing a non-secret environment variable in the Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -1061,7 +955,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 37: Change environment variable from non secret to secret
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of changing an environment variable from non-secret to secret within a project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -1082,7 +975,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 38: Edit secret environment variable
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of editing a secret environment variable in a deployed Haddock project.
 - **Prerequisites:**
   - The developer should be logged into the Haddock platform and have access to the specified project.
@@ -1104,7 +996,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 39: Delete environment variable
 
-- **Role Involved:** Developer
 - **Objective:** Test the ability to delete an environment variable in a deployed project on the platform.
 - **Prerequisites:**
   - A Haddock-deployed project is accessible and active.
@@ -1123,7 +1014,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 40: Editing the github application configuration
 
-- **Role Involved:** Administrator
 - **Objective:** Test the functionality of editing the GitHub application configuration.
 - **Prerequisites:**
   - The administrator is logged in to the application.
@@ -1140,7 +1030,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 41: Inviting a new user
 
-- **Role Involved:** Admin
 - **Objective:** To test the functionality of inviting a new user to the platform.
 - **Prerequisites:**
   - A valid email address for the invited user
@@ -1159,7 +1048,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 42: Downloading a user's personal data
 
-- **Role Involved:** Admin
 - **Objective:** Test the functionality of downloading a user's personal data from the system.
 - **Prerequisites:**
   - The user is logged in to their admin account.
@@ -1178,7 +1066,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 43: Delete an authorization method
 
-- **Role Involved:** Developer
 - **Objective:** Test the functionality of deleting an authorization method in the application settings.
 - **Prerequisites:**
   - The user is logged in to their developer account.
@@ -1195,7 +1082,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 44: Deactivate a user
 
-- **Role Involved:** Admin
 - **Objective:** Test deactivation of a user's account
 - **Prerequisites:**
   - The user is logged in to their admin account.
@@ -1213,7 +1099,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 45: Activate a user
 
-- **Role Involved:** Admin
 - **Objective:** Test activation of a user's account
 - **Prerequisites:**
   - The user is logged in to their admin account.
@@ -1231,7 +1116,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 46: Change a user's password
 
-- **Role Involved:** Admin
 - **Objective:** Test changing a user's password
 - **Prerequisites:**
   - The user is logged in to their admin account.
@@ -1251,7 +1135,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 47: Delete a user
 
-- **Role Involved:** Admin
 - **Objective:** Test deletion of a user's account
 - **Prerequisites:**
   - The user is logged in to their admin account.
@@ -1269,7 +1152,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 48: Delete project
 
-- **Role Involved:** Developer
 - **Objective:** To verify that a project can be successfully deleted and the user is redirected to the dashboard page where the deleted project is no longer displayed.
 - **Prerequisites:**
 
@@ -1293,7 +1175,6 @@ Each scenario includes: description, objective, prerequisites, steps, and expect
 
 #### Scenario 49: Logout
 
-- **Role Involved:** Developer
 - **Objective:** Test the logout feature
 - **Prerequisites:**
   - The user is logged in to their account.
