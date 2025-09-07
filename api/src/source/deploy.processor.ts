@@ -33,7 +33,7 @@ export class DeployConsumer {
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
     private readonly composeService: ComposeService,
-  ) {}
+  ) { }
 
   @OnQueueFailed()
   onError(job: Job<any>, error: any) {
@@ -65,8 +65,8 @@ export class DeployConsumer {
 
     const authorizationType: AuthorizationEnum = source.authorizationId
       ? await this.authorizationService.getAuthorizationType(
-          source.authorizationId,
-        )
+        source.authorizationId,
+      )
       : AuthorizationEnum.NONE;
 
     switch (authorizationType) {
@@ -81,9 +81,9 @@ export class DeployConsumer {
 
           fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
 
-          await execCommand(
-            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${repoPath}`,
-          );
+            await execCommand(
+            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone -b ${branch} git@github.com:${organization}/${repository}.git ${repoPath}`,
+            );
         } catch (e) {
           fs.unlinkSync(tempFilePath);
 
@@ -182,10 +182,10 @@ export class DeployConsumer {
   }
 
   @Process('deploy')
-  async deploy(job: Job<PersistedSourceDto>) {
-    this.logger.log(`Deploying source for project ${job.data.project.id}`);
+  async deploy(job: Job<{ source: PersistedSourceDto, startAfterDeploy: boolean }>) {
+    const { source, startAfterDeploy } = job.data
+    this.logger.log(`Deploying source for project ${source.project.id}`);
 
-    const source = job.data;
 
     try {
       const deployPath: string = await this.getDeployPath(source);
@@ -202,8 +202,10 @@ export class DeployConsumer {
       this.logger.log(`Setting up VM for project ${source.project.id}`);
       await this.vmService.createVM(source.project.vmId, deployPath);
 
-      this.logger.log(`Starting VM for project ${source.project.id}`);
-      await this.vmService.upVm(source.project.vmId);
+      if (startAfterDeploy) {
+        this.logger.log(`Starting VM for project ${source.project.id}`);
+        await this.vmService.upVm(source.project.vmId);
+      }
 
       this.logger.log(`Deployed project ${source.project.id}`);
     } catch (e) {

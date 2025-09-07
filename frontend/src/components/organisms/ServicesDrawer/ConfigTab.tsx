@@ -21,9 +21,9 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
     content: React.ReactNode
   ) => (
     <section className="space-y-3">
-      <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+      <h3 className="text-sm font-medium text-typography/70">{title}</h3>
       {isEmpty ? (
-        <p className="text-sm text-gray-500 italic">{emptyMessage}</p>
+        <p className="text-sm text-typography/50 italic">{emptyMessage}</p>
       ) : (
         content
       )}
@@ -39,7 +39,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card-foreground">
                 <TableHead className="w-1/3 font-medium">Key</TableHead>
                 <TableHead className="font-medium">Value</TableHead>
               </TableRow>
@@ -47,7 +47,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
             <TableBody>
               {Object.entries(serviceInformations.environment).map(
                 ([key, value]) => (
-                  <TableRow key={key} className="hover:bg-gray-50">
+                  <TableRow key={key} className="hover:bg-card-foreground">
                     <TableCell className="font-mono text-xs">{key}</TableCell>
                     <TableCell className="font-mono text-xs truncate max-w-xs">
                       {value}
@@ -67,13 +67,13 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card">
                 <TableHead className="font-medium">Service name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {serviceInformations.depends_on.map((depend, index) => (
-                <TableRow key={index} className="hover:bg-gray-50">
+                <TableRow key={index}>
                   <TableCell>{depend}</TableCell>
                 </TableRow>
               ))}
@@ -89,28 +89,28 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card">
                 <TableHead className="w-1/3 font-medium">Resource</TableHead>
                 <TableHead className="font-medium">Limit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-gray-50">
+              <TableRow>
                 <TableCell>CPU</TableCell>
                 <TableCell>
                   <span className="font-medium">
                     {serviceInformations.deployment?.cpus}
                   </span>
-                  <span className="text-gray-500 ml-1">%</span>
+                  <span className="text-typography/50 ml-1">%</span>
                 </TableCell>
               </TableRow>
-              <TableRow className="hover:bg-gray-50">
+              <TableRow>
                 <TableCell>Memory</TableCell>
                 <TableCell>
                   <span className="font-medium">
                     {serviceInformations.deployment?.memory}
                   </span>
-                  <span className="text-gray-500 ml-1">MB</span>
+                  <span className="text-typography/50 ml-1">MB</span>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -125,17 +125,17 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="bg-card">
                 <TableHead className="w-1/3 font-medium">ID</TableHead>
                 <TableHead className="font-medium">Value</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-gray-50">
+              <TableRow>
                 <TableCell>UID</TableCell>
                 <TableCell>{serviceInformations.user?.uid}</TableCell>
               </TableRow>
-              <TableRow className="hover:bg-gray-50">
+              <TableRow>
                 <TableCell>GID</TableCell>
                 <TableCell>{serviceInformations.user?.gid}</TableCell>
               </TableRow>

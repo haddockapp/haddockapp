@@ -70,6 +70,7 @@ const useWebsockets = () => {
         if (data) {
           dispatch(
             setMetrics({
+              projectId,
               cpuUsage: data.cpu_usage,
               diskUsage: data.disk_usage,
               memoryUsage: data.memory_usage,
@@ -89,7 +90,7 @@ const useWebsockets = () => {
       },
       ({ logs }) => {
         if (logs) {
-          dispatch(setLogs(logs));
+          dispatch(setLogs({ projectId, logs }));
         }
       }
     );

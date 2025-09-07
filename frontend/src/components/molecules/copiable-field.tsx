@@ -7,8 +7,8 @@ interface CopiableFieldProps {
 }
 const CopiableField: FC<CopiableFieldProps> = ({ value }) => (
   <div className="flex items-center space-x-2">
-    <div className="border-gray-200 border rounded-sm p-2 bg-gray-100 text-start min-w-80 min-h-8">
-      <span className="text-gray-600">{value}</span>
+    <div className="dark:border-card-foreground border-gray-200 border rounded-sm p-2 dark:bg-card bg-gray-100 text-start min-w-80 min-h-8">
+      <span className="text-typography/60">{value}</span>
     </div>
     {value && (
       <Copy

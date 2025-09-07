@@ -68,6 +68,7 @@ export const Histogram: FC<HistogramProps> = ({ data, config, domain }) => (
           content={<ChartTooltipContent />}
         />
         <Area
+          isAnimationActive={false}
           dataKey="y"
           type="step"
           fill="var(--color-y)"

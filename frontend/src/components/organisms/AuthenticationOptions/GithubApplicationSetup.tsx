@@ -37,7 +37,7 @@ const GithubApplicationSetup: FC = () => {
       Trigger={({ onOpen }) => (
         <Button variant="outline" onClick={onOpen} className="space-x-2">
           <img
-            className="w-5 rounded-full"
+            className="w-5 rounded-full dark:bg-white dark:invert"
             src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg"
           />
           <span>App Configuration</span>

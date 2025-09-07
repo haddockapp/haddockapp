@@ -8,8 +8,9 @@ import { useParams } from "react-router-dom";
 import ProjectManagementPanel from "@/components/organisms/ProjectManagement/ProjectManagementPanel";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
+import { useAppDispatch } from "@/hooks/useStore";
 import { setProjectId } from "@/services/metricSlice";
+import useMetrics from "@/hooks/use-metrics";
 
 enum TabsValue {
   Topology = "topology",
@@ -33,9 +34,7 @@ const ProjectDetails: FC = () => {
     };
   }, [dispatch, projectId]);
 
-  const { cpuUsage, memoryUsage, diskUsage, logs } = useAppSelector(
-    (state) => state.metrics
-  );
+  const { cpuUsage, memoryUsage, diskUsage, logs } = useMetrics();
 
   if (isLoading) {
     return (

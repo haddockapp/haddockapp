@@ -21,41 +21,41 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
       case VmState.Running:
         return {
           label: "Running",
-          bgColor: "bg-emerald-100",
-          textColor: "text-emerald-700",
-          borderColor: "border-emerald-200",
+          bgColor: "dark:bg-emerald-700 bg-emerald-100",
+          textColor: "dark:text-white text-emerald-700",
+          borderColor: "dark:border-emerald-900 border-emerald-200",
           icon: <CheckCircle className="h-4 w-4" />,
         };
       case VmState.Starting:
         return {
           label: "Starting",
-          bgColor: "bg-amber-100",
-          textColor: "text-amber-700",
-          borderColor: "border-amber-200",
+          bgColor: "dark:bg-amber-600 bg-amber-400",
+          textColor: "text-white",
+          borderColor: "dark:border-amber-900 border-amber-500",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopping:
         return {
           label: "Stopping",
-          bgColor: "bg-amber-100",
-          textColor: "text-amber-700",
-          borderColor: "border-amber-200",
+          bgColor: "dark:bg-amber-600 bg-amber-400",
+          textColor: "text-white",
+          borderColor: "dark:border-amber-900 border-amber-500",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopped:
         return {
           label: "Stopped",
-          bgColor: "bg-slate-100",
-          textColor: "text-slate-700",
-          borderColor: "border-slate-200",
+          bgColor: "dark:bg-slate-800 bg-slate-400",
+          textColor: "text-white",
+          borderColor: "dark:border-slate-900 border-slate-500",
           icon: <Clock className="h-4 w-4" />,
         };
       default:
         return {
           label: "Error",
-          bgColor: "bg-red-100",
-          textColor: "text-red-700",
-          borderColor: "border-red-200",
+          bgColor: "dark:bg-red-800 bg-red-400",
+          textColor: "dark:text-red-300 text-white",
+          borderColor: "dark:border-red-900 border-red-500",
           icon: <AlertCircle className="h-4 w-4" />,
         };
     }
@@ -72,7 +72,7 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border font-medium",
+        "inline-flex items-center gap-1.5 rounded-sm border font-medium",
         bgColor,
         textColor,
         borderColor,

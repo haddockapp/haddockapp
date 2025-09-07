@@ -104,13 +104,13 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   return (
     <div
       className={cn(
-        "w-[500px] border-l border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out",
+        "w-[500px] border-l  shadow-lg transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
       {service ? (
         <div className="flex flex-col h-full">
-          <div className="border-b border-gray-200 p-4">
+          <div className="border-b border-border p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
@@ -119,7 +119,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                   className="w-10 h-10 object-contain"
                 />
                 <div>
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-typography/90">
                     {service.name}
                   </h3>
                   <div className="flex items-center gap-2 text-sm">
@@ -130,7 +130,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                       {status.slice(0, 1).toUpperCase().concat(status.slice(1))}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-typography/50">
                     {service.statusDetails?.Status ??
                       getRelativeTimeLabel(
                         service.statusTimeStamp,
@@ -148,7 +148,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                 <X size={16} />
               </Button>
             </div>
-            <p className="text-sm text-gray-500 mt-2 truncate">
+            <p className="text-sm text-typography/50 mt-2 truncate">
               {service.image}
             </p>
           </div>
@@ -160,22 +160,22 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
               onValueChange={(value) => setSelectedTab(value as TabsValue)}
               className="p-4"
             >
-              <TabsList className="w-full grid grid-cols-3 mb-6 bg-gray-50 p-1 rounded-lg">
+              <TabsList className="w-full grid grid-cols-3 mb-6 p-1 rounded-lg">
                 <TabsTrigger
                   value={TabsValue.Status}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Status
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Config}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Configuration
                 </TabsTrigger>
                 <TabsTrigger
                   value={TabsValue.Networks}
-                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-white"
+                  className="py-2 text-sm font-medium transition-all data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:bg-background"
                 >
                   Networks
                 </TabsTrigger>
@@ -183,7 +183,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Status}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service && (
                   <StatusTab
@@ -198,12 +198,12 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Config}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service ? (
                   <ConfigTab serviceInformations={service} />
                 ) : (
-                  <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="flex items-center justify-center h-32 text-typography/50">
                     No configuration found
                   </div>
                 )}
@@ -211,7 +211,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
 
               <TabsContent
                 value={TabsValue.Networks}
-                className="p-4 border rounded-md bg-white"
+                className="p-4 border rounded-md bg-background"
               >
                 {service ? (
                   <NetworksTab
@@ -219,7 +219,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
                     projectId={projectId}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-32 text-gray-500">
+                  <div className="flex items-center justify-center h-32 text-typography/50">
                     No networks found
                   </div>
                 )}
@@ -229,7 +229,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Select a service to view details</p>
+          <p className="text-typography/50">Select a service to view details</p>
         </div>
       )}
     </div>

@@ -2,9 +2,11 @@ import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { FC, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 import SimpleDrawer from "./SimpleDrawer";
 import Settings from "./Settings";
+import { setTheme, Theme } from "@/services/settingsSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 
 const pathTranslations: Record<string, string> = {
   ["/"]: "/ authentication",
@@ -15,7 +17,8 @@ const pathTranslations: Record<string, string> = {
 
 const Header: FC = () => {
   const { projectId } = useParams();
-
+  const dispatch = useAppDispatch();
+  const selectedTheme = useAppSelector((state) => state.settings.theme);
   const navigate = useNavigate();
 
   const { data: projects } = useGetProjectsQuery();
@@ -33,25 +36,39 @@ const Header: FC = () => {
           src="/haddock.png"
           onClick={() => navigate("/dashboard")}
         />
-        <h3 className="text-2xl ml-2">
+        <h3 className="text-typography text-2xl ml-2">
           {projectId
             ? `/ project / ${projectName}`
             : pathTranslations[window.location.pathname] ??
               window.location.pathname}
         </h3>
       </div>
-      <SimpleDrawer
-        Content={Settings}
-        Trigger={({ onOpen }) => (
-          <Button onClick={onOpen} variant="ghost" className="group p-2">
-            <Menu
-              strokeWidth={3}
-              className="stroke-primary/70 group-hover:stroke-primary duration-1000"
-            />
-          </Button>
-        )}
-        title="Settings"
-      />
+      <div className="flex flex-row items-center">
+        <Button
+          onClick={() =>
+            dispatch(
+              setTheme(selectedTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT)
+            )
+          }
+          variant="ghost"
+          className="group p-2"
+        >
+          {selectedTheme === Theme.LIGHT ? (
+            <Sun className="text-primary/70 group-hover:text-primary" />
+          ) : (
+            <Moon className="text-primary/70 group-hover:text-primary" />
+          )}
+        </Button>
+        <SimpleDrawer
+          Content={Settings}
+          Trigger={({ onOpen }) => (
+            <Button onClick={onOpen} variant="ghost" className="group p-2">
+              <Menu className="text-primary/70 group-hover:text-primary" />
+            </Button>
+          )}
+          title="Settings"
+        />
+      </div>
     </div>
   );
 };

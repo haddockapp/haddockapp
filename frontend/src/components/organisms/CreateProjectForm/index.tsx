@@ -14,7 +14,7 @@ import {
   AuthorizationEnum,
   useGetAllAuthorizationsQuery,
 } from "@/services/backendApi/authorizations";
-import Select from "react-select";
+import Select from "@/components/molecules/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import CreateSelect from "@/components/molecules/create-select";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   authorization: z
@@ -56,6 +57,7 @@ interface CreateProjectFormProps {
 }
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,13 +128,14 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             : undefined,
         })
           .unwrap()
-          .then(() => {
+          .then((res) => {
             toast({
               title: "Project created !",
               duration: 1000,
             });
             reset();
             onClose?.();
+            navigate(`/project/${res.id}`);
             setFormStep(0);
           })
           .catch(() => {
@@ -267,7 +270,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>CPUs</span>
-                    <span className="text-gray-400">{field.value}</span>
+                    <span className="text-typography/40">{field.value}</span>
                   </Label>
                   <FormControl>
                     <Slider
@@ -290,7 +293,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>Memory</span>
-                    <span className="text-gray-400">{field.value} MB</span>
+                    <span className="text-typography/40">{field.value} MB</span>
                   </Label>
                   <FormControl>
                     <Slider
@@ -313,7 +316,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                 <FormItem className="space-y-2">
                   <Label className="flex justify-between">
                     <span>Disk</span>
-                    <span className="text-gray-400">{field.value} MB</span>
+                    <span className="text-typography/40">{field.value} MB</span>
                   </Label>
                   <FormControl>
                     <Slider

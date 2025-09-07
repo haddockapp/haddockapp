@@ -25,9 +25,9 @@ import {
   Form,
   FormMessage,
 } from "@/components/ui/form";
-import Select from "react-select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Select from "@/components/molecules/select";
 
 const formSchema = z.object({
   authorization: z
@@ -42,9 +42,13 @@ const formSchema = z.object({
 
 interface EditProjectDialogProps {
   project: ProjectDto | undefined;
+  isDisabled?: boolean;
 }
 
-const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
+const EditProjectDialog: FC<EditProjectDialogProps> = ({
+  project,
+  isDisabled,
+}) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
   const [editProject] = useUpdateProjectMutation();
   const { toast } = useToast();
@@ -112,7 +116,7 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onToggle}>
-      <DialogTrigger asChild>
+      <DialogTrigger disabled={isDisabled} asChild>
         <Button variant="default" className="font-bold mt-4">
           <Pencil className="mr-2" size={15} />
           Edit this project
@@ -124,7 +128,7 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({ project }) => {
             {`Edit ${project?.name ?? "this project"}`}
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className="text-gray-600 text-sm">
+        <DialogDescription className="text-typography/60 text-sm">
           <Form {...methods}>
             <form
               onSubmit={handleSubmit(onSubmit)}
