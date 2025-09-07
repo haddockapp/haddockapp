@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from "./useStore";
 import { backendApi } from "@/services/backendApi";
 import { VmState } from "@/types/vm/vm";
 import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
-import { useGetSelfQuery } from "@/services/backendApi/users";
 import {
   LogsSocketType,
   MetricsSocketType,
@@ -27,14 +26,13 @@ type SocketMessage = {
 
 const useWebsockets = () => {
   const dispatch = useAppDispatch();
-  const { isAuth } = useAppSelector((state) => state.auth);
-  const { data: me } = useGetSelfQuery(undefined, { skip: !isAuth });
+  const { clientId } = useAppSelector((state) => state.auth);
 
   const { socketUrl } = useAppSelector((state) => state.config);
   const { projectId, oldProjectId } = useAppSelector((state) => state.metrics);
 
   const unsubscribe = (unsubscribeProjectId: string) => {
-    if (!me) return;
+    if (!clientId) return;
     const socket = getSocket();
     if (!socket) return;
 
@@ -49,14 +47,14 @@ const useWebsockets = () => {
         WebsocketService.STATUS,
       ],
       subscribe: false,
-      userId: me.id,
+      userId: clientId,
       data: {},
     });
     return;
   };
 
   const subscribe = async () => {
-    if (!me) return;
+    if (!clientId) return;
     if (!projectId) return;
 
     console.log(`SUBSCRIBE ${projectId}`);
@@ -65,7 +63,7 @@ const useWebsockets = () => {
         projectId,
         service: WebsocketService.METRICS,
         subscribe: true,
-        userId: me.id,
+        userId: clientId,
         data: {},
       },
       ({ data }) => {
@@ -86,7 +84,7 @@ const useWebsockets = () => {
         projectId,
         service: WebsocketService.LOGS,
         subscribe: true,
-        userId: me.id,
+        userId: clientId,
         data: {},
       },
       ({ logs }) => {
@@ -101,7 +99,7 @@ const useWebsockets = () => {
         projectId,
         service: WebsocketService.STATUS,
         subscribe: true,
-        userId: me.id,
+        userId: clientId,
         data: {},
       },
       ({ status }) => {
@@ -130,7 +128,7 @@ const useWebsockets = () => {
   };
 
   useEffect(() => {
-    if (!me || !socketUrl) return;
+    if (!clientId || !socketUrl) return;
 
     connectSocket(socketUrl);
 
@@ -139,7 +137,7 @@ const useWebsockets = () => {
 
     socket.connect();
 
-    socket.emit("join", { userId: me.id });
+    socket.emit("join", { userId: clientId });
 
     socket.on("message", (msg: SocketMessage) => {
       if (msg.scope === "project" && msg.event === "status_change")
@@ -189,7 +187,7 @@ const useWebsockets = () => {
       socket.disconnect();
       socket.off("message");
     };
-  }, [dispatch, me, socketUrl, projectId]);
+  }, [dispatch, clientId, socketUrl, projectId]);
 
   useEffect(() => {
     if (!projectId && oldProjectId) {
@@ -204,7 +202,7 @@ const useWebsockets = () => {
       socket.off(WebsocketService.LOGS);
       socket.off(WebsocketService.STATUS);
     };
-  }, [dispatch, me, projectId, oldProjectId]);
+  }, [dispatch, clientId, projectId, oldProjectId]);
 };
 
 export default useWebsockets;
