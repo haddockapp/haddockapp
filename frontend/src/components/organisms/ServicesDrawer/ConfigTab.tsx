@@ -39,7 +39,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="bg-card-foreground">
+              <TableRow>
                 <TableHead className="w-1/3 font-medium">Key</TableHead>
                 <TableHead className="font-medium">Value</TableHead>
               </TableRow>
@@ -47,7 +47,7 @@ const ConfigTab: FC<ConfigTabProps> = ({ serviceInformations }) => {
             <TableBody>
               {Object.entries(serviceInformations.environment).map(
                 ([key, value]) => (
-                  <TableRow key={key} className="hover:bg-card-foreground">
+                  <TableRow key={key}>
                     <TableCell className="font-mono text-xs">{key}</TableCell>
                     <TableCell className="font-mono text-xs truncate max-w-xs">
                       {value}
