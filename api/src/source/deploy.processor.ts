@@ -81,9 +81,9 @@ export class DeployConsumer {
 
           fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
 
-          await execCommand(
-            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone git@github.com:${organization}/${repository}.git ${repoPath}`,
-          );
+            await execCommand(
+            `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone -b ${branch} git@github.com:${organization}/${repository}.git ${repoPath}`,
+            );
         } catch (e) {
           fs.unlinkSync(tempFilePath);
 
