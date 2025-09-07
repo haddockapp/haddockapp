@@ -71,15 +71,41 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
   }, [subdomainValue, domainValue, mainDomain]);
 
   const onSubmit: SubmitHandler<ConfigNetworkFormType> = (data) => {
-    const fullDomain = subdomainValue
-      ? `${subdomainValue}.${data.domain}`
-      : data.domain;
+    const domainId = domains?.find(
+      (domain) => domain.domain === data.domain
+    )?.id;
+    if (!domainId) {
+      toast({
+        title: "Domain not found",
+        description: "Please select a valid domain",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createRedirection({
       projectId: projectId,
       port: parseInt(data.port),
-      domain: fullDomain,
-    });
-    onClose();
+      domainId: domainId,
+      prefix: data.subdomain,
+    })
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Redirection created",
+          description: "Network connection has been successfully created",
+          duration: 1000,
+        });
+        onClose();
+      })
+      .catch(() => {
+        toast({
+          title: "Failed to create redirection",
+          description:
+            "An error occurred while creating the network connection. Please try again.",
+          variant: "destructive",
+        });
+      });
   };
 
   const isSubmitDisabled = useMemo(() => {
@@ -150,17 +176,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
           </p>
         )}
       </div>
-      <Button
-        className="w-full"
-        type="submit"
-        disabled={isSubmitDisabled}
-        onClick={() => {
-          toast({
-            title: "Redirection created",
-            duration: 1000,
-          });
-        }}
-      >
+      <Button className="w-full" type="submit" disabled={isSubmitDisabled}>
         Create
       </Button>
     </form>

@@ -7,7 +7,8 @@ export interface NetworkConnectionDto {
 }
 
 export interface CreateNetworkConnectionDto {
-  domain: string;
+  domainId: string;
+  prefix: string;
   port: number;
   projectId: string;
 }
