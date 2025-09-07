@@ -70,7 +70,7 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
     return subdomainValue === "" && domainValue === mainDomain;
   }, [subdomainValue, domainValue, mainDomain]);
 
-  const onSubmit: SubmitHandler<ConfigNetworkFormType> = async (data) => {
+  const onSubmit: SubmitHandler<ConfigNetworkFormType> = (data) => {
     const domainId = domains?.find(
       (domain) => domain.domain === data.domain
     )?.id;
@@ -83,28 +83,29 @@ const ConfigNetworkForm: FC<ConfigNetworkFormProps> = ({
       return;
     }
 
-    try {
-      await createRedirection({
-        projectId: projectId,
-        port: parseInt(data.port),
-        domainId: domainId,
-        prefix: data.subdomain,
-      }).unwrap();
-
-      toast({
-        title: "Redirection created",
-        description: "Network connection has been successfully created",
-        duration: 1000,
+    createRedirection({
+      projectId: projectId,
+      port: parseInt(data.port),
+      domainId: domainId,
+      prefix: data.subdomain,
+    })
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Redirection created",
+          description: "Network connection has been successfully created",
+          duration: 1000,
+        });
+        onClose();
+      })
+      .catch(() => {
+        toast({
+          title: "Failed to create redirection",
+          description:
+            "An error occurred while creating the network connection. Please try again.",
+          variant: "destructive",
+        });
       });
-      onClose();
-    } catch {
-      toast({
-        title: "Failed to create redirection",
-        description:
-          "An error occurred while creating the network connection. Please try again.",
-        variant: "destructive",
-      });
-    }
   };
 
   const isSubmitDisabled = useMemo(() => {
