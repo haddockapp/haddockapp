@@ -9,10 +9,9 @@ import ProjectManagementPanel from "@/components/organisms/ProjectManagement/Pro
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
-import { setProjectId } from "@/services/metricSlice";
-import useMetrics from "@/hooks/use-metrics";
+import { setAlert, setProjectId } from "@/services/metricSlice";
 
-enum TabsValue {
+export enum ProjectTabsValue {
   Topology = "topology",
   Monitoring = "monitoring",
   Settings = "settings",
@@ -21,7 +20,9 @@ enum TabsValue {
 const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
-  const [selectedTab, setSelectedTab] = useState<TabsValue>(TabsValue.Topology);
+  const [selectedTab, setSelectedTab] = useState<ProjectTabsValue>(
+    ProjectTabsValue.Topology
+  );
 
   const { data: projects, isLoading } = useGetProjectsQuery();
   const currentProject = projects?.find((project) => project.id === projectId);
@@ -34,7 +35,10 @@ const ProjectDetails: FC = () => {
     };
   }, [dispatch, projectId]);
 
-  const { cpuUsage, memoryUsage, diskUsage, logs } = useMetrics();
+  useEffect(() => {
+    if (selectedTab === ProjectTabsValue.Monitoring && !!projectId)
+      dispatch(setAlert({ projectId, isAlert: false }));
+  }, [selectedTab]);
 
   if (isLoading) {
     return (
@@ -51,48 +55,51 @@ const ProjectDetails: FC = () => {
 
   return (
     <>
-      <ProjectManagementPanel project={currentProject} />
+      <ProjectManagementPanel
+        onChangeTab={setSelectedTab}
+        project={currentProject}
+      />
 
-      <Tabs defaultValue="topology">
+      <Tabs value={selectedTab}>
         <div className="w-full text-right">
           <TabsList>
             <TabsTrigger
-              value={TabsValue.Topology}
-              onClick={() => setSelectedTab(TabsValue.Topology)}
+              value={ProjectTabsValue.Topology}
+              onClick={() => setSelectedTab(ProjectTabsValue.Topology)}
             >
               <span
                 className={
-                  selectedTab === TabsValue.Topology ? "text-primary" : ""
+                  selectedTab === ProjectTabsValue.Topology
+                    ? "text-primary"
+                    : ""
                 }
               >
                 Topology
               </span>
             </TabsTrigger>
             <TabsTrigger
-              value={TabsValue.Monitoring}
-              disabled={
-                !cpuUsage.length &&
-                !memoryUsage.length &&
-                !diskUsage.length &&
-                !logs.length
-              }
-              onClick={() => setSelectedTab(TabsValue.Monitoring)}
+              value={ProjectTabsValue.Monitoring}
+              onClick={() => setSelectedTab(ProjectTabsValue.Monitoring)}
             >
               <span
                 className={
-                  selectedTab === TabsValue.Monitoring ? "text-primary" : ""
+                  selectedTab === ProjectTabsValue.Monitoring
+                    ? "text-primary"
+                    : ""
                 }
               >
                 Monitoring
               </span>
             </TabsTrigger>
             <TabsTrigger
-              value={TabsValue.Settings}
-              onClick={() => setSelectedTab(TabsValue.Settings)}
+              value={ProjectTabsValue.Settings}
+              onClick={() => setSelectedTab(ProjectTabsValue.Settings)}
             >
               <span
                 className={
-                  selectedTab === TabsValue.Settings ? "text-primary" : ""
+                  selectedTab === ProjectTabsValue.Settings
+                    ? "text-primary"
+                    : ""
                 }
               >
                 Settings
@@ -106,7 +113,7 @@ const ProjectDetails: FC = () => {
           </ReactFlowProvider>
         </TabsContent>
         <TabsContent value="monitoring">
-          <MonitoringTab />
+          <MonitoringTab projectId={projectId ?? ""} />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsTab />

@@ -21,15 +21,19 @@ import type { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import ProjectActionConfirmDialog from "./ProjectActionConfirmDialog";
 import { QueryKeys, backendApi } from "@/services/backendApi";
 import { useAppDispatch } from "@/hooks/useStore";
+import useMetrics from "@/hooks/use-metrics";
+import { ProjectTabsValue } from "@/pages/project";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
+  onChangeTab: (tab: ProjectTabsValue) => void;
 }
 
 type ActionType = "start" | "stop" | "pull" | "recreate" | null;
 
 const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   project,
+  onChangeTab,
 }) => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -159,6 +163,8 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
 
   const dialogConfig = getDialogConfig();
 
+  const { buildLogs, isAlert } = useMetrics();
+
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
@@ -171,7 +177,17 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
               Manage the lifecycle of your project
             </CardDescription>
           </div>
-          <ProjectStatusBadge status={projectStatus} size="lg" />
+          <ProjectStatusBadge
+            isAlert={isAlert}
+            onClick={
+              buildLogs.length > 0
+                ? () => onChangeTab(ProjectTabsValue.Monitoring)
+                : undefined
+            }
+            tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
+            status={projectStatus}
+            size="lg"
+          />
         </div>
       </CardHeader>
       <CardContent>
