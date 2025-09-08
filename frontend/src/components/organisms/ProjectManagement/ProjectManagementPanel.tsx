@@ -84,7 +84,6 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           break;
         case "pull":
           await pullProject(project.id).unwrap();
-          console.log(new Date());
           setTimeout(() => {
             dispatch(backendApi.util.invalidateTags([QueryKeys.Projects]));
           }, 1000);
@@ -106,7 +105,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           });
           break;
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Action failed",
         description: `Failed to ${action} the project. Please try again later.`,
@@ -181,7 +180,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
             label="Start"
             icon={<Play className="h-4 w-4" />}
             onClick={() => handleActionClick("start")}
-            isDisabled={isRunning || isStarting || isLoading}
+            isDisabled={isRunning || isStarting || isLoading || isStopping}
             disabledReason={
               isRunning
                 ? "Project is already running"
@@ -189,6 +188,8 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 ? "Project is currently starting"
                 : isLoading
                 ? "Another action is in progress"
+                : isStopping
+                ? "Project is currently stopping"
                 : undefined
             }
             variant="default"
@@ -199,12 +200,14 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
             label="Stop"
             icon={<Square className="h-4 w-4" />}
             onClick={() => handleActionClick("stop")}
-            isDisabled={!isRunning || isLoading}
+            isDisabled={!isRunning || isLoading || isStopping}
             disabledReason={
               !isRunning
                 ? "Project must be running to stop it"
                 : isLoading
                 ? "Another action is in progress"
+                : isStopping
+                ? "Project is currently stopping"
                 : undefined
             }
             variant="outline"
@@ -215,12 +218,14 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
             label="Update"
             icon={<RefreshCw className="h-4 w-4" />}
             onClick={() => handleActionClick("pull")}
-            isDisabled={(!isStopped && !isError) || isLoading}
+            isDisabled={(!isStopped && !isError) || isLoading || isStopping}
             disabledReason={
               !isStopped && !isError
                 ? "Project must be stopped to update it"
                 : isLoading
                 ? "Another action is in progress"
+                : isStopping
+                ? "Project is currently stopping"
                 : undefined
             }
             variant="outline"
@@ -231,12 +236,14 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
             label="Recreate"
             icon={<RotateCcw className="h-4 w-4" />}
             onClick={() => handleActionClick("recreate")}
-            isDisabled={(!isStopped && !isError) || isLoading}
+            isDisabled={(!isStopped && !isError) || isLoading || isStopping}
             disabledReason={
               !isStopped && !isError
                 ? "Project must be stopped to recreate it"
                 : isLoading
                 ? "Another action is in progress"
+                : isStopping
+                ? "Project is currently stopping"
                 : undefined
             }
             variant="outline"
