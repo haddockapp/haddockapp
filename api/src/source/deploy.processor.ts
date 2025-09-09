@@ -33,7 +33,7 @@ export class DeployConsumer {
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
     private readonly composeService: ComposeService,
-  ) { }
+  ) {}
 
   @OnQueueFailed()
   onError(job: Job<any>, error: any) {
@@ -65,8 +65,8 @@ export class DeployConsumer {
 
     const authorizationType: AuthorizationEnum = source.authorizationId
       ? await this.authorizationService.getAuthorizationType(
-        source.authorizationId,
-      )
+          source.authorizationId,
+        )
       : AuthorizationEnum.NONE;
 
     switch (authorizationType) {
@@ -81,14 +81,17 @@ export class DeployConsumer {
 
           fs.writeFileSync(tempFilePath, key, { mode: 0o600 });
 
-            await execCommand(
+          await execCommand(
             `GIT_SSH_COMMAND="ssh -i ${tempFilePath}" git clone -b ${branch} git@github.com:${organization}/${repository}.git ${repoPath}`,
-            );
+          );
         } catch (e) {
           fs.unlinkSync(tempFilePath);
 
           if (e instanceof ExecutionError) {
-            this.logger.error(`Failed to clone repository: ${e.message}`);
+            throw new DeployError('Failed to clone repository', [
+              e.stdout,
+              e.stderr,
+            ]);
           }
           throw new DeployError('Failed to clone repository');
         }
@@ -115,8 +118,7 @@ export class DeployConsumer {
             },
           })
           .catch((err) => {
-            this.logger.error(`Failed to clone repository: ${err.message}`);
-            throw new DeployError('Failed to clone repository');
+            throw new DeployError('Failed to clone repository', [err.message]);
           });
         break;
       }
@@ -131,8 +133,7 @@ export class DeployConsumer {
             singleBranch: true,
           })
           .catch((err) => {
-            this.logger.error(`Failed to clone repository: ${err.message}`);
-            throw new DeployError('Failed to clone repository');
+            throw new DeployError('Failed to clone repository', [err.message]);
           });
         break;
       }
@@ -182,10 +183,11 @@ export class DeployConsumer {
   }
 
   @Process('deploy')
-  async deploy(job: Job<{ source: PersistedSourceDto, startAfterDeploy: boolean }>) {
-    const { source, startAfterDeploy } = job.data
+  async deploy(
+    job: Job<{ source: PersistedSourceDto; startAfterDeploy: boolean }>,
+  ) {
+    const { source, startAfterDeploy } = job.data;
     this.logger.log(`Deploying source for project ${source.project.id}`);
-
 
     try {
       const deployPath: string = await this.getDeployPath(source);
@@ -209,12 +211,20 @@ export class DeployConsumer {
 
       this.logger.log(`Deployed project ${source.project.id}`);
     } catch (e) {
+      const logs: string[] = [];
       if (e instanceof DeployError) {
-        this.logger.error(`Failed to deploy source: ${e.message}`);
+        this.logger.error(`Failed to deploy source: ${e.message}`, e.logs);
+        e.logs.forEach((log) => logs.push(log));
       } else if (e instanceof ExecutionError) {
-        this.logger.error(`Failed to execute command: ${e.message}`);
+        this.logger.error(
+          `Failed to execute command: ${e.message}`,
+          e.stdout,
+          e.stderr,
+        );
+        logs.push(e.stdout, e.stderr);
       } else {
         this.logger.error(`Unexpected error: ${e.message}`);
+        logs.push(e.message);
       }
 
       const vm: PersistedVmDto = await this.vmRepository.getVm({
@@ -226,11 +236,17 @@ export class DeployConsumer {
           await this.vmService.downVm(source.project.vmId);
         } catch (e) {
           if (e instanceof ExecutionError) {
-            this.logger.error(`Failed to stop vm: ${e.message}`);
+            this.logger.error(
+              `Failed to stop vm: ${e.message}`,
+              e.stdout,
+              e.stderr,
+            );
           }
         }
       }
-      await this.vmService.changeVmStatus(source.project.vmId, VmState.Error);
+      await this.vmService.changeVmStatus(source.project.vmId, VmState.Error, {
+        logs: logs,
+      });
       return;
     }
   }
@@ -243,10 +259,20 @@ export class DeployConsumer {
     try {
       await this.vmService.upVm(project.vmId);
     } catch (e) {
+      const logs: string[] = [];
       if (e instanceof ExecutionError) {
-        this.logger.error(`Failed to start vm: ${e.message}`);
+        this.logger.error(
+          `Failed to start vm: ${e.message}`,
+          e.stdout,
+          e.stderr,
+        );
+        logs.push(e.stdout, e.stderr);
+      } else {
+        logs.push(e.message);
       }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error, {
+        logs: logs,
+      });
     }
   }
 
@@ -258,10 +284,20 @@ export class DeployConsumer {
     try {
       await this.vmService.downVm(project.vmId);
     } catch (e) {
+      const logs: string[] = [];
       if (e instanceof ExecutionError) {
-        this.logger.error(`Failed to stop vm: ${e.message}`);
+        this.logger.error(
+          `Failed to stop vm: ${e.message}`,
+          e.stdout,
+          e.stderr,
+        );
+        logs.push(e.stdout, e.stderr);
+      } else {
+        logs.push(e.message);
       }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error);
+      await this.vmService.changeVmStatus(project.vmId, VmState.Error, {
+        logs: logs,
+      });
     }
   }
 }
