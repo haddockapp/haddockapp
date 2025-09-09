@@ -250,7 +250,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               rules={{ required: true }}
               render={({ field }) => (
                 <FormItem>
-                  <Label>Docker compose path</Label>
+                  <Label>Compose path</Label>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
