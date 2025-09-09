@@ -77,7 +77,7 @@ const MonitoringTab: FC<MonitoringTabProps> = () => {
               <div className="flex flex-row items-center space-x-2">
                 <ScrollTextIcon />
                 <h3 className="text-lg font-semibold text-typography/80">
-                  Docker logs
+                  Container logs
                 </h3>
               </div>
             </AccordionTrigger>
