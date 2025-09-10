@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IVMManager } from '../../types/ivm.manager';
+import { IVMManager, UpdatedVm } from '../../types/ivm.manager';
 import { Project, Source, Vm } from '@prisma/client';
-import { execCommand } from 'src/utils/exec-utils';
+import { execCommand, ExecResult } from 'src/utils/exec-utils';
 import { compile } from 'handlebars';
 import { readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
@@ -9,6 +9,7 @@ import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { EnvironmentVar } from 'src/project/dto/environmentVar';
+import { ExecutionError } from 'src/types/error/execution.error';
 
 @Injectable()
 export class VagrantManager implements IVMManager {
@@ -48,7 +49,10 @@ export class VagrantManager implements IVMManager {
     }
   }
 
-  private async runSource(project: Project, source: Source): Promise<void> {
+  private async runSource(
+    project: Project,
+    source: Source,
+  ): Promise<ExecResult> {
     switch (source.type) {
       case 'github': {
         const composePath = this.getComposePath(source);
@@ -58,20 +62,20 @@ export class VagrantManager implements IVMManager {
           ])
           .join(' ');
 
-        await execCommand(
+        const res = await execCommand(
           `cd ${project.path} && vagrant ssh -c 'cd source && ${envArgs} docker compose -f ${composePath} up --build -d'`,
         );
-        break;
+        this.logger.log(
+          `Source ${source.id} of type ${source.type} deployed for Vm ${project.vmId}`,
+        );
+        return res;
       }
       default:
         throw new Error('Invalid source type');
     }
-    this.logger.log(
-      `Source ${source.id} of type ${source.type} deployed for Vm ${project.vmId}`,
-    );
   }
 
-  async createVM(vm: PersistedVmDto, deployPath: string): Promise<Vm> {
+  async createVM(vm: PersistedVmDto, deployPath: string): Promise<UpdatedVm> {
     const composePath = this.getComposePath(vm.project.source);
 
     const template: string = this.template({
@@ -87,65 +91,85 @@ export class VagrantManager implements IVMManager {
 
     this.logger.log(`Vagrantfile created for VM ${vm.id}`);
 
-    return vm;
+    return {
+      vm,
+      logs: {
+        stdout: `Vagrantfile ${deployPath}/Vagrantfile created.`,
+        stderr: '',
+      },
+    };
   }
 
-  async destroyVM(vm: PersistedVmDto): Promise<Vm> {
-    await execCommand(`cd ${vm.project.path} && vagrant destroy -f`);
+  async destroyVM(vm: PersistedVmDto): Promise<UpdatedVm> {
+    const result = await execCommand(
+      `cd ${vm.project.path} && vagrant destroy -f`,
+    );
 
     this.logger.log(`VM ${vm.id} destroyed`);
 
-    return vm;
+    return { vm, logs: result };
   }
 
-  async startVM(vm: PersistedVmDto, force: boolean = false): Promise<Vm> {
+  async startVM(
+    vm: PersistedVmDto,
+    force: boolean = false,
+  ): Promise<UpdatedVm> {
     const output = await execCommand(`cd ${vm.project.path} && vagrant up`);
 
-    await this.runSource(vm.project, vm.project.source);
+    const sourceRes = await this.runSource(vm.project, vm.project.source);
 
-    const ip = this.getIpFromOutput(output);
+    output.stdout += '\n' + sourceRes.stdout;
+    output.stderr += '\n' + sourceRes.stderr;
+
+    const ip = this.getIpFromOutput(output.stdout);
 
     if (
       !(force && (ip !== undefined || ip !== '' || ip !== null)) &&
       ip === undefined
     ) {
-      throw new Error('Failed to get IP address');
+      throw new ExecutionError(output.stdout, output.stderr);
     }
 
     this.logger.log(`VM ${vm.id} is running on IP ${ip || vm.ip}`);
 
     vm.ip = ip || vm.ip;
 
-    return vm;
+    return { vm, logs: output };
   }
 
-  async stopVM(vm: PersistedVmDto): Promise<Vm> {
-    await execCommand(`cd ${vm.project.path} && vagrant halt`);
+  async stopVM(vm: PersistedVmDto): Promise<UpdatedVm> {
+    const result = await execCommand(`cd ${vm.project.path} && vagrant halt`);
 
     this.logger.log(`VM ${vm.id} stopped`);
 
-    return vm;
+    return { vm, logs: result };
   }
 
-  async restartVM(vm: PersistedVmDto): Promise<Vm> {
+  async restartVM(vm: PersistedVmDto): Promise<UpdatedVm> {
     const output = await execCommand(`cd ${vm.project.path} && vagrant reload`);
 
-    await this.runSource(vm.project, vm.project.source);
+    const sourceRes = await this.runSource(vm.project, vm.project.source);
 
-    const ip = this.getIpFromOutput(output);
+    output.stdout += '\n' + sourceRes.stdout;
+    output.stderr += '\n' + sourceRes.stderr;
+
+    const ip = this.getIpFromOutput(output.stdout);
 
     if (!(ip !== undefined || ip !== '' || ip !== null) && ip === undefined) {
-      throw new Error('Failed to get IP address');
+      throw new ExecutionError(output.stdout, output.stderr);
     }
 
     vm.ip = ip || vm.ip;
 
     this.logger.log(`VM ${vm.id} restarted on IP ${ip || vm.ip}`);
 
-    return vm;
+    return { vm, logs: output };
   }
 
-  async executeCommand(vm: PersistedVmDto, command: string): Promise<string> {
+  async executeCommand(
+    vm: PersistedVmDto,
+    command: string,
+  ): Promise<ExecResult> {
     const output = await execCommand(
       `cd ${vm.project.path} && vagrant ssh -c "${command}"`,
     );

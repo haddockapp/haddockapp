@@ -1,25 +1,32 @@
 import { exec, ExecOptions } from 'child_process';
 import { ExecutionError } from 'src/types/error/execution.error';
 
+export interface ExecResult {
+  stdout: string;
+  stderr: string;
+  error?: Error;
+}
+
 const execCommand = async (
   command: string,
   options?: ExecOptions,
-): Promise<string> => {
+): Promise<ExecResult> => {
   try {
-    const promise = new Promise<string>((resolve, reject) => {
-      exec(command, options, (error, stdout) => {
+    const promise = new Promise<ExecResult>((resolve, reject) => {
+      exec(command, options, (error, stdout, stderr) => {
         if (error) {
-          reject(new ExecutionError(`Command failed: ${error.message}`));
+          reject(new ExecutionError(stdout, stderr, error));
         }
-        resolve(stdout);
+        resolve({ stdout, stderr });
       });
     });
 
     return await promise;
   } catch (error) {
-    throw new ExecutionError(
-      `Execution of command "${command}" failed: ${error.message}`,
-    );
+    if (error instanceof ExecutionError) {
+      throw error;
+    }
+    throw new ExecutionError('', '', error as Error);
   }
 };
 
