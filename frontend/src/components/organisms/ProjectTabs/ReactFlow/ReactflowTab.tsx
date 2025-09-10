@@ -179,7 +179,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
 
   if (!services || services.length === 0) {
     return (
-      <div className="mt-2 h-[75vh] pt-8">
+      <div className="px-8 space-y-8">
         <h1 className="text-3xl font-bold my-8">Services</h1>
         <div className="flex flex-column items-center justify-center">
           <p className="text-lg">No services found</p>

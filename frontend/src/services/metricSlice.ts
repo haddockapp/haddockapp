@@ -26,24 +26,41 @@ export type DiskUsage = {
   timestamp?: string;
 };
 
+export type MetricsData = {
+  cpuUsage: CpuUsage[];
+  diskUsage: DiskUsage[];
+  memoryUsage: MemoryUsage[];
+  logs: string[];
+  buildLogs: string[];
+  isAlert: boolean;
+};
+
 interface MetricsState {
   projectId: string | null;
   oldProjectId: string | null;
-  metrics: Record<
-    string,
-    {
-      cpuUsage: CpuUsage[];
-      diskUsage: DiskUsage[];
-      memoryUsage: MemoryUsage[];
-      logs: string[];
-    }
-  >;
+  metrics: Record<string, MetricsData>;
 }
 
 const initialState: MetricsState = {
   projectId: null,
   oldProjectId: null,
   metrics: {},
+};
+
+const initializeMetrics = (
+  state: Record<string, MetricsData>,
+  projectId: string
+) => {
+  if (!!state[projectId]) return;
+
+  state[projectId] = {
+    cpuUsage: [] as CpuUsage[],
+    diskUsage: [] as DiskUsage[],
+    memoryUsage: [] as MemoryUsage[],
+    logs: [] as string[],
+    buildLogs: [] as string[],
+    isAlert: false,
+  };
 };
 
 const metricSlice = createSlice({
@@ -56,6 +73,26 @@ const metricSlice = createSlice({
       }
       state.projectId = action.payload;
     },
+    setBuildLogs(
+      state,
+      action: PayloadAction<{ projectId: string; buildLogs: string[] }>
+    ) {
+      const projectId = action.payload.projectId;
+      initializeMetrics(state.metrics, projectId);
+      const oldBatch = state.metrics[projectId].buildLogs;
+      const newBatch = action.payload.buildLogs;
+
+      state.metrics[projectId].buildLogs = [...oldBatch, ...newBatch];
+    },
+    setAlert(
+      state,
+      action: PayloadAction<{ projectId: string; isAlert: boolean }>
+    ) {
+      const projectId = action.payload.projectId;
+      initializeMetrics(state.metrics, projectId);
+
+      state.metrics[projectId].isAlert = action.payload.isAlert;
+    },
     setMetrics(
       state,
       action: PayloadAction<{
@@ -66,17 +103,8 @@ const metricSlice = createSlice({
       }>
     ) {
       const timestamp = new Date().toUTCString();
-
       const projectId = action.payload.projectId;
-
-      if (!state.metrics[projectId]) {
-        state.metrics[projectId] = {
-          cpuUsage: [],
-          diskUsage: [],
-          memoryUsage: [],
-          logs: [],
-        };
-      }
+      initializeMetrics(state.metrics, projectId);
 
       state.metrics[projectId].cpuUsage = [
         ...state.metrics[projectId].cpuUsage,
@@ -96,21 +124,14 @@ const metricSlice = createSlice({
       action: PayloadAction<{ projectId: string; logs: string[] }>
     ) {
       const projectId = action.payload.projectId;
-
-      if (!state.metrics[projectId]) {
-        state.metrics[projectId] = {
-          cpuUsage: [],
-          diskUsage: [],
-          memoryUsage: [],
-          logs: [],
-        };
-      }
+      initializeMetrics(state.metrics, projectId);
 
       state.metrics[projectId].logs = action.payload.logs;
     },
   },
 });
 
-export const { setMetrics, setLogs, setProjectId } = metricSlice.actions;
+export const { setMetrics, setLogs, setProjectId, setBuildLogs, setAlert } =
+  metricSlice.actions;
 
 export default metricSlice;

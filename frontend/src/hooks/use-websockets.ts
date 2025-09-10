@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./useStore";
 import { backendApi } from "@/services/backendApi";
 import { VmState } from "@/types/vm/vm";
-import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import {
+  EventScope,
+  EventType,
   LogsSocketType,
   MetricsSocketType,
   StatusSocketType,
@@ -13,9 +14,17 @@ import {
   handleProjectSubcription,
 } from "@/services/websockets";
 import { ServiceDto } from "@/services/backendApi/services";
-import { setMetrics, setLogs } from "@/services/metricSlice";
+import {
+  setMetrics,
+  setLogs,
+  setBuildLogs,
+  setAlert,
+} from "@/services/metricSlice";
 import { ServiceState } from "@/types/services/services";
-import { updateServiceStatus } from "@/services/backendApi/projects";
+import {
+  updateProjectStatus,
+  updateServiceStatus,
+} from "@/services/backendApi/projects";
 
 type SocketMessage = {
   event: string;
@@ -141,46 +150,58 @@ const useWebsockets = () => {
     socket.emit("join", { userId: clientId });
 
     socket.on("message", (msg: SocketMessage) => {
-      if (msg.scope === "project" && msg.event === "status_change")
-        dispatch(
-          backendApi.util.updateQueryData(
-            "getProjects" as never,
-            undefined as never,
-            (draftPosts) => {
-              if (msg.scope === "project" && msg.event === "status_change") {
-                const project = (draftPosts as unknown as ProjectDto[]).find(
-                  (project) => project.id === msg.target
+      switch (msg.event) {
+        case EventType.STATUS_CHANGE: {
+          switch (msg.scope) {
+            case EventScope.PROJECT: {
+              const { status: newStatus, data } = msg.data as {
+                status: VmState;
+                data?: { logs: string[] };
+              };
+
+              if (data?.logs)
+                dispatch(
+                  setBuildLogs({
+                    projectId: msg.target,
+                    buildLogs: data.logs,
+                  })
                 );
-                if (project) {
-                  project.vm.status = (msg.data as { status: string })
-                    .status as VmState;
 
-                  if (project.vm.status === VmState.Running) {
-                    subscribe();
-                  } else {
-                    if (project.vm.status === VmState.Stopping && projectId) {
-                      unsubscribe(projectId);
-                    }
-                  }
-                }
-              }
+              if (newStatus === VmState.Error)
+                dispatch(
+                  setAlert({
+                    isAlert: true,
+                    projectId: msg.target,
+                  })
+                );
+
+              updateProjectStatus({
+                dispatch,
+                projectId: msg.target,
+                newStatus,
+                onSubscribe: subscribe,
+                onUnsubscribe: () => unsubscribe(projectId!),
+              });
+              break;
             }
-          )
-        );
-      if (msg.scope === "service" && msg.event === "status_change") {
-        const { service: serviceId, status: newStatus } = msg.data as {
-          service: string;
-          status: ServiceState;
-        };
+            case EventScope.SERVICE: {
+              const { service: serviceId, status: newStatus } = msg.data as {
+                service: string;
+                status: ServiceState;
+              };
 
-        setTimeout(() => {
-          updateServiceStatus({
-            dispatch,
-            projectId: msg.target,
-            serviceId,
-            newStatus,
-          });
-        }, 100);
+              setTimeout(() => {
+                updateServiceStatus({
+                  dispatch,
+                  projectId: msg.target,
+                  serviceId,
+                  newStatus,
+                });
+              }, 100);
+              break;
+            }
+          }
+        }
       }
     });
 

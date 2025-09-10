@@ -2,6 +2,15 @@ import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { io, Socket } from "socket.io-client";
 import { ServiceStatusDetails } from "./backendApi/services";
 
+export enum EventScope {
+  PROJECT = "project",
+  SERVICE = "service",
+}
+
+export enum EventType {
+  STATUS_CHANGE = "status_change",
+}
+
 export enum WebsocketService {
   METRICS = "metrics",
   LOGS = "logs",
