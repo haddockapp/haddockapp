@@ -14,7 +14,7 @@ interface ProjectStatusBadgeProps {
   className?: string;
   showIcon?: boolean;
   size?: "sm" | "md" | "lg";
-  onClick: () => void;
+  onClick?: () => void;
   tooltip?: string;
   isAlert?: boolean;
 }
