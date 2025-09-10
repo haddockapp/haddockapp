@@ -42,7 +42,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
 
   const [startProject, { isLoading: isStartingMutation }] =
     useStartProjectMutation();
-  const [stopProject, { isLoading: isStopping }] = useStopProjectMutation();
+  const [stopProject, { isLoading: isStopLoading }] = useStopProjectMutation();
   const [pullProject, { isLoading: isPulling }] = usePullProjectMutation();
   const [recreateProject, { isLoading: isRecreating }] =
     useRecreateProjectMutation();
@@ -51,10 +51,11 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   const isRunning = projectStatus === VmState.Running;
   const isStopped = projectStatus === VmState.Stopped;
   const isStarting = projectStatus === VmState.Starting;
+  const isStopping = projectStatus === VmState.Stopping;
   const isError = !isRunning && !isStopped && !isStarting;
 
   const isLoading =
-    isStartingMutation || isStopping || isPulling || isRecreating;
+    isStartingMutation || isStopLoading || isPulling || isRecreating;
 
   const handleActionClick = (action: ActionType) => {
     setCurrentAction(action);
