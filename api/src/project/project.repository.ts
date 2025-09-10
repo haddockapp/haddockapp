@@ -48,7 +48,7 @@ export class ProjectRepository {
   }
 
   async createProject(data: CreateProjectDto): Promise<Project> {
-    return this.prismaService.project.create({
+    const project = await this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
         vm: {
@@ -86,6 +86,19 @@ export class ProjectRepository {
           : {}),
       },
     });
+
+    const domain = await this.prismaService.domain.findFirst();
+
+    await this.prismaService.networkConnection.create({
+      data: {
+        domain: `demo.${domain.domain}`,
+        port: 8080,
+        projectId: project.id,
+        https: domain.https,
+      },
+    });
+
+    return project;
   }
 
   async updateProject(params: {

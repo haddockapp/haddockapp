@@ -63,7 +63,7 @@ export class ProjectController {
       );
     }
     const project = await this.projectRepository.createProject(data);
-    await this.sourceService.deploySource(project.sourceId, false);
+    await this.sourceService.deploySource(project.sourceId, true);
     return project;
   }
 
