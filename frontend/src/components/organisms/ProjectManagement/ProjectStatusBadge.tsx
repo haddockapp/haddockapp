@@ -1,7 +1,7 @@
 import { VmState } from "@/types/vm/vm";
 import { cn } from "@/lib/utils";
 import type { FC } from "react";
-import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { CheckCircle, Clock, Loader2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -14,7 +14,7 @@ interface ProjectStatusBadgeProps {
   className?: string;
   showIcon?: boolean;
   size?: "sm" | "md" | "lg";
-  onClick?: () => void;
+  onClick: () => void;
   tooltip?: string;
   isAlert?: boolean;
 }
@@ -68,11 +68,7 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
           bgColor: "dark:bg-red-800 bg-red-100",
           textColor: "dark:text-white text-red-700",
           borderColor: "dark:border-red-900 border-red-200",
-          icon: !!onClick ? (
-            <QuestionMarkCircledIcon className="h-4 w-4" />
-          ) : (
-            <AlertCircle className="h-4 w-4" />
-          ),
+          icon: <QuestionMarkCircledIcon className="h-4 w-4" />,
         };
     }
   };
@@ -87,15 +83,12 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
 
   return (
     <Tooltip delayDuration={0}>
-      <TooltipContent>{tooltip}</TooltipContent>
+      {tooltip && <TooltipContent>{tooltip}</TooltipContent>}
       <TooltipTrigger>
         <div
           className={cn(
-            `inline-flex items-center gap-1.5 rounded-sm border font-medium ${
-              !!onClick ? "cursor-pointer hover:brightness-95" : ""
-            } ${
-              isAlert ? "motion-safe:animate-scale-pulse transform-gpu" : ""
-            }`,
+            `inline-flex items-center gap-1.5 rounded-sm border font-medium cursor-pointer hover:brightness-95
+            ${isAlert ? "motion-safe:animate-scale-pulse transform-gpu" : ""}`,
             bgColor,
             textColor,
             borderColor,
