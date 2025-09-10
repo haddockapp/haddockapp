@@ -2,12 +2,21 @@ import { VmState } from "@/types/vm/vm";
 import { cn } from "@/lib/utils";
 import type { FC } from "react";
 import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 
 interface ProjectStatusBadgeProps {
   status: VmState;
   className?: string;
   showIcon?: boolean;
   size?: "sm" | "md" | "lg";
+  onClick?: () => void;
+  tooltip?: string;
+  isAlert?: boolean;
 }
 
 const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
@@ -15,6 +24,9 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
   className,
   showIcon = true,
   size = "md",
+  onClick,
+  tooltip,
+  isAlert,
 }) => {
   const getStatusConfig = () => {
     switch (status) {
@@ -56,7 +68,11 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
           bgColor: "dark:bg-red-800 bg-red-100",
           textColor: "dark:text-white text-red-700",
           borderColor: "dark:border-red-900 border-red-200",
-          icon: <AlertCircle className="h-4 w-4" />,
+          icon: !!onClick ? (
+            <QuestionMarkCircledIcon className="h-4 w-4" />
+          ) : (
+            <AlertCircle className="h-4 w-4" />
+          ),
         };
     }
   };
@@ -70,19 +86,29 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
   };
 
   return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-sm border font-medium",
-        bgColor,
-        textColor,
-        borderColor,
-        sizeClasses[size],
-        className
-      )}
-    >
-      {showIcon && icon}
-      <span>{label}</span>
-    </div>
+    <Tooltip delayDuration={0}>
+      <TooltipContent>{tooltip}</TooltipContent>
+      <TooltipTrigger>
+        <div
+          className={cn(
+            `inline-flex items-center gap-1.5 rounded-sm border font-medium ${
+              !!onClick ? "cursor-pointer hover:brightness-95" : ""
+            } ${
+              isAlert ? "motion-safe:animate-scale-pulse transform-gpu" : ""
+            }`,
+            bgColor,
+            textColor,
+            borderColor,
+            sizeClasses[size],
+            className
+          )}
+          onClick={onClick}
+        >
+          {showIcon && icon}
+          <span>{label}</span>
+        </div>
+      </TooltipTrigger>
+    </Tooltip>
   );
 };
 

@@ -8,6 +8,7 @@ export enum VmState {
   Running = "running",
   Stopping = "stopping",
   Stopped = "stopped",
+  Error = "error",
 }
 
 export type VMInfos = {

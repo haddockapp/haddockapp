@@ -10,6 +10,39 @@ import {
   UpdateProjectDto,
 } from "./projects.dto";
 import { ServiceState } from "@/types/services/services";
+import { VmState } from "@/types/vm/vm";
+
+export const updateProjectStatus = ({
+  dispatch,
+  onSubscribe,
+  onUnsubscribe,
+  projectId,
+  newStatus,
+}: {
+  dispatch: ThunkDispatch<any, any, UnknownAction>;
+  onSubscribe: () => void;
+  onUnsubscribe: () => void;
+  projectId: string;
+  newStatus: VmState;
+}) =>
+  dispatch(
+    backendApi.util.updateQueryData(
+      "getProjects" as never,
+      undefined as never,
+      (draftPosts) => {
+        const project = (draftPosts as unknown as ProjectDto[]).find(
+          ({ id }) => id === projectId
+        );
+        if (project) {
+          project.vm.status = newStatus;
+          if (project.vm.status === VmState.Running) onSubscribe();
+          else if (project.vm.status === VmState.Stopping && projectId) {
+            onUnsubscribe();
+          }
+        }
+      }
+    )
+  );
 
 export const updateServiceStatus = ({
   dispatch,
