@@ -22,7 +22,7 @@ import ProjectActionConfirmDialog from "./ProjectActionConfirmDialog";
 import { QueryKeys, backendApi } from "@/services/backendApi";
 import { useAppDispatch } from "@/hooks/useStore";
 import useMetrics from "@/hooks/use-metrics";
-import { ProjectTabsValue } from "@/pages/project";
+import { ProjectTabsValue } from "@/pages/project/projectTabsType";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
@@ -180,11 +180,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           </div>
           <ProjectStatusBadge
             isAlert={isAlert}
-            onClick={
-              buildLogs.length > 0
-                ? () => onChangeTab(ProjectTabsValue.Monitoring)
-                : undefined
-            }
+            onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
             tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
             status={projectStatus}
             size="lg"

@@ -10,12 +10,7 @@ import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setAlert, setProjectId } from "@/services/metricSlice";
-
-export enum ProjectTabsValue {
-  Topology = "topology",
-  Monitoring = "monitoring",
-  Settings = "settings",
-}
+import { ProjectTabsValue } from "./projectTabsType";
 
 const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +33,7 @@ const ProjectDetails: FC = () => {
   useEffect(() => {
     if (selectedTab === ProjectTabsValue.Monitoring && !!projectId)
       dispatch(setAlert({ projectId, isAlert: false }));
-  }, [selectedTab]);
+  }, [dispatch, projectId, selectedTab]);
 
   if (isLoading) {
     return (
