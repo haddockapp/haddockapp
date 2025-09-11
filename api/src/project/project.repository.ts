@@ -50,6 +50,7 @@ export class ProjectRepository {
   async createProject(data: CreateProjectDto): Promise<Project> {
     const project = await this.prismaService.project.create({
       data: {
+        id: await this.prismaService.project.count() === 0 ? "demo" : undefined,
         name: this.generatePirateShipName(),
         vm: {
           create: {
