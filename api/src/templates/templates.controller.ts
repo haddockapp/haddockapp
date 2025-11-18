@@ -8,6 +8,6 @@ export class TemplatesController {
 
   @Get()
   listProjects() {
-    return this.templatesService.listProjects();
+    return this.templatesService.listTemplates();
   }
 }

@@ -23,7 +23,4 @@ export class TemplatesMapper {
             icon: template.icon
         };
     }
-
-
-
 }
