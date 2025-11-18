@@ -11,10 +11,10 @@ export class SourceService {
     @InjectQueue('deploys') private readonly deployQueue: Queue,
     private readonly sourceFactory: SourceFactory,
     private readonly sourceRepository: SourceRepository,
-  ) { }
+  ) {}
 
   async registerSource(createSourceDto: CreateSourceDto) {
-    const source = this.sourceFactory.createSource(createSourceDto);
+    const source = await this.sourceFactory.createSource(createSourceDto);
     return this.sourceRepository.createSource(source);
   }
 

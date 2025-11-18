@@ -60,30 +60,15 @@ export class ProjectRepository {
           },
         },
         source: {
-          create: {
-            type: 'github',
-            settings: {
-              organization: data.repository_organisation,
-              repository: data.repository_name,
-              branch: data.repository_branch,
-              composePath: data.compose_path,
-            },
-            ...(data.authorization_id
-              ? {
-                  authorization: {
-                    connect: { id: data.authorization_id },
-                  },
-                }
-              : {}),
-          },
+          connect: { id: data.source_id },
         },
-        ...(data.workspace_id !== undefined
-          ? {
+        ...(data.workspace_id === undefined
+          ? {}
+          : {
               workspace: {
                 connect: { id: data.workspace_id },
               },
-            }
-          : {}),
+            }),
       },
     });
   }
