@@ -6,5 +6,6 @@ import { TemplatesMapper } from './templates.mapper';
 @Module({
   controllers: [TemplatesController],
   providers: [TemplatesService, TemplatesMapper],
+  exports: [TemplatesService],
 })
 export class TemplatesModule {}

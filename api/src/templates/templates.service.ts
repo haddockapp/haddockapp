@@ -19,7 +19,7 @@ export class TemplatesService {
         return template || null;
     }
 
-    private async getTemplateVersion(templateId: string, versionId: string) {
+    async getTemplateVersion(templateId: string, versionId: string) {
         const template = await this.getTemplateById(templateId);
         if (!template) {
             return null;
