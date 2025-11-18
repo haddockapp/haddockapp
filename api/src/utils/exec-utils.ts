@@ -14,10 +14,13 @@ const execCommand = async (
   try {
     const promise = new Promise<ExecResult>((resolve, reject) => {
       exec(command, options, (error, stdout, stderr) => {
+        const outStr = stdout?.toString() ?? '';
+        const errStr = stderr?.toString() ?? '';
+
         if (error) {
-          reject(new ExecutionError(stdout, stderr, error));
+          reject(new ExecutionError(outStr, errStr, error));
         }
-        resolve({ stdout, stderr });
+        resolve({ stdout: outStr, stderr: errStr });
       });
     });
 

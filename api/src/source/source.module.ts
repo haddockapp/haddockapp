@@ -9,6 +9,8 @@ import { AuthorizationModule } from '../authorization/authorization.module';
 import { SourceRepository } from './source.repository';
 import { ProjectModule } from 'src/project/project.module';
 import { ComposeModule } from 'src/compose/compose.module';
+import { SourceController } from './source.controller';
+import { ZipSourceGuard } from './guard/zip-source.guard';
 
 @Module({
   imports: [
@@ -21,7 +23,14 @@ import { ComposeModule } from 'src/compose/compose.module';
     AuthorizationModule,
     ComposeModule,
   ],
-  providers: [SourceService, SourceFactory, DeployConsumer, SourceRepository],
+  providers: [
+    SourceService,
+    SourceFactory,
+    DeployConsumer,
+    SourceRepository,
+    ZipSourceGuard,
+  ],
   exports: [SourceService],
+  controllers: [SourceController],
 })
 export class SourceModule {}

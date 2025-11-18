@@ -52,17 +52,7 @@ export class ProjectController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createProject(@Body() data: CreateProjectDto) {
-    const canReadSource = await this.authorizationService.canReadSource(
-      data.authorization_id,
-      data.repository_organisation,
-      data.repository_name,
-    );
-    if (!canReadSource) {
-      throw new BadRequestException(
-        'Provided authorization does not have access to the repository.',
-      );
-    }
-    const project = await this.projectRepository.createProject(data);
+    const project = await this.projectService.createProject(data);
     await this.sourceService.deploySource(project.sourceId, false);
     return project;
   }

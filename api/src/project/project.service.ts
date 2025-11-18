@@ -25,6 +25,7 @@ import { ServiceStatus } from 'src/types/service.enum';
 import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { CreateProjectDto } from './dto/CreateProject.dto';
 
 @Injectable()
 export class ProjectService {
@@ -40,6 +41,12 @@ export class ProjectService {
     private readonly dockerService: DockerService,
     @InjectQueue('deploys') private readonly deployQueue: Queue,
   ) {}
+
+  async createProject(data: CreateProjectDto): Promise<Project> {
+    const project = await this.projectRepository.createProject(data);
+
+    return project;
+  }
 
   async updateProject(
     projectId: string,

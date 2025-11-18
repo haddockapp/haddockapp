@@ -1,15 +1,40 @@
-import { Authorization } from '@prisma/client';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class CreateGithubSourceDto {
-  type: 'github';
-
-  authorization: Authorization;
-
-  organization: string;
-
-  repository: string;
-
-  branch: string;
+export enum SourceType {
+  GITHUB = 'github',
+  ZIP_UPLOAD = 'zip_upload',
 }
 
-export type CreateSourceDto = CreateGithubSourceDto;
+export interface DefaultSource {
+  type: SourceType;
+}
+
+export class CreateGithubSourceDto implements DefaultSource {
+  type = SourceType.GITHUB;
+
+  @IsUUID()
+  @IsNotEmpty()
+  authorization_id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  organization: string;
+
+  @IsString()
+  @IsNotEmpty()
+  repository: string;
+
+  @IsString()
+  @IsNotEmpty()
+  branch: string;
+
+  @IsString()
+  @IsNotEmpty()
+  compose_path: string;
+}
+
+export class CreateZipUploadSourceDto implements DefaultSource {
+  type = SourceType.ZIP_UPLOAD;
+}
+
+export type CreateSourceDto = CreateGithubSourceDto | CreateZipUploadSourceDto;
