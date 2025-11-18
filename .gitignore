@@ -4,4 +4,5 @@ dist
 .env.prod
 .idea
 workspaces
+uploads
 Caddyfile
