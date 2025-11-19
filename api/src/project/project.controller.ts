@@ -6,14 +6,16 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   NotFoundException,
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthorizationService } from 'src/authorization/authorization.service';
-import { ComposeService } from 'src/compose/compose.service';
-import { DockerService } from 'src/docker/docker.service';
 import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import { SourceService } from '../source/source.service';
@@ -24,9 +26,15 @@ import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
 import { EnvironmentVar } from './dto/environmentVar';
 import { ServiceActionDto } from './dto/serviceAction.dto';
+import { ZipSourceGuard } from './guard/zip-source.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { existsSync, mkdirSync } from 'node:fs';
 
 @Controller('project')
 export class ProjectController {
+  private readonly logger = new Logger(ProjectController.name);
+
   constructor(
     private readonly projectService: ProjectService,
     private readonly projectRepository: ProjectRepository,
@@ -185,5 +193,52 @@ export class ProjectController {
     @Body() data: ServiceActionDto,
   ) {
     return await this.projectService.serviceAction(projectId, data);
+  }
+
+  @Post('/zip_upload/:id')
+  @UseGuards(ZipSourceGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const uploadPath = '../uploads';
+          if (!existsSync(uploadPath)) {
+            mkdirSync(uploadPath, { recursive: true });
+          }
+          cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+          const sourceId = req.params.id;
+          cb(null, `${sourceId}.zip`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype !== 'application/zip') {
+          return cb(new Error('Only zip files are allowed'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadZip(
+    @Param('id') projectId: string,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ): Promise<{ file: string }> {
+    try {
+      if (!file) {
+        throw new BadRequestException('No file uploaded');
+      }
+
+      this.logger.log(`ZIP file uploaded: ${file.filename}`);
+
+      return {
+        file: file.filename,
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        error.message || 'Failed to upload ZIP file',
+      );
+    }
   }
 }

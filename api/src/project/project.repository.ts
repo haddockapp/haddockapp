@@ -47,7 +47,10 @@ export class ProjectRepository {
     return `${prefix} ${suffix}`;
   }
 
-  async createProject(data: CreateProjectDto): Promise<Project> {
+  async createProject(
+    data: CreateProjectDto,
+    source_id: string,
+  ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
@@ -60,7 +63,7 @@ export class ProjectRepository {
           },
         },
         source: {
-          connect: { id: data.source_id },
+          connect: { id: source_id },
         },
         ...(data.workspace_id === undefined
           ? {}

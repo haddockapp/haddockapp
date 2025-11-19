@@ -43,7 +43,9 @@ export class ProjectService {
   ) {}
 
   async createProject(data: CreateProjectDto): Promise<Project> {
-    const project = await this.projectRepository.createProject(data);
+    const source = await this.sourceService.registerSource(data.source);
+
+    const project = await this.projectRepository.createProject(data, source.id);
 
     return project;
   }
