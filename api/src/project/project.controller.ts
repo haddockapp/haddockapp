@@ -16,7 +16,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthorizationService } from 'src/authorization/authorization.service';
-import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
+import {
+  GithubSourceSettingsDto,
+  ZipUploadSourceSettingsDto,
+} from 'src/source/dto/settings.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import { SourceService } from '../source/source.service';
 import { CreateProjectDto } from './dto/CreateProject.dto';
@@ -231,6 +234,28 @@ export class ProjectController {
       }
 
       this.logger.log(`ZIP file uploaded: ${file.filename}`);
+
+      const newSettings: Partial<ZipUploadSourceSettingsDto> = {
+        status: 'uploaded',
+      };
+
+      const project = await this.projectRepository.findProjectById(projectId);
+      if (!project) {
+        throw new NotFoundException('Project not found.');
+      }
+
+      await this.sourceService.updateSourceSettings(
+        project.sourceId,
+        newSettings,
+      );
+
+      const settings = getSettings<ZipUploadSourceSettingsDto>(
+        project.source.settings,
+      );
+
+      if (settings.status === 'none') {
+        await this.sourceService.deploySource(project.sourceId, false);
+      }
 
       return {
         file: file.filename,
