@@ -4,12 +4,12 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { SourceRepository } from '../source.repository';
-import { SourceType } from '../dto/create-source.dto';
+import { ProjectRepository } from '../project.repository';
+import { SourceType } from 'src/source/dto/create-source.dto';
 
 @Injectable()
 export class ZipSourceGuard implements CanActivate {
-  constructor(private readonly sourceRepository: SourceRepository) {}
+  constructor(private readonly project: ProjectRepository) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -19,7 +19,8 @@ export class ZipSourceGuard implements CanActivate {
       throw new ForbiddenException('Source ID is required');
     }
 
-    const source = await this.sourceRepository.findById(sourceId);
+    const project = await this.project.findProjectById(sourceId);
+    const source = project?.source;
 
     if (!source) {
       throw new ForbiddenException('Source not found');

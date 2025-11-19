@@ -35,6 +35,10 @@ export class CreateGithubSourceDto implements DefaultSource {
 
 export class CreateZipUploadSourceDto implements DefaultSource {
   type = SourceType.ZIP_UPLOAD;
+
+  @IsString()
+  @IsNotEmpty()
+  compose_path: string;
 }
 
 export type CreateSourceDto = CreateGithubSourceDto | CreateZipUploadSourceDto;

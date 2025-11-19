@@ -32,6 +32,7 @@ export class SourceFactory {
         organization: createSourceDto.organization,
         repository: createSourceDto.repository,
         branch: createSourceDto.branch,
+        composePath: createSourceDto.compose_path,
       },
       authorizationId: createSourceDto.authorization_id,
     };
@@ -42,7 +43,10 @@ export class SourceFactory {
   ): Promise<SourceDto> {
     return {
       type: 'zip_upload',
-      settings: {},
+      settings: {
+        composePath: createSourceDto.compose_path,
+        status: 'none',
+      },
       authorizationId: null,
     };
   }
