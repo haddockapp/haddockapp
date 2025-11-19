@@ -9,3 +9,7 @@ export interface ZipUploadSourceSettingsDto {
   composePath: string;
   status: 'none' | 'uploaded' | 'deployed';
 }
+
+export type SourceSettingsDto =
+  | GithubSourceSettingsDto
+  | ZipUploadSourceSettingsDto;

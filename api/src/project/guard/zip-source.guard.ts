@@ -13,13 +13,13 @@ export class ZipSourceGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const sourceId = request.params?.id;
+    const project_id = request.params?.id;
 
-    if (!sourceId) {
-      throw new ForbiddenException('Source ID is required');
+    if (!project_id) {
+      throw new ForbiddenException('Project ID is required');
     }
 
-    const project = await this.project.findProjectById(sourceId);
+    const project = await this.project.findProjectById(project_id);
     const source = project?.source;
 
     if (!source) {

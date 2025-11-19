@@ -93,7 +93,16 @@ export class ProjectService {
       if (e instanceof ExecutionError) {
         this.logger.error(`Failed to destroy vm: ${e.message}`);
       }
-      return;
+      throw e;
+    }
+
+    try {
+      await this.sourceService.deletePhysicalFiles(project.sourceId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to delete physical files: ${e.message}`);
+      }
+      throw e;
     }
 
     await this.projectRepository.deleteProject(projectId);
@@ -128,17 +137,22 @@ export class ProjectService {
   async deployProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);
 
+    if (!project) {
+      throw new NotFoundException('Project not found.');
+    }
+
     if (
-      project.vm.status === VmState.Running ||
-      project.vm.status === VmState.Starting ||
-      project.vm.status === VmState.Stopping
+      project.vm &&
+      (project.vm.status === VmState.Running ||
+        project.vm.status === VmState.Starting ||
+        project.vm.status === VmState.Stopping)
     ) {
       throw new BadRequestException('Project is already running');
     }
 
     this.logger.log(`Deploying project ${project.id}`);
 
-    await this.sourceService.deploySource(project.sourceId);
+    await this.sourceService.deploySource(project.sourceId, false);
   }
 
   async recreateProject(projectId: string) {

@@ -6,7 +6,10 @@ import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { VmState } from '../types/vm.enum';
 import { VmService } from '../vm/vm.service';
-import { GithubSourceSettingsDto } from './dto/settings.dto';
+import {
+  GithubSourceSettingsDto,
+  ZipUploadSourceSettingsDto,
+} from './dto/settings.dto';
 import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
@@ -22,6 +25,9 @@ import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { ComposeService } from 'src/compose/compose.service';
 import { ServiceDto } from 'src/compose/model/Service';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
+import { SourceType } from './dto/create-source.dto';
+import { SourceService } from './source.service';
+import * as unzipper from 'unzipper';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -33,6 +39,7 @@ export class DeployConsumer {
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
     private readonly composeService: ComposeService,
+    private readonly sourceService: SourceService,
   ) {}
 
   @OnQueueFailed()
@@ -141,17 +148,79 @@ export class DeployConsumer {
     return deployPath;
   }
 
-  private getDeployPath(source: PersistedSourceDto): Promise<string> {
-    if (source.type === 'github') {
-      return this.deployGithubSource(source);
+  private async deployZipUploadSource(
+    source: PersistedSourceDto,
+  ): Promise<string> {
+    const settings = getSettings<ZipUploadSourceSettingsDto>(source.settings);
+    const deployPath = `../workspaces/${source.project?.id}`;
+    const extractPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (settings.status === 'none') {
+      throw new DeployError('No zip upload found for deployment');
     }
-    throw new Error(`Unknown source type ${source.type}`);
+
+    if (settings.status === 'deployed') {
+      return deployPath;
+    }
+
+    const zipPath = `../uploads/${source.project?.id}.zip`;
+
+    if (fs.existsSync(extractPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${extractPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(extractPath, { recursive: true });
+    }
+
+    this.logger.log(
+      `Deploying zip upload source for project ${source.project.id} to ${extractPath}...`,
+    );
+
+    try {
+      await fs
+        .createReadStream(zipPath)
+        .pipe(unzipper.Extract({ path: extractPath }))
+        .promise();
+
+      // Update settings only after successful unzip
+      await this.sourceService.updateSourceSettings(source.id, {
+        ...settings,
+        status: 'deployed',
+      });
+    } catch (err) {
+      throw new DeployError(`Failed to unzip project source: ${err.message}`);
+    }
+
+    await this.sourceService.updateSourceSettings(source.id, {
+      ...settings,
+      status: 'deployed',
+    });
+
+    return deployPath;
+  }
+
+  private getDeployPath(source: PersistedSourceDto): Promise<string> {
+    switch (source.type) {
+      case SourceType.GITHUB:
+        return this.deployGithubSource(source);
+      case SourceType.ZIP_UPLOAD: {
+        return this.deployZipUploadSource(source);
+      }
+      default:
+        throw new Error(`Unknown source type ${source.type}`);
+    }
   }
 
   private getComposePath(source: PersistedSourceDto): string {
     switch (source.type) {
-      case 'github': {
+      case SourceType.GITHUB: {
         const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+      }
+      case SourceType.ZIP_UPLOAD: {
+        const settings = getSettings<ZipUploadSourceSettingsDto>(
+          source.settings,
+        );
         return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
       }
       default:
