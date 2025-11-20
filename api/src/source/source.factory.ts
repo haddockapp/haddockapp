@@ -6,9 +6,14 @@ import {
   CreateZipUploadSourceDto,
   SourceType,
 } from './dto/create-source.dto';
-import { CreateSourceRequest, SourceDto } from './dto/source.dto';
+import { SourceDto } from './dto/source.dto';
 import { AuthorizationService } from 'src/authorization/authorization.service';
 import { TemplatesService } from 'src/templates/templates.service';
+import {
+  GithubSourceSettingsDto,
+  TemplateSourceSettingsDto,
+  ZipUploadSourceSettingsDto,
+} from './dto/settings.dto';
 
 @Injectable()
 export class SourceFactory {
@@ -30,15 +35,16 @@ export class SourceFactory {
         'Provided authorization does not have access to the repository.',
       );
     }
+    const settings: GithubSourceSettingsDto = {
+      organization: createSourceDto.organization,
+      repository: createSourceDto.repository,
+      branch: createSourceDto.branch,
+      composePath: createSourceDto.compose_path,
+    };
 
     return {
       type: 'github',
-      settings: {
-        organization: createSourceDto.organization,
-        repository: createSourceDto.repository,
-        branch: createSourceDto.branch,
-        composePath: createSourceDto.compose_path,
-      },
+      settings: { ...settings },
       authorizationId: createSourceDto.authorization_id,
     };
   }
@@ -46,12 +52,14 @@ export class SourceFactory {
   private async createZipUploadSource(
     createSourceDto: CreateZipUploadSourceDto,
   ): Promise<SourceDto> {
+    const settings: ZipUploadSourceSettingsDto = {
+      composePath: createSourceDto.compose_path,
+      status: 'none',
+    };
+
     return {
       type: 'zip_upload',
-      settings: {
-        composePath: createSourceDto.compose_path,
-        status: 'none',
-      },
+      settings: { ...settings },
       authorizationId: null,
     };
   }
@@ -64,18 +72,32 @@ export class SourceFactory {
       createSourceDto.versionId,
     );
 
-    return {
-      type: 'template',
-      settings: {
-        version: JSON.stringify(templateVersion),
-      },
-      authorizationId: null,
-    };
+    try {
+      const envVars = await this.templateService.buildTemplateEnvironment(
+        createSourceDto.templateId,
+        createSourceDto.versionId,
+        createSourceDto.variables,
+      );
+
+      const settings: TemplateSourceSettingsDto = {
+        composePath: templateVersion.compose,
+        path: templateVersion.path,
+      };
+
+      return {
+        type: 'template',
+        settings: { ...settings },
+        authorizationId: null,
+        environmentVars: envVars,
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        'Error building template environment variables: ' + error.message,
+      );
+    }
   }
 
-  async createSource(
-    createSourceDto: CreateSourceDto,
-  ): Promise<CreateSourceRequest> {
+  async createSource(createSourceDto: CreateSourceDto): Promise<SourceDto> {
     switch (createSourceDto.type) {
       case SourceType.GITHUB:
         return this.createGithubSource(

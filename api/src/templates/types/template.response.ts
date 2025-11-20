@@ -1,19 +1,19 @@
 export interface TemplateResponse {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    versions: Version[];
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  versions: VersionResponse[];
 }
 
-export interface Version {
-    id: string;
-    label: string;
-    variables: Variable[];
+export interface VersionResponse {
+  id: string;
+  label: string;
+  variables: VariableResponse[];
 }
 
-export interface Variable {
-    key: string;
-    label: string;
-    type: "plain" | "secret";
+export interface VariableResponse {
+  key: string;
+  label: string;
+  type: 'plain' | 'secret';
 }

@@ -11,7 +11,8 @@ export interface ZipUploadSourceSettingsDto {
 }
 
 export interface TemplateSourceSettingsDto {
-  version: string; // JSON stringified Version object
+  composePath: string;
+  path: string;
 }
 
 export type SourceSettingsDto =

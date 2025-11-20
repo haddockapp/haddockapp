@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Source } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSourceRequest, PersistedSourceDto } from './dto/source.dto';
+import { PersistedSourceDto, SourceDto } from './dto/source.dto';
 import { SourceSettingsDto } from './dto/settings.dto';
 import { getSettings } from './utils/get-settings';
 
@@ -19,9 +19,17 @@ export class SourceRepository {
     });
   }
 
-  async createSource(source: CreateSourceRequest): Promise<Source | null> {
+  async createSource(source: SourceDto): Promise<Source | null> {
     return this.prismaService.source.create({
-      data: source,
+      data: {
+        type: source.type,
+        settings: source.settings,
+        authorization: source.authorizationId
+          ? {
+              connect: { id: source.authorizationId },
+            }
+          : undefined,
+      },
     });
   }
 

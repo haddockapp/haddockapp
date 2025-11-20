@@ -9,6 +9,7 @@ import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { getSettings } from 'src/source/utils/get-settings';
 import {
   GithubSourceSettingsDto,
+  TemplateSourceSettingsDto,
   ZipUploadSourceSettingsDto,
 } from 'src/source/dto/settings.dto';
 import { EnvironmentVar } from 'src/project/dto/environmentVar';
@@ -57,6 +58,15 @@ export class VagrantManager implements IVMManager {
         }
         return settings.composePath;
       }
+      case SourceType.TEMPLATE: {
+        const settings = getSettings<TemplateSourceSettingsDto>(
+          source.settings,
+        );
+        if (settings.composePath === undefined || !settings.composePath) {
+          throw new Error('Compose path not set');
+        }
+        return settings.composePath;
+      }
       default:
         throw new Error('Invalid source type');
     }
@@ -68,6 +78,7 @@ export class VagrantManager implements IVMManager {
   ): Promise<ExecResult> {
     switch (source.type) {
       case SourceType.GITHUB:
+      case SourceType.TEMPLATE:
       case SourceType.ZIP_UPLOAD: {
         const composePath = this.getComposePath(source);
         const envArgs = project.environmentVars
@@ -85,6 +96,7 @@ export class VagrantManager implements IVMManager {
         return res;
       }
       default:
+        this.logger.error(`Source type ${source.type} not supported for Vm ${project.vmId}`);
         throw new Error('Invalid source type');
     }
   }
