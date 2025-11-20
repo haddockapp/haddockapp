@@ -8,6 +8,7 @@ import { VmState } from '../types/vm.enum';
 import { VmService } from '../vm/vm.service';
 import {
   GithubSourceSettingsDto,
+  TemplateSourceSettingsDto,
   ZipUploadSourceSettingsDto,
 } from './dto/settings.dto';
 import { PersistedSourceDto } from './dto/source.dto';
@@ -28,6 +29,7 @@ import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { SourceType } from './dto/create-source.dto';
 import { SourceService } from './source.service';
 import * as unzipper from 'unzipper';
+import { Version } from 'src/templates/types/template.type';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -199,12 +201,52 @@ export class DeployConsumer {
     return deployPath;
   }
 
+  private async deployTemplateSource(
+    source: PersistedSourceDto,
+  ): Promise<string> {
+    const deployPath = `../workspaces/${source.project?.id}`;
+    const repoPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (fs.existsSync(repoPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${repoPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(repoPath, { recursive: true });
+    }
+
+    this.logger.log(
+      `Deploying template source for project ${source.project.id} to ${repoPath}`,
+    );
+
+    const settings = getSettings<TemplateSourceSettingsDto>(source.settings);
+
+    const version = JSON.parse(settings.version) as Version;
+
+    await git
+      .clone({
+        fs,
+        http,
+        url: `https://github.com/haddockapp/templates/.git`,
+        dir: repoPath,
+        gitdir: `${version.path}`,
+        singleBranch: true,
+      })
+      .catch((err) => {
+        throw new DeployError('Failed to clone repository', [err.message]);
+      });
+
+    return deployPath;
+  }
+
   private getDeployPath(source: PersistedSourceDto): Promise<string> {
     switch (source.type) {
       case SourceType.GITHUB:
         return this.deployGithubSource(source);
       case SourceType.ZIP_UPLOAD: {
         return this.deployZipUploadSource(source);
+      }
+      case SourceType.TEMPLATE: {
+        return this.deployTemplateSource(source);
       }
       default:
         throw new Error(`Unknown source type ${source.type}`);

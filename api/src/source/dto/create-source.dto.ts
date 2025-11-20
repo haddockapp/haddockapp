@@ -3,6 +3,7 @@ import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 export enum SourceType {
   GITHUB = 'github',
   ZIP_UPLOAD = 'zip_upload',
+  TEMPLATE = 'template',
 }
 
 export interface DefaultSource {
@@ -41,4 +42,19 @@ export class CreateZipUploadSourceDto implements DefaultSource {
   compose_path: string;
 }
 
-export type CreateSourceDto = CreateGithubSourceDto | CreateZipUploadSourceDto;
+export class CreateTemplateSourceDto implements DefaultSource {
+  type = SourceType.TEMPLATE;
+
+  @IsString()
+  @IsNotEmpty()
+  templateId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  versionId: string;
+
+  @IsNotEmpty()
+  variables: Record<string, string>;
+}
+
+export type CreateSourceDto = CreateGithubSourceDto | CreateZipUploadSourceDto | CreateTemplateSourceDto;
