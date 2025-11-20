@@ -61,7 +61,10 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
               className="mt-8 items-center w-full"
             >
               <TabsList className="mb-4">
-                <TabsTrigger value={TabsValue.Status}>
+                <TabsTrigger
+                  value={TabsValue.Status}
+                  className="shadow-sm hover:shadow-md transition-shadow"
+                >
                   <Button
                     variant="link"
                     onClick={() => setSelectedTab(TabsValue.Status)}
@@ -74,7 +77,10 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                     Status
                   </Button>
                 </TabsTrigger>
-                <TabsTrigger value={TabsValue.Config}>
+                <TabsTrigger
+                  value={TabsValue.Config}
+                  className="shadow-sm hover:shadow-md transition-shadow"
+                >
                   <Button
                     variant="link"
                     onClick={() => setSelectedTab(TabsValue.Config)}
@@ -87,7 +93,10 @@ const ServiceDrawerContent: FC<ServiceDrawerContentProps> = ({
                     Configuration
                   </Button>
                 </TabsTrigger>
-                <TabsTrigger value={TabsValue.Networks}>
+                <TabsTrigger
+                  value={TabsValue.Networks}
+                  className="shadow-sm hover:shadow-md transition-shadow"
+                >
                   <Button
                     variant="link"
                     onClick={() => setSelectedTab(TabsValue.Networks)}

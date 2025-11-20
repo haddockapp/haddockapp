@@ -71,6 +71,7 @@ const ProjectDetails: FC = () => {
             <TabsTrigger
               value={ProjectTabsValue.Topology}
               onClick={() => setSelectedTab(ProjectTabsValue.Topology)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
@@ -85,6 +86,7 @@ const ProjectDetails: FC = () => {
             <TabsTrigger
               value={ProjectTabsValue.Monitoring}
               onClick={() => setSelectedTab(ProjectTabsValue.Monitoring)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
@@ -99,6 +101,7 @@ const ProjectDetails: FC = () => {
             <TabsTrigger
               value={ProjectTabsValue.Settings}
               onClick={() => setSelectedTab(ProjectTabsValue.Settings)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
