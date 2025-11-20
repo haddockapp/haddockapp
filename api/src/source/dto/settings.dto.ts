@@ -10,6 +10,11 @@ export interface ZipUploadSourceSettingsDto {
   status: 'none' | 'uploaded' | 'deployed';
 }
 
+export interface TemplateSourceSettingsDto {
+  version: string; // JSON stringified Version object
+}
+
 export type SourceSettingsDto =
   | GithubSourceSettingsDto
-  | ZipUploadSourceSettingsDto;
+  | ZipUploadSourceSettingsDto
+  | TemplateSourceSettingsDto;

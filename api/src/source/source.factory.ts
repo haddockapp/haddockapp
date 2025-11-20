@@ -2,15 +2,20 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CreateGithubSourceDto,
   CreateSourceDto,
+  CreateTemplateSourceDto,
   CreateZipUploadSourceDto,
   SourceType,
 } from './dto/create-source.dto';
 import { CreateSourceRequest, SourceDto } from './dto/source.dto';
 import { AuthorizationService } from 'src/authorization/authorization.service';
+import { TemplatesService } from 'src/templates/templates.service';
 
 @Injectable()
 export class SourceFactory {
-  constructor(private readonly authorizationService: AuthorizationService) {}
+  constructor(
+    private readonly authorizationService: AuthorizationService,
+    private readonly templateService: TemplatesService,
+  ) {}
 
   private async createGithubSource(
     createSourceDto: CreateGithubSourceDto,
@@ -51,6 +56,23 @@ export class SourceFactory {
     };
   }
 
+  private async createTemplateSource(
+    createSourceDto: CreateTemplateSourceDto,
+  ): Promise<SourceDto> {
+    const templateVersion = await this.templateService.getTemplateVersion(
+      createSourceDto.templateId,
+      createSourceDto.versionId,
+    );
+
+    return {
+      type: 'template',
+      settings: {
+        version: JSON.stringify(templateVersion),
+      },
+      authorizationId: null,
+    };
+  }
+
   async createSource(
     createSourceDto: CreateSourceDto,
   ): Promise<CreateSourceRequest> {
@@ -62,6 +84,10 @@ export class SourceFactory {
       case SourceType.ZIP_UPLOAD:
         return this.createZipUploadSource(
           createSourceDto as CreateZipUploadSourceDto,
+        );
+      case SourceType.TEMPLATE:
+        return this.createTemplateSource(
+          createSourceDto as CreateTemplateSourceDto,
         );
       default:
         throw new Error('Invalid source type');
