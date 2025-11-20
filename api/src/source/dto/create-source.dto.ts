@@ -57,4 +57,7 @@ export class CreateTemplateSourceDto implements DefaultSource {
   variables: Record<string, string>;
 }
 
-export type CreateSourceDto = CreateGithubSourceDto | CreateZipUploadSourceDto | CreateTemplateSourceDto;
+export type CreateSourceDto =
+  | CreateGithubSourceDto
+  | CreateZipUploadSourceDto
+  | CreateTemplateSourceDto;

@@ -29,7 +29,6 @@ import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { SourceType } from './dto/create-source.dto';
 import { SourceService } from './source.service';
 import * as unzipper from 'unzipper';
-import { Version } from 'src/templates/types/template.type';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -152,13 +151,13 @@ export class DeployConsumer {
 
   private async deployZipUploadSource(
     source: PersistedSourceDto,
-  ): Promise<string> {
+  ): Promise<string | null> {
     const settings = getSettings<ZipUploadSourceSettingsDto>(source.settings);
     const deployPath = `../workspaces/${source.project?.id}`;
     const extractPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
 
     if (settings.status === 'none') {
-      throw new DeployError('No zip upload found for deployment');
+      return null;
     }
 
     if (settings.status === 'deployed') {
@@ -220,25 +219,24 @@ export class DeployConsumer {
 
     const settings = getSettings<TemplateSourceSettingsDto>(source.settings);
 
-    const version = JSON.parse(settings.version) as Version;
-
-    await git
-      .clone({
-        fs,
-        http,
-        url: `https://github.com/haddockapp/templates/.git`,
-        dir: repoPath,
-        gitdir: `${version.path}`,
-        singleBranch: true,
-      })
-      .catch((err) => {
-        throw new DeployError('Failed to clone repository', [err.message]);
-      });
+    try {
+      await execCommand(
+        `git clone --depth 1 --filter=blob:none --sparse https://github.com/haddockapp/templates.git ${deployPath}/tmp \
+        && cd ${deployPath}/tmp \
+        && git sparse-checkout set ${settings.path} \
+        && cd - \
+        && mv ${deployPath}/tmp/${settings.path} ${repoPath} \
+        && rm -rf ${deployPath}/tmp
+        `,
+      );
+    } catch (e) {
+      throw new DeployError('Failed to clone repository', [e.stdout, e.stderr]);
+    }
 
     return deployPath;
   }
 
-  private getDeployPath(source: PersistedSourceDto): Promise<string> {
+  private getDeployPath(source: PersistedSourceDto): Promise<string | null> {
     switch (source.type) {
       case SourceType.GITHUB:
         return this.deployGithubSource(source);
@@ -261,6 +259,12 @@ export class DeployConsumer {
       }
       case SourceType.ZIP_UPLOAD: {
         const settings = getSettings<ZipUploadSourceSettingsDto>(
+          source.settings,
+        );
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+      }
+      case SourceType.TEMPLATE: {
+        const settings = getSettings<TemplateSourceSettingsDto>(
           source.settings,
         );
         return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
@@ -302,6 +306,13 @@ export class DeployConsumer {
 
     try {
       const deployPath: string = await this.getDeployPath(source);
+
+      if (deployPath === null) {
+        this.logger.log(
+          `No deployable source found for project ${source.project.id}, skipping deployment.`,
+        );
+        return;
+      }
 
       await this.projectRepository.updateProject({
         where: { id: source.project.id },

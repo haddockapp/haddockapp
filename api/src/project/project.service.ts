@@ -26,6 +26,7 @@ import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { CreateProjectDto } from './dto/CreateProject.dto';
+import { CreatedSource } from 'src/source/dto/source.dto';
 
 @Injectable()
 export class ProjectService {
@@ -43,9 +44,26 @@ export class ProjectService {
   ) {}
 
   async createProject(data: CreateProjectDto): Promise<Project> {
-    const source = await this.sourceService.registerSource(data.source);
+    const source: CreatedSource = await this.sourceService.registerSource(
+      data.source,
+    );
 
     const project = await this.projectRepository.createProject(data, source.id);
+
+    if (source.environmentVars) {
+      await this.projectRepository.updateEnvironmentVars(
+        project.id,
+        source.environmentVars,
+      );
+      const updatedProject = await this.projectRepository.findProjectById(
+        project.id,
+      );
+      if (updatedProject) {
+        return updatedProject;
+      } else {
+        throw new NotFoundException('Project not found after creation.');
+      }
+    }
 
     return project;
   }

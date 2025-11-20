@@ -6,6 +6,7 @@ import { Queue } from 'bull';
 import { SourceRepository } from './source.repository';
 import { SourceSettingsDto } from './dto/settings.dto';
 import * as fs from 'node:fs';
+import { CreatedSource } from './dto/source.dto';
 
 @Injectable()
 export class SourceService {
@@ -17,9 +18,12 @@ export class SourceService {
     private readonly sourceRepository: SourceRepository,
   ) {}
 
-  async registerSource(createSourceDto: CreateSourceDto) {
+  async registerSource(
+    createSourceDto: CreateSourceDto,
+  ): Promise<CreatedSource> {
     const source = await this.sourceFactory.createSource(createSourceDto);
-    return this.sourceRepository.createSource(source);
+    const createdSource = await this.sourceRepository.createSource(source);
+    return { ...createdSource, environmentVars: source.environmentVars };
   }
 
   async deploySource(sourceId: string, startAfterDeploy: boolean = true) {

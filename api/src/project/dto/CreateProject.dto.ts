@@ -12,6 +12,7 @@ import { AllowedValues } from '../validator/AllowedValues.validator';
 import {
   CreateGithubSourceDto,
   CreateSourceDto,
+  CreateTemplateSourceDto,
   CreateZipUploadSourceDto,
   SourceType,
 } from 'src/source/dto/create-source.dto';
@@ -37,23 +38,32 @@ class ValidSourceConstraint implements ValidatorConstraintInterface {
   validate(source: any) {
     if (!source || typeof source !== 'object') return false;
 
-    if (source.type === SourceType.GITHUB) {
-      const errors = validateSync(
-        plainToInstance(CreateGithubSourceDto, source),
-      );
-      return errors.length === 0;
-    } else if (source.type === SourceType.ZIP_UPLOAD) {
-      const errors = validateSync(
-        plainToInstance(CreateZipUploadSourceDto, source),
-      );
-      return errors.length === 0;
+    switch (source.type) {
+      case SourceType.TEMPLATE: {
+        const templateErrors = validateSync(
+          plainToInstance(CreateTemplateSourceDto, source),
+        );
+        return templateErrors.length === 0;
+      }
+      case SourceType.GITHUB: {
+        const githubErrors = validateSync(
+          plainToInstance(CreateGithubSourceDto, source),
+        );
+        return githubErrors.length === 0;
+      }
+      case SourceType.ZIP_UPLOAD: {
+        const zipErrors = validateSync(
+          plainToInstance(CreateZipUploadSourceDto, source),
+        );
+        return zipErrors.length === 0;
+      }
+      default:
+        return false;
     }
-
-    return false;
   }
 
   defaultMessage() {
-    return 'Source must be a valid GitHub or ZIP upload source';
+    return 'Source must be a valid suported source type';
   }
 }
 
