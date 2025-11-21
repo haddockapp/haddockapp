@@ -275,6 +275,95 @@ check_updates() {
     read -p "Press Enter to return to menu..."
 }
 
+# Rollback update to backup
+rollback_update() {
+    local BACKUP_DIR=$1
+    local STASH_CREATED=$2
+    local PREVIOUS_VERSION=$3
+    
+    echo ""
+    print_warning "Rolling back update..."
+    
+    # Stop services
+    print_info "Stopping services..."
+    pm2 stop haddock-api 2>/dev/null || true
+    systemctl stop caddy 2>/dev/null || true
+    
+    # Restore database if backup exists
+    if [ -f "$BACKUP_DIR/database.sql" ]; then
+        print_info "Restoring database..."
+        get_db_credentials
+        if sudo -u postgres psql -d "$POSTGRES_DB" -f "$BACKUP_DIR/database.sql" > /dev/null 2>&1; then
+            print_success "Database restored from backup"
+        else
+            print_warning "Failed to restore database. You may need to restore manually from: $BACKUP_DIR/database.sql"
+        fi
+    fi
+    
+    # Restore configs
+    if [ -f "$BACKUP_DIR/.env" ]; then
+        print_info "Restoring configuration..."
+        cp "$BACKUP_DIR/.env" "$API_DIR/" 2>/dev/null || true
+        print_success "Configuration restored"
+    fi
+    
+    # Restore code using git if possible
+    if [ -d "$SCRIPT_DIR/.git" ] && [ -n "$PREVIOUS_VERSION" ]; then
+        print_info "Restoring code to previous version..."
+        cd "$SCRIPT_DIR"
+        
+        # Checkout the previous version/commit
+        if git checkout "$PREVIOUS_VERSION" 2>/dev/null; then
+            print_success "Code restored to previous version"
+        else
+            print_warning "Could not restore code automatically. You may need to checkout manually."
+        fi
+        
+        # Restore stashed changes if we created a stash
+        if [ "$STASH_CREATED" = true ]; then
+            print_info "Restoring stashed changes..."
+            if git stash pop; then
+                print_success "Stashed changes restored"
+            else
+                print_warning "Could not restore stashed changes automatically. Run 'git stash pop' manually."
+            fi
+        fi
+    fi
+    
+    # Reinstall dependencies and rebuild with previous version
+    if [ -d "$SCRIPT_DIR/.git" ] && [ -n "$PREVIOUS_VERSION" ]; then
+        print_info "Rebuilding with previous version..."
+        
+        # Reinstall API dependencies
+        if [ -f "$API_DIR/package.json" ]; then
+            cd "$API_DIR"
+            yarn install --frozen-lockfile > /dev/null 2>&1 || true
+            yarn build > /dev/null 2>&1 || true
+        fi
+        
+        # Reinstall Frontend dependencies
+        if [ -f "$SCRIPT_DIR/frontend/package.json" ]; then
+            cd "$SCRIPT_DIR/frontend"
+            yarn install --frozen-lockfile > /dev/null 2>&1 || true
+            yarn build > /dev/null 2>&1 || true
+        fi
+    fi
+    
+    # Start services back up
+    print_info "Restarting services..."
+    systemctl start caddy 2>/dev/null || true
+    cd "$API_DIR"
+    pm2 restart haddock-api 2>/dev/null || pm2 start yarn --name haddock-api -- start:prod 2>/dev/null || true
+    pm2 save 2>/dev/null || true
+    
+    echo ""
+    print_error "Update failed and has been rolled back"
+    print_info "Backup is still available at: $BACKUP_DIR"
+    print_info "Check the log file for details: $LOG_FILE"
+    echo ""
+    read -p "Press Enter to return to menu..."
+}
+
 # Perform update
 perform_update() {
     local TARGET_VERSION=$1
@@ -325,6 +414,12 @@ perform_update() {
     print_info "Updating code from GitHub..."
     cd "$SCRIPT_DIR"
     
+    # Save current version for potential rollback
+    PREVIOUS_VERSION=""
+    if [ -d ".git" ]; then
+        PREVIOUS_VERSION=$(git rev-parse HEAD 2>/dev/null || echo "")
+    fi
+    
     # Check if this is a git repository
     if [ -d ".git" ]; then
         # Check if there are local changes to stash
@@ -345,6 +440,13 @@ perform_update() {
             print_success "Code updated to tag $TARGET_VERSION"
         else
             print_error "Tag $TARGET_VERSION does not exist. Aborting update."
+            
+            # Restart services since they were stopped
+            print_info "Restarting services..."
+            systemctl start caddy 2>/dev/null || true
+            cd "$API_DIR"
+            pm2 restart haddock-api 2>/dev/null || pm2 start yarn --name haddock-api -- start:prod 2>/dev/null || true
+            pm2 save 2>/dev/null || true
             
             # Restore stashed changes if we stashed them
             if [ "$STASH_CREATED" = true ]; then
@@ -382,6 +484,14 @@ perform_update() {
         else
             print_error "Failed to download release"
             rm -rf "$TEMP_DIR"
+            
+            # Restart services since they were stopped
+            print_info "Restarting services..."
+            systemctl start caddy 2>/dev/null || true
+            cd "$API_DIR"
+            pm2 restart haddock-api 2>/dev/null || pm2 start yarn --name haddock-api -- start:prod 2>/dev/null || true
+            pm2 save 2>/dev/null || true
+            
             echo ""
             read -p "Press Enter to return to menu..."
             return 1
@@ -395,32 +505,52 @@ perform_update() {
     if [ -f "$API_DIR/package.json" ]; then
         cd "$API_DIR"
         print_info "Installing API dependencies..."
-        yarn install --frozen-lockfile 2>&1 | tee -a "$LOG_FILE"
+        if ! yarn install --frozen-lockfile 2>&1 | tee -a "$LOG_FILE"; then
+            print_error "Failed to install API dependencies!"
+            rollback_update "$BACKUP_DIR" "$STASH_CREATED" "$PREVIOUS_VERSION"
+            return 1
+        fi
     fi
     
     # Update Frontend dependencies
     if [ -f "$SCRIPT_DIR/frontend/package.json" ]; then
         cd "$SCRIPT_DIR/frontend"
         print_info "Installing Frontend dependencies..."
-        yarn install --frozen-lockfile 2>&1 | tee -a "$LOG_FILE"
+        if ! yarn install --frozen-lockfile 2>&1 | tee -a "$LOG_FILE"; then
+            print_error "Failed to install Frontend dependencies!"
+            rollback_update "$BACKUP_DIR" "$STASH_CREATED" "$PREVIOUS_VERSION"
+            return 1
+        fi
     fi
     
     # Build API
     print_info "Building API..."
     cd "$API_DIR"
-    yarn build 2>&1 | tee -a "$LOG_FILE"
+    if ! yarn build 2>&1 | tee -a "$LOG_FILE"; then
+        print_error "Failed to build API!"
+        rollback_update "$BACKUP_DIR" "$STASH_CREATED" "$PREVIOUS_VERSION"
+        return 1
+    fi
     
     # Build Frontend (if needed)
     if [ -d "$SCRIPT_DIR/frontend" ]; then
         print_info "Building Frontend..."
         cd "$SCRIPT_DIR/frontend"
-        yarn build 2>&1 | tee -a "$LOG_FILE"
+        if ! yarn build 2>&1 | tee -a "$LOG_FILE"; then
+            print_error "Failed to build Frontend!"
+            rollback_update "$BACKUP_DIR" "$STASH_CREATED" "$PREVIOUS_VERSION"
+            return 1
+        fi
     fi
     
     # Run database migrations
     print_info "Running database migrations..."
     cd "$API_DIR"
-    npx prisma db push 2>&1 | tee -a "$LOG_FILE"
+    if ! npx prisma db push 2>&1 | tee -a "$LOG_FILE"; then
+        print_error "Failed to run database migrations!"
+        rollback_update "$BACKUP_DIR" "$STASH_CREATED" "$PREVIOUS_VERSION"
+        return 1
+    fi
     
     # Start services
     print_info "Starting services..."
