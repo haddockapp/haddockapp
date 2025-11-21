@@ -327,10 +327,16 @@ perform_update() {
         # Fetch updates
         git fetch --all --tags
         
-        # Checkout the target version
-        git checkout "tags/$TARGET_VERSION" || git checkout "$TARGET_VERSION"
-        
-        print_success "Code updated to $TARGET_VERSION"
+        # Checkout the target version (must be a tag)
+        if git rev-parse --verify --quiet "refs/tags/$TARGET_VERSION" >/dev/null; then
+            git checkout "tags/$TARGET_VERSION"
+            print_success "Code updated to tag $TARGET_VERSION"
+        else
+            print_error "Tag $TARGET_VERSION does not exist. Aborting update."
+            echo ""
+            read -p "Press Enter to return to menu..."
+            return 1
+        fi
     else
         print_warning "Not a git repository. Downloading release..."
         
