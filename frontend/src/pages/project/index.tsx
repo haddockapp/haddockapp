@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setAlert, setProjectId } from "@/services/metricSlice";
 import { ProjectTabsValue } from "./projectTabsType";
+import { AnimatePresence, motion } from "framer-motion";
 
 const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
@@ -49,11 +50,20 @@ const ProjectDetails: FC = () => {
   }
 
   return (
-    <>
-      <ProjectManagementPanel
-        onChangeTab={setSelectedTab}
-        project={currentProject}
-      />
+    <div className="px-6">
+      <AnimatePresence>
+        <motion.div
+          key={currentProject.id}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+        >
+          <ProjectManagementPanel
+            onChangeTab={setSelectedTab}
+            project={currentProject}
+          />
+        </motion.div>
+      </AnimatePresence>
 
       <Tabs value={selectedTab}>
         <div className="w-full text-right">
@@ -114,7 +124,7 @@ const ProjectDetails: FC = () => {
           <SettingsTab />
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 };
 
