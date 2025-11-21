@@ -61,11 +61,20 @@ export class AppService {
   private isNewerVersion(latest: string, current: string): boolean {
     try {
       // Use semver for proper version comparison including pre-release identifiers
-      const latestVersion = semver.coerce(latest);
-      const currentVersion = semver.coerce(current);
+      const latestValid = semver.valid(latest);
+      const currentValid = semver.valid(current);
 
-      if (latestVersion && currentVersion) {
-        return semver.gt(latestVersion, currentVersion);
+      // If both are valid semver, compare them
+      if (latestValid && currentValid) {
+        return semver.gt(latestValid, currentValid);
+      }
+
+      // If they're not valid semver, try to coerce them
+      const latestCoerced = semver.coerce(latest);
+      const currentCoerced = semver.coerce(current);
+
+      if (latestCoerced && currentCoerced) {
+        return semver.gt(latestCoerced, currentCoerced);
       }
 
       // Fallback to false if versions can't be parsed
