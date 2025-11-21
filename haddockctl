@@ -299,8 +299,14 @@ perform_update() {
     if check_database; then
         get_db_credentials
         print_info "Backing up database..."
-        sudo -u postgres pg_dump "$POSTGRES_DB" > "$BACKUP_DIR/database.sql"
-        print_success "Database backed up to $BACKUP_DIR/database.sql"
+        if sudo -u postgres pg_dump "$POSTGRES_DB" > "$BACKUP_DIR/database.sql"; then
+            print_success "Database backed up to $BACKUP_DIR/database.sql"
+        else
+            print_error "Database backup failed! Aborting update."
+            echo ""
+            read -p "Press Enter to return to menu..."
+            return 1
+        fi
     fi
     
     # Backup configs
