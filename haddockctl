@@ -349,6 +349,7 @@ perform_update() {
             # Restore stashed changes if we stashed them
             if [ "$STASH_CREATED" = true ]; then
                 print_info "Restoring stashed changes..."
+                cd "$SCRIPT_DIR"
                 if git stash pop; then
                     print_success "Stashed changes restored"
                 else
