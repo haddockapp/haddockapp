@@ -19,7 +19,7 @@ const MonitoringTab: FC<MonitoringTabProps> = () => {
   const { cpuUsage, memoryUsage, diskUsage, logs, buildLogs } = useMetrics();
 
   return (
-    <div className="px-8 space-y-8">
+    <div className="space-y-8">
       <h1 className="text-3xl font-bold mt-8 mb-4">Monitoring</h1>
       {cpuUsage.length === 0 && logs.length === 0 && buildLogs.length === 0 && (
         <p className="text-typography/70">No monitoring data available yet.</p>

@@ -63,7 +63,7 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
                   pV.includes(key) ? pV.filter((v) => v !== key) : [...pV, key]
                 )
               }
-              className="text-xl"
+              className="text-xl px-2"
             >
               {name}
             </AccordionTrigger>

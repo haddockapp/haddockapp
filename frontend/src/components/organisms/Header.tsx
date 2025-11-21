@@ -29,14 +29,14 @@ const Header: FC = () => {
   );
 
   return (
-    <div className="flex flex-row justify-between w-full pt-4 px-8 items-center">
-      <div className="flex items-center">
+    <div className="flex flex-col sm:flex-row justify-between w-full pt-4 px-8 items-center">
+      <div className="flex flex-col sm:flex-row items-center">
         <img
-          className="w-16 cursor-pointer"
+          className="w-12 sm:w-16 cursor-pointer"
           src="/haddock.png"
           onClick={() => navigate("/dashboard")}
         />
-        <h3 className="text-typography text-2xl ml-2">
+        <h3 className="text-typography text-sm sm:text-2xl ml-2 text-nowrap">
           {projectId
             ? `/ project / ${projectName}`
             : pathTranslations[window.location.pathname] ??
