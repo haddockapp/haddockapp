@@ -183,8 +183,8 @@ EOF
     
     # Update password in database
     print_info "Updating password in database..."
-    sudo -u postgres psql -d "$POSTGRES_DB" -c \
-        "UPDATE \"User\" SET password='$PASSWORD_HASH' WHERE email='$ADMIN_EMAIL';" >/dev/null 2>&1
+    sudo -u postgres psql -d "$POSTGRES_DB" -v email="$ADMIN_EMAIL" -v hash="$PASSWORD_HASH" -c \
+        "UPDATE \"User\" SET password=:'hash' WHERE email=:'email';" >/dev/null 2>&1
     
     if [ $? -eq 0 ]; then
         echo ""
