@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as semver from 'semver';
 
 @Injectable()
 export class AppService {
@@ -16,22 +17,22 @@ export class AppService {
       let updateAvailable = false;
       let changelog = null;
       let releaseUrl = null;
-      
+
       try {
         const response = await fetch(
-          'https://api.github.com/repos/haddockapp/haddockapp/releases/latest'
+          'https://api.github.com/repos/haddockapp/haddockapp/releases/latest',
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           latestVersion = data.tag_name;
           changelog = data.body; // Release notes/changelog
           releaseUrl = data.html_url;
-          
+
           // Compare versions (remove 'v' prefix if present)
           const current = currentVersion.replace(/^v/, '');
           const latest = latestVersion.replace(/^v/, '');
-          
+
           updateAvailable = this.isNewerVersion(latest, current);
         }
       } catch (error) {
@@ -58,17 +59,20 @@ export class AppService {
   }
 
   private isNewerVersion(latest: string, current: string): boolean {
-    const latestParts = latest.split('.').map(Number);
-    const currentParts = current.split('.').map(Number);
+    try {
+      // Use semver for proper version comparison including pre-release identifiers
+      const latestVersion = semver.coerce(latest);
+      const currentVersion = semver.coerce(current);
 
-    for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
-      const latestPart = latestParts[i] || 0;
-      const currentPart = currentParts[i] || 0;
+      if (latestVersion && currentVersion) {
+        return semver.gt(latestVersion, currentVersion);
+      }
 
-      if (latestPart > currentPart) return true;
-      if (latestPart < currentPart) return false;
+      // Fallback to false if versions can't be parsed
+      return false;
+    } catch (error) {
+      console.error('Error comparing versions:', error);
+      return false;
     }
-
-    return false;
   }
 }
