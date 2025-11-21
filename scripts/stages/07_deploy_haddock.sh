@@ -3,22 +3,14 @@ section_progress "Deploying Haddock"
 #                  Haddock                   #
 ##############################################
 
-# Download Haddock
-output "Downloading Haddock..."
-curl -L --silent --show-error "https://releases.haddock.ovh/main/release.zip" -o /tmp/haddock.zip &
-spinner $! "Downloading Haddock..."
-
 # Create directory with proper permissions
 sudo mkdir -p /opt/haddock
 sudo chown $USER:$USER /opt/haddock
 
-# Extract files
-output "Extracting files..."
-sudo unzip -q /tmp/haddock.zip -d /opt/haddock &
-spinner $! "Extracting files..."
-
-# Remove the zip file
-sudo rm -f /tmp/haddock.zip
+# Clone Haddock from GitHub
+output "Cloning Haddock from GitHub..."
+git clone --depth 1 --branch main https://github.com/haddockapp/haddockapp.git /opt/haddock 2>&1 | tee -a $INSTALL_LOG &
+spinner $! "Cloning Haddock..."
 
 # Set proper permissions
 sudo chown -R $USER:$USER /opt/haddock
