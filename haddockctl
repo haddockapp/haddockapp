@@ -351,14 +351,13 @@ perform_update() {
         curl -sL "https://github.com/$GITHUB_REPO/archive/refs/tags/$TARGET_VERSION.tar.gz" -o "$TEMP_DIR/release.tar.gz"
         
         if [ $? -eq 0 ]; then
-            tar -xzf "$TEMP_DIR/release.tar.gz" -C "$TEMP_DIR"
+            tar --strip-components=1 -xzf "$TEMP_DIR/release.tar.gz" -C "$TEMP_DIR"
             
             # Copy new files (preserve database and custom configs)
             print_info "Copying new files..."
-            cd "$TEMP_DIR"/*/ 
             
             # Copy all files except configs
-            find . -type f ! -name '*.yml' ! -name '.env' -exec cp --parents {} "$SCRIPT_DIR/" \; 2>/dev/null
+            find "$TEMP_DIR" -type f ! -name '*.yml' ! -name '.env' -exec cp --parents {} "$SCRIPT_DIR/" \; 2>/dev/null
             
             rm -rf "$TEMP_DIR"
             print_success "Release downloaded and extracted"
