@@ -291,12 +291,18 @@ rollback_update() {
     
     # Restore database if backup exists
     if [ -f "$BACKUP_DIR/database.sql" ]; then
-        print_info "Restoring database..."
-        get_db_credentials
-        if sudo -u postgres psql -d "$POSTGRES_DB" -f "$BACKUP_DIR/database.sql" > /dev/null 2>&1; then
-            print_success "Database restored from backup"
+        # Verify backup was created recently (within last hour) to ensure it's from this session
+        if [ -n "$(find "$BACKUP_DIR/database.sql" -mmin -60 2>/dev/null)" ]; then
+            print_info "Restoring database..."
+            get_db_credentials
+            if sudo -u postgres psql -d "$POSTGRES_DB" -f "$BACKUP_DIR/database.sql" > /dev/null 2>&1; then
+                print_success "Database restored from backup"
+            else
+                print_warning "Failed to restore database. You may need to restore manually from: $BACKUP_DIR/database.sql"
+            fi
         else
-            print_warning "Failed to restore database. You may need to restore manually from: $BACKUP_DIR/database.sql"
+            print_warning "Database backup is too old or not from this session. Skipping restore for safety."
+            print_info "Manual restore available at: $BACKUP_DIR/database.sql"
         fi
     fi
     
@@ -337,15 +343,23 @@ rollback_update() {
         # Reinstall API dependencies
         if [ -f "$API_DIR/package.json" ]; then
             cd "$API_DIR"
-            yarn install --frozen-lockfile > /dev/null 2>&1 || true
-            yarn build > /dev/null 2>&1 || true
+            if ! yarn install --frozen-lockfile > /dev/null 2>&1; then
+                print_warning "Failed to reinstall API dependencies during rollback"
+            fi
+            if ! yarn build > /dev/null 2>&1; then
+                print_warning "Failed to rebuild API during rollback"
+            fi
         fi
         
         # Reinstall Frontend dependencies
         if [ -f "$SCRIPT_DIR/frontend/package.json" ]; then
             cd "$SCRIPT_DIR/frontend"
-            yarn install --frozen-lockfile > /dev/null 2>&1 || true
-            yarn build > /dev/null 2>&1 || true
+            if ! yarn install --frozen-lockfile > /dev/null 2>&1; then
+                print_warning "Failed to reinstall Frontend dependencies during rollback"
+            fi
+            if ! yarn build > /dev/null 2>&1; then
+                print_warning "Failed to rebuild Frontend during rollback"
+            fi
         fi
     fi
     
