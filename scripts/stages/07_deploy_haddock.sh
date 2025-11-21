@@ -7,6 +7,11 @@ section_progress "Deploying Haddock"
 sudo mkdir -p /opt/haddock
 sudo chown $USER:$USER /opt/haddock
 
+# Ensure /opt/haddock is empty before cloning
+if [ -d /opt/haddock ] && [ "$(ls -A /opt/haddock)" ]; then
+    output "Error: /opt/haddock already exists and is not empty. Please remove or empty the directory before deploying Haddock."
+    exit 1
+fi
 # Clone Haddock from GitHub
 output "Cloning Haddock from GitHub..."
 git clone --depth 1 --branch main https://github.com/haddockapp/haddockapp.git /opt/haddock 2>&1 | tee -a $INSTALL_LOG &
