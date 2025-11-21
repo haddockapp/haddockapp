@@ -435,7 +435,7 @@ perform_update() {
     print_info "Backup available at: $BACKUP_DIR"
     
     # Restore stashed changes if we stashed them
-    if [ -d "$SCRIPT_DIR/.git" ] && [ "$STASH_CREATED" = true ]; then
+    if [ "$STASH_CREATED" = true ]; then
         echo ""
         print_info "Restoring previously stashed changes..."
         cd "$SCRIPT_DIR"
