@@ -581,7 +581,7 @@ show_help() {
     echo ""
     echo "When run without options, launches the interactive menu."
     echo ""
-    echo "For more information, see: HADDOCKCTL.md"
+    echo "For more information, see: README.md"
 }
 
 show_version() {
