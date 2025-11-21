@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle2, RefreshCw, ExternalLink, ChevronDown, Chevro
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
-const About: FC<{ onClose: () => void }> = () => {
+const About: FC = () => {
   const { data: versionInfo, isLoading, error, refetch } = useGetVersionQuery();
   const [showChangelog, setShowChangelog] = useState(false);
 
