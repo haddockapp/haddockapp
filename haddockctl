@@ -327,8 +327,14 @@ perform_update() {
     
     # Check if this is a git repository
     if [ -d ".git" ]; then
-        # Save local changes
-        git stash save "Auto-stash before update to $TARGET_VERSION"
+        # Check if there are local changes to stash
+        STASH_CREATED=false
+        if ! git diff-index --quiet HEAD --; then
+            print_info "Stashing local changes..."
+            git stash save "Auto-stash before update to $TARGET_VERSION"
+            STASH_CREATED=true
+            print_success "Local changes stashed (will be restored after update)"
+        fi
         
         # Fetch updates
         git fetch --all --tags
@@ -339,6 +345,18 @@ perform_update() {
             print_success "Code updated to tag $TARGET_VERSION"
         else
             print_error "Tag $TARGET_VERSION does not exist. Aborting update."
+            
+            # Restore stashed changes if we stashed them
+            if [ "$STASH_CREATED" = true ]; then
+                print_info "Restoring stashed changes..."
+                cd "$SCRIPT_DIR"
+                if git stash pop; then
+                    print_success "Stashed changes restored"
+                else
+                    print_warning "Could not restore stashed changes automatically. Run 'git stash pop' manually."
+                fi
+            fi
+            
             echo ""
             read -p "Press Enter to return to menu..."
             return 1
@@ -415,6 +433,20 @@ perform_update() {
     print_success "Update completed successfully!"
     print_info "Haddock is now running version $TARGET_VERSION"
     print_info "Backup available at: $BACKUP_DIR"
+    
+    # Restore stashed changes if we stashed them
+    if [ "$STASH_CREATED" = true ]; then
+        echo ""
+        print_info "Restoring previously stashed changes..."
+        cd "$SCRIPT_DIR"
+        if git stash pop; then
+            print_success "Stashed changes restored successfully"
+        else
+            print_warning "Could not restore stashed changes automatically."
+            print_warning "There may be conflicts with the updated code."
+            print_info "To restore manually, run: cd $SCRIPT_DIR && git stash pop"
+        fi
+    fi
     
     echo ""
     read -p "Press Enter to return to menu..."
