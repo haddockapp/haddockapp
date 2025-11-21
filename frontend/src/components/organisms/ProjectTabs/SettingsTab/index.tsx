@@ -22,7 +22,7 @@ const SettingsTabAction: FC<PropsWithChildren<SettingsTabActionProps>> = ({
   children,
 }) => {
   return (
-    <div className="flex flex-row justify-between items-center border-b pb-4 mt-4 px-4">
+    <div className="flex flex-row justify-between items-center border-b pb-4 mt-4">
       <div className="flex flex-col space-y-2">
         <h3 className="text-lg font-semibold text-typography/80">{title}</h3>
         <p className="text-sm text-typography/60">{description}</p>
@@ -62,7 +62,7 @@ const SettingsTab: FC = () => {
   };
 
   return (
-    <div className="px-8">
+    <div>
       <h1 className="text-3xl font-bold mt-8 mb-4">Settings</h1>
       <Dialog
         open={isLoadingDelete}

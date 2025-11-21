@@ -161,9 +161,6 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
 
   return (
     <div className="flex-col space-y-4">
-      <h2 className="text-lg font-semibold text-typography/80">
-        Environment Variables
-      </h2>
       <p className="text-sm text-typography/60">
         Environment variables are used to configure the behavior of your
         application.

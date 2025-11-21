@@ -3,6 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 import ProjectCard from "./ProjectCard";
 import { useNavigate } from "react-router-dom";
 import { ProjectDto } from "@/services/backendApi/projects";
+import { AnimatePresence, motion } from "framer-motion";
 
 const ProjectsListEmptyState: FC = () => (
   <div className="flex flex-column justify-center items-center">
@@ -25,13 +26,21 @@ const ProjectsList: FC<ProjectsListProps> = ({ isLoading, projects }) => {
         ) : projects.length === 0 ? (
           <ProjectsListEmptyState />
         ) : (
-          projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onClick={() => navigate(`/project/${project.id}`)}
-            />
-          ))
+          <AnimatePresence>
+            {projects.map((project) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <ProjectCard
+                  project={project}
+                  onClick={() => navigate(`/project/${project.id}`)}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>
