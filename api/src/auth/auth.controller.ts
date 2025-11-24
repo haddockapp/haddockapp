@@ -16,14 +16,10 @@ import { CurrentUser } from './user.context';
 import { User } from '@prisma/client';
 import { SignupDto } from './dto/Signup.dto';
 import { Request, Response } from 'express';
-import { AutologinsService } from '../autologins/autologins.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private autologinsService: AutologinsService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Public()
   @UseGuards(AuthGuard('github'))
@@ -45,36 +41,16 @@ export class AuthController {
   @Public()
   @Post('saml/callback')
   @UseGuards(SamlAuthGuard)
-  async samlCallbackPost(
-    @CurrentUser() user: User,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    // Generate autologin token (UUID) instead of JWT
-    const autologinToken = await this.autologinsService.generateToken(user.id);
-
-    // Redirect to frontend with autologin token
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const redirectUrl = `${frontendUrl}/autologin?token=${autologinToken}`;
-
+  async samlCallbackPost(@CurrentUser() user: User, @Res() res: Response) {
+    const redirectUrl = await this.authService.generateAutologinLink(user.id);
     return res.redirect(redirectUrl);
   }
 
   @Public()
   @Get('saml/callback')
   @UseGuards(SamlAuthGuard)
-  async samlCallbackGet(
-    @CurrentUser() user: User,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    // Generate autologin token (UUID) instead of JWT
-    const autologinToken = await this.autologinsService.generateToken(user.id);
-
-    // Redirect to frontend with autologin token
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const redirectUrl = `${frontendUrl}/autologin?token=${autologinToken}`;
-
+  async samlCallbackGet(@CurrentUser() user: User, @Res() res: Response) {
+    const redirectUrl = await this.authService.generateAutologinLink(user.id);
     return res.redirect(redirectUrl);
   }
 

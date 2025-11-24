@@ -50,6 +50,9 @@ export class SamlStrategy extends PassportStrategy(Strategy, 'saml') {
       identifierFormat:
         'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       passReqToCallback: true,
+      // Disable RequestedAuthnContext to allow Azure AD to use any authentication method
+      // (MFA, passwordless, password, etc.) This prevents AADSTS75011 errors
+      disableRequestedAuthnContext: true,
     });
 
     // Load config from DB asynchronously
@@ -86,24 +89,16 @@ export class SamlStrategy extends PassportStrategy(Strategy, 'saml') {
     }
   }
 
-  authenticate(req: any, options?: any) {
+  async authenticate(req: any, options?: any) {
     // Reload config from DB before each authentication
     // This ensures we use the latest config when creating SAML requests
-    this.loadConfigFromDb()
-      .then(() => {
-        // Call parent authenticate after config is loaded
-        super.authenticate(req, options);
-      })
-      .catch((error) => {
-        console.error('Failed to reload SAML config:', error);
-        // Still try to authenticate with existing config
-        super.authenticate(req, options);
-      });
-  }
-
-  private async refreshConfig() {
-    // Reload config from DB to ensure it's up to date
-    await this.loadConfigFromDb();
+    try {
+      await this.loadConfigFromDb();
+    } catch (error) {
+      console.error('Failed to reload SAML config:', error);
+      // Still try to authenticate with existing config
+    }
+    return super.authenticate(req, options);
   }
 
   async validate(
@@ -112,7 +107,7 @@ export class SamlStrategy extends PassportStrategy(Strategy, 'saml') {
     done: (error: any, user?: any) => void,
   ): Promise<void> {
     // Refresh config from DB to ensure it's up to date
-    await this.refreshConfig();
+    await this.loadConfigFromDb();
 
     try {
       // Extract email from SAML profile

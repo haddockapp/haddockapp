@@ -187,18 +187,11 @@ export class ConfigurationService {
         SAML_CERT_KEY,
         cert,
       );
-      if (callbackUrl) {
+      if (callbackUrl)
         await this.configurationRepository.updateConfiguration(
           SAML_CALLBACK_URL_KEY,
           callbackUrl,
         );
-      } else if (config.callbackUrl) {
-        // Keep existing callback URL if not provided
-        await this.configurationRepository.updateConfiguration(
-          SAML_CALLBACK_URL_KEY,
-          config.callbackUrl,
-        );
-      }
     }
   }
 
@@ -228,17 +221,14 @@ export class ConfigurationService {
     }
 
     // Validate certificate format
-    if (!config.cert.includes('-----BEGIN CERTIFICATE-----')) {
+    if (!config.cert.includes('-----BEGIN CERTIFICATE-----'))
       errors.push('Certificate does not appear to be in PEM format');
-    }
-    if (!config.cert.includes('-----END CERTIFICATE-----')) {
+    if (!config.cert.includes('-----END CERTIFICATE-----'))
       errors.push('Certificate is missing END CERTIFICATE marker');
-    }
 
     // Validate issuer is not empty
-    if (!config.issuer || config.issuer.trim().length === 0) {
+    if (!config.issuer || config.issuer.trim().length === 0)
       errors.push('Issuer cannot be empty');
-    }
 
     // Validate callback URL format if provided
     if (config.callbackUrl) {
@@ -276,14 +266,12 @@ export class ConfigurationService {
       // which means the configuration is at least syntactically valid
     } catch (error) {
       errors.push(
-        `Failed to initialize SAML strategy: ${error.message || error}`,
+        `Failed to initialize SAML strategy: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
     // Check if SAML is enabled
-    if (!config.enabled) {
-      warnings.push('SAML SSO is currently disabled');
-    }
+    if (!config.enabled) warnings.push('SAML SSO is currently disabled');
 
     return {
       valid: errors.length === 0,

@@ -7,7 +7,6 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigurationRepository } from './configuration.repository';
 import { SetupGitbubDto } from './dto/setup-github.dto';
 import { SetupSamlDto } from './dto/setup-saml.dto';
 import { ToggleSamlDto } from './dto/toggle-saml.dto';
@@ -17,10 +16,7 @@ import { AdminGuard } from 'src/auth/guard/admin.guard';
 
 @Controller('configuration')
 export class ConfigurationController {
-  constructor(
-    private readonly configurationRepository: ConfigurationRepository,
-    private readonly configurationService: ConfigurationService,
-  ) {}
+  constructor(private readonly configurationService: ConfigurationService) {}
 
   @Public()
   @Get()
@@ -57,9 +53,8 @@ export class ConfigurationController {
         data.issuer,
         data.cert,
       );
-    if (!dataConform) {
+    if (!dataConform)
       throw new BadRequestException('Given SAML configuration is not valid');
-    }
 
     await this.configurationService.modifySamlConfiguration(
       data.entryPoint,
@@ -73,14 +68,14 @@ export class ConfigurationController {
   @Get('saml')
   async getSamlConfiguration() {
     const config = await this.configurationService.getSamlConfigurationPublic();
-    if (!config) {
+    if (!config)
       return {
         entryPoint: '',
         issuer: '',
         callbackUrl: '',
         enabled: false,
       };
-    }
+
     return config;
   }
 
