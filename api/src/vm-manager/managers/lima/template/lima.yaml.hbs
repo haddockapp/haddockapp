@@ -1,0 +1,41 @@
+# Lima VM template for {{name}}
+vmType: vz
+arch: "aarch64"
+
+cpus: {{cpus}}
+memory: "{{ram}}MiB"
+disk: "10GiB"
+
+images:
+  - location: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2"
+    arch: "aarch64"
+
+mounts:
+  - location: "{{project_path}}"
+    mountPoint: "/workspace/source"
+    writable: true
+  
+  - location: "{{absoluteRoot}}/metrics"
+    mountPoint: /mnt/metrics
+    writable: false
+
+networks:
+  - vzNAT: true
+
+provision:
+  - mode: system
+    script: |
+      set -eux
+
+      apt-get update
+      apt-get install -y curl
+
+      curl -fsSL https://get.docker.com | sh
+
+      # Enable and start docker service
+      systemctl enable docker
+      systemctl start docker
+
+      # Provision Metrics service
+      bash /mnt/metrics/provision/lima.sh > /var/log/metrics-provision.log 2>&1
+
