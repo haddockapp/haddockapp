@@ -40,16 +40,7 @@ function TemplateSourceForm() {
   const templateOptions = useMemo(
     () =>
       data.map((template) => ({
-        label: (
-          <>
-            <img
-              src={template.icon}
-              alt={`${template.name} icon`}
-              className="inline-block w-6 h-6 mr-2"
-            />
-            {template.name}
-          </>
-        ),
+        label: template.name,
         value: template.id,
       })) ?? [],
     [data]
@@ -85,6 +76,16 @@ function TemplateSourceForm() {
             <FormControl>
               <Select
                 {...field}
+                formatOptionLabel={(option) => (
+                  <>
+                    <img
+                      src={data.find((t) => t.id === option.value)?.icon}
+                      alt={`${option.label} icon`}
+                      className="inline-block w-6 h-6 mr-2"
+                    />
+                    {option.label}
+                  </>
+                )}
                 isLoading={isFetching}
                 options={templateOptions}
               />
