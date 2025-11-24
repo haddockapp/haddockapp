@@ -47,69 +47,38 @@ const SourceTypeCard: FC<SourceTypeCardProps> = ({
   </Card>
 );
 
-const formSchema = z
-  .object({
-    source: z.nativeEnum(SourceType),
+const formSchema = z.discriminatedUnion("source", [
+  z.object({
+    source: z.literal(SourceType.GITHUB),
     composePath: z.string(),
-    authorization: z
-      .object({ label: z.string(), value: z.string() })
-      .optional(),
-    repository: z.object({ label: z.string(), value: z.string() }).optional(),
-    branch: z.object({ label: z.string(), value: z.string() }).optional(),
-    templateId: z.object({ label: z.string(), value: z.string() }).optional(),
-    templateVersionId: z
-      .object({ label: z.string(), value: z.string() })
-      .optional(),
+    authorization: z.object({ label: z.string(), value: z.string() }),
+    repository: z.object({ label: z.string(), value: z.string() }),
+    branch: z.object({ label: z.string(), value: z.string() }),
     variables: z.record(z.string()).optional(),
     memory: z.number().int().min(512).max(8192),
     disk: z.number().int().min(256).max(2048),
     vcpus: z.number().int().min(1).max(8),
-  })
-  .refine(
-    (data) =>
-      (data.source === SourceType.GITHUB && data.repository) ||
-      data.source !== SourceType.GITHUB,
-    {
-      message: "Repository is required when source is GitHub",
-      path: ["repository"],
-    }
-  )
-  .refine(
-    (data) =>
-      (data.source === SourceType.GITHUB && data.branch) ||
-      data.source !== SourceType.GITHUB,
-    {
-      message: "Branch is required when source is GitHub",
-      path: ["branch"],
-    }
-  )
-  .refine(
-    (data) =>
-      (data.source === SourceType.GITHUB && data.authorization) ||
-      data.source !== SourceType.GITHUB,
-    {
-      message: "Authorization is required when source is GitHub",
-      path: ["authorization"],
-    }
-  )
-  .refine(
-    (data) =>
-      (data.source === SourceType.TEMPLATE && data.templateId) ||
-      data.source !== SourceType.TEMPLATE,
-    {
-      message: "Template ID is required when source is Template",
-      path: ["templateId"],
-    }
-  )
-  .refine(
-    (data) =>
-      (data.source === SourceType.TEMPLATE && data.templateVersionId) ||
-      data.source !== SourceType.TEMPLATE,
-    {
-      message: "Template Version ID is required when source is Template",
-      path: ["templateVersionId"],
-    }
-  );
+  }),
+  z.object({
+    source: z.literal(SourceType.ZIP_UPLOAD),
+    composePath: z.string(),
+    variables: z.record(z.string()).optional(),
+    memory: z.number().int().min(512).max(8192),
+    disk: z.number().int().min(256).max(2048),
+    vcpus: z.number().int().min(1).max(8),
+  }),
+  z.object({
+    source: z.literal(SourceType.TEMPLATE),
+    composePath: z.string(),
+    templateId: z.object({ label: z.string(), value: z.string() }),
+    templateVersionId: z.object({ label: z.string(), value: z.string() }),
+    variables: z.record(z.string()).optional(),
+    memory: z.number().int().min(512).max(8192),
+    disk: z.number().int().min(256).max(2048),
+    vcpus: z.number().int().min(1).max(8),
+  }),
+  // Add other source types as needed
+]);
 
 interface CreateProjectFormProps {
   onClose?: () => void;
