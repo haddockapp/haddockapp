@@ -15,6 +15,7 @@ import { LogOutIcon } from "lucide-react";
 import { useAppDispatch } from "@/hooks/useStore";
 import { useNavigate } from "react-router-dom";
 import useSetup from "@/hooks/use-setup";
+import SSO from "./SSO";
 
 const settings: {
   key: string;
@@ -38,6 +39,12 @@ const settings: {
     key: "authorizations",
     name: "Authorizations",
     Component: Authorizations,
+    isAuthRequired: true,
+  },
+  {
+    key: "sso",
+    name: "Single Sign-On (SSO) Configuration",
+    Component: SSO,
     isAuthRequired: true,
   },
   {
@@ -70,7 +77,7 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
                   pV.includes(key) ? pV.filter((v) => v !== key) : [...pV, key]
                 )
               }
-              className="text-xl px-2"
+              className="text-xl"
             >
               {name}
             </AccordionTrigger>
