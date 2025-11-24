@@ -4,15 +4,19 @@ import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReactFlowProvider } from "@xyflow/react";
 import { FC, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ProjectManagementPanel from "@/components/organisms/ProjectManagement/ProjectManagementPanel";
 import { useGetProjectsQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setAlert, setProjectId } from "@/services/metricSlice";
 import { ProjectTabsValue } from "./projectTabsType";
+import SimpleDialog from "@/components/organisms/SimpleDialog";
+import UploadZipDialog from "@/components/organisms/UploadZipDialog";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const ProjectDetails: FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
   const [selectedTab, setSelectedTab] = useState<ProjectTabsValue>(
@@ -50,6 +54,19 @@ const ProjectDetails: FC = () => {
 
   return (
     <>
+      {currentProject.source.type === SourceType.ZIP_UPLOAD &&
+        "status" in currentProject.source.settings &&
+        currentProject.source.settings.status === "none" && (
+          <SimpleDialog
+            isOpen
+            onOpen={() => {}}
+            onClose={() => navigate("/dashboard")}
+            title="Upload a ZIP file"
+            description="Drag and drop or browse to upload a ZIP file containing your project."
+            Content={UploadZipDialog}
+          />
+        )}
+
       <ProjectManagementPanel
         onChangeTab={setSelectedTab}
         project={currentProject}

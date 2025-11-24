@@ -195,6 +195,20 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Projects],
     }),
+    uploadProjectZip: builder.mutation<void, { projectId: string; file: File }>(
+      {
+        query: ({ projectId, file }) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          return {
+            url: `/project/zip_upload/${projectId}`,
+            method: "POST",
+            body: formData,
+          };
+        },
+        invalidatesTags: [QueryKeys.Projects],
+      }
+    ),
   }),
 });
 
@@ -212,4 +226,5 @@ export const {
   useStopProjectMutation,
   usePullProjectMutation,
   useRecreateProjectMutation,
+  useUploadProjectZipMutation,
 } = projectsApi;
