@@ -1,6 +1,7 @@
 import { ServiceState } from "@/types/services/services";
 import { Source } from "@/types/source";
 import { VMInfos } from "@/types/vm/vm";
+import { CreateSourceDto } from "./sources.dto";
 
 export enum ServiceAction {
   START = "start",
@@ -15,14 +16,10 @@ export const serviceActionToStatus: Record<ServiceAction, ServiceState> = {
 };
 
 export type CreateProjectDto = {
-  repository_organisation: string;
-  repository_name: string;
-  repository_branch: string;
   vm_memory: number;
   vm_disk: number;
   vm_cpus: number;
-  compose_path: string;
-  authorization_id?: string;
+  source: CreateSourceDto;
 };
 
 export type ProjectDto = {

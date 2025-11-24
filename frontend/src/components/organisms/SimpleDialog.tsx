@@ -10,7 +10,7 @@ import {
 import Divider from "../atoms/divider";
 
 interface SimpleDialogProps {
-  Trigger: FC<{ onOpen: () => void }>;
+  Trigger?: FC<{ onOpen: () => void }>;
   Content: FC<{ onClose?: () => void; isAppSetup?: boolean }>;
   title: string;
   description: JSX.Element | string;
@@ -28,9 +28,11 @@ const SimpleDialog: FC<SimpleDialogProps> = ({
   onClose,
 }) => (
   <Dialog onOpenChange={(open) => (open ? onOpen() : onClose())} open={isOpen}>
-    <DialogTrigger asChild>
-      <Trigger onOpen={onOpen} />
-    </DialogTrigger>
+    {Trigger && (
+      <DialogTrigger asChild>
+        <Trigger onOpen={onOpen} />
+      </DialogTrigger>
+    )}
     <DialogContent className="flex flex-col">
       <DialogHeader>
         <DialogTitle>{title}</DialogTitle>

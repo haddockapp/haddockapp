@@ -1,8 +1,9 @@
-import { Settings } from "./github/github.dto";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
+import { SourceSettingsDto } from "./github/github.dto";
 
 export type Source = {
   id: string;
-  type: string;
+  type: SourceType;
   authorizationId: string;
-  settings: Settings;
+  settings: SourceSettingsDto;
 };

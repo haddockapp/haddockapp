@@ -17,7 +17,16 @@ const Projects: FC = () => {
         <SimpleDialog
           {...disclosureMethods}
           title="Create a project"
-          description="Fill the form to create a new project."
+          description={
+            <p>
+              <span>To get started, deploy your project using either : </span>
+              <ul className="list-disc list-inside">
+                <li>a zip file from your computer;</li>
+                <li>a GitHub repository you have access to;</li>
+                <li>one of Haddock's preconfigured templates.</li>
+              </ul>
+            </p>
+          }
           Content={CreateProjectForm}
           Trigger={({ onOpen }) => (
             <Button onClick={onOpen} className="gap-2">

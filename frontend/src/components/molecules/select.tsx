@@ -22,6 +22,7 @@ const selectStyles = {
   }),
   placeholder: (provided: object) => ({
     ...provided,
+    color: "hsl(var(--typography)/50%)",
     cursor: "text",
   }),
   menu: (provided: object) => ({
@@ -32,15 +33,20 @@ const selectStyles = {
 };
 
 interface Option {
-  readonly label: string;
+  readonly label: React.ReactNode;
   readonly value: string;
 }
 
-const Select: FC<{ isLoading?: boolean; options: Option[] }> = ({
-  ...props
-}) => (
+const Select: FC<{
+  isLoading?: boolean;
+  options: Option[];
+  isDisabled?: boolean;
+  placeholder?: string;
+}> = ({ ...props }) => (
   <ReactSelect
     {...props}
+    isDisabled={props.isDisabled}
+    placeholder={props.placeholder ?? "Select..."}
     theme={(theme) => ({
       ...theme,
       colors: {
