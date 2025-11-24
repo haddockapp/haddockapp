@@ -11,13 +11,10 @@ const AuthenticationOptions: FC = () => {
 
   return (
     <div className="space-y-4 max-w-[400px] w-full mx-auto text-center">
-      {ssoConfig && (
-        <>
-          <SSOAuthentication />
-          <OrDivider />
-        </>
-      )}
-      <GithubAuthentication reason={GithubAuthReason.LOGIN} />
+      <div className="space-y-4">
+        {ssoConfig && <SSOAuthentication />}
+        <GithubAuthentication reason={GithubAuthReason.LOGIN} />
+      </div>
       <OrDivider />
       <EmailAuthentication />
     </div>
