@@ -77,7 +77,6 @@ const formSchema = z.discriminatedUnion("source", [
     disk: z.number().int().min(256).max(2048),
     vcpus: z.number().int().min(1).max(8),
   }),
-  // Add other source types as needed
 ]);
 
 interface CreateProjectFormProps {
