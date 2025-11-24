@@ -12,11 +12,25 @@ import { Card } from "@/components/ui/card";
 import { FolderArchive, Presentation } from "lucide-react";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { twMerge } from "tailwind-merge";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import GithubSourceForm from "./GithubSourceForm";
 import DataAllocationForm from "./DataAllocationForm";
 import ZipSourceForm from "./ZipSourceForm";
 import TemplateSourceForm from "./TemplateSourceForm";
+
+const MotionWrapper: FC<{ children: React.ReactNode; key: string }> = ({
+  key,
+  children,
+}) => (
+  <motion.div
+    key={key}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+  >
+    {children}
+  </motion.div>
+);
 
 type SourceTypeCardProps = {
   icon: React.ReactNode;
@@ -36,14 +50,14 @@ const SourceTypeCard: FC<SourceTypeCardProps> = ({
   <Card
     onClick={() => onChangeValue(value)}
     className={twMerge(
-      "p-4 flex flex-row items-center gap-2 text-typography/70",
+      "p-2 md:p-8 flex flex-row items-center gap-2 text-typography/70",
       isActive
         ? "text-primary cursor-default"
         : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow"
     )}
   >
     {icon}
-    <span className="text-lg">{label}</span>
+    <span className="text-md md:text-xl">{label}</span>
   </Card>
 );
 
@@ -69,7 +83,6 @@ const formSchema = z.discriminatedUnion("source", [
   }),
   z.object({
     source: z.literal(SourceType.TEMPLATE),
-    composePath: z.string(),
     templateId: z.object({ label: z.string(), value: z.string() }),
     templateVersionId: z.object({ label: z.string(), value: z.string() }),
     variables: z.record(z.string()).optional(),
@@ -99,7 +112,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
 
   const [formStep, setFormStep] = useState<number>(0);
 
-  const [createProject] = useCreateProjectMutation();
+  const [createProject, { isLoading }] = useCreateProjectMutation();
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     switch (formStep) {
@@ -107,6 +120,9 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
         setFormStep(1);
         break;
       case 1:
+        setFormStep(2);
+        break;
+      case 2:
         createProject({
           vm_cpus: +data.vcpus,
           vm_memory: +data.memory,
@@ -163,100 +179,76 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-between space-y-8"
+        className="flex flex-col justify-between space-y-8 w-full"
       >
         <FormProvider {...form}>
-          <AnimatePresence>
-            {formStep === 0 && (
-              <>
-                <div className="flex flex-row items-center justify-around">
-                  <Controller
-                    control={control}
-                    name="source"
-                    render={({ field }) => (
-                      <>
-                        <SourceTypeCard
-                          icon={<FolderArchive />}
-                          label="ZIP File"
-                          value={SourceType.ZIP_UPLOAD}
-                          onChangeValue={() =>
-                            field.onChange(SourceType.ZIP_UPLOAD)
-                          }
-                          isActive={field.value === SourceType.ZIP_UPLOAD}
-                        />
-                        <SourceTypeCard
-                          icon={<GitHubLogoIcon className="size-6" />}
-                          label="GitHub"
-                          value={SourceType.GITHUB}
-                          onChangeValue={() =>
-                            field.onChange(SourceType.GITHUB)
-                          }
-                          isActive={field.value === SourceType.GITHUB}
-                        />
-                        <SourceTypeCard
-                          icon={<Presentation />}
-                          label="Template"
-                          value={SourceType.TEMPLATE}
-                          onChangeValue={() =>
-                            field.onChange(SourceType.TEMPLATE)
-                          }
-                          isActive={field.value === SourceType.TEMPLATE}
-                        />
-                      </>
-                    )}
-                  />
-                </div>
-                {watchSourceType === SourceType.GITHUB && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <GithubSourceForm />
-                  </motion.div>
-                )}
-                {watchSourceType === SourceType.ZIP_UPLOAD && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <ZipSourceForm />
-                  </motion.div>
-                )}
-                {watchSourceType === SourceType.TEMPLATE && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <TemplateSourceForm />
-                  </motion.div>
-                )}
-              </>
-            )}
-            {formStep === 1 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <DataAllocationForm />
-              </motion.div>
-            )}
-            {watchSourceType && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{ width: "100%" }}
-              >
-                <Button className="w-full" type="submit">
-                  {formStep === 0 ? "Next" : "Create"}
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {formStep === 0 && (
+            <MotionWrapper key="source-selection">
+              <div className="flex flex-row items-center justify-around p-8">
+                <Controller
+                  control={control}
+                  name="source"
+                  render={({ field }) => (
+                    <div className="flex flex-row items-center justify-around w-full gap-4">
+                      <SourceTypeCard
+                        icon={<FolderArchive className="shrink-0" />}
+                        label="ZIP File"
+                        value={SourceType.ZIP_UPLOAD}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.ZIP_UPLOAD);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.ZIP_UPLOAD}
+                      />
+                      <SourceTypeCard
+                        icon={<GitHubLogoIcon className="size-6 shrink-0" />}
+                        label="GitHub"
+                        value={SourceType.GITHUB}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.GITHUB);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.GITHUB}
+                      />
+                      <SourceTypeCard
+                        icon={<Presentation className="shrink-0" />}
+                        label="Template"
+                        value={SourceType.TEMPLATE}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.TEMPLATE);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.TEMPLATE}
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+            </MotionWrapper>
+          )}
+          {formStep === 1 && (
+            <MotionWrapper key="source-form">
+              {watchSourceType === SourceType.GITHUB && <GithubSourceForm />}
+              {watchSourceType === SourceType.ZIP_UPLOAD && <ZipSourceForm />}
+              {watchSourceType === SourceType.TEMPLATE && (
+                <TemplateSourceForm />
+              )}
+            </MotionWrapper>
+          )}
+          {formStep === 2 && (
+            <MotionWrapper key="data-allocation-form">
+              <DataAllocationForm />
+            </MotionWrapper>
+          )}
+          {formStep > 0 && (
+            <Button
+              disabled={isLoading}
+              type="submit"
+              className="self-end w-full max-w-24"
+            >
+              {formStep !== 2 ? "Next" : "Create"}
+            </Button>
+          )}
         </FormProvider>
       </form>
     </Form>

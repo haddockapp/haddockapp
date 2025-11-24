@@ -6,7 +6,7 @@ import { useUploadProjectZipMutation } from "@/services/backendApi/projects";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
-function UploadZipDialog() {
+function UploadZipDialog({ onClose }: { onClose?: () => void }) {
   const { projectId } = useParams<{ projectId: string }>();
 
   const { toast } = useToast();
@@ -33,12 +33,13 @@ function UploadZipDialog() {
 
       await uploadZip({ projectId: projectId!, file })
         .unwrap()
-        .then(() =>
+        .then(() => {
           toast({
             title: "Upload complete",
             description: `${file.name} uploaded successfully.`,
-          })
-        )
+          });
+          onClose?.();
+        })
         .catch((err) => {
           console.error(err);
           toast({
@@ -48,7 +49,7 @@ function UploadZipDialog() {
           });
         });
     },
-    [projectId, toast, uploadZip]
+    [onClose, projectId, toast, uploadZip]
   );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

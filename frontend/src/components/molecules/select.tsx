@@ -33,7 +33,7 @@ const selectStyles = {
 };
 
 interface Option {
-  readonly label: React.ReactNode;
+  readonly label: string;
   readonly value: string;
 }
 
@@ -42,9 +42,11 @@ const Select: FC<{
   options: Option[];
   isDisabled?: boolean;
   placeholder?: string;
+  formatOptionLabel?: (option: Option) => React.ReactNode;
 }> = ({ ...props }) => (
   <ReactSelect
     {...props}
+    formatOptionLabel={props.formatOptionLabel}
     isDisabled={props.isDisabled}
     placeholder={props.placeholder ?? "Select..."}
     theme={(theme) => ({
