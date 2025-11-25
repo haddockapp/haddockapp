@@ -8,6 +8,7 @@ import {
 import Authorizations from "./Authorizations";
 import ChangeGithubApplication from "./ChangeGithubApplication";
 import UsersSettings from "./Users";
+import About from "./About";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/services/authSlice";
 import { LogOutIcon } from "lucide-react";
@@ -38,6 +39,12 @@ const settings: {
     name: "Authorizations",
     Component: Authorizations,
     isAuthRequired: true,
+  },
+  {
+    key: "about",
+    name: "About",
+    Component: About,
+    isAuthRequired: false,
   },
 ];
 
