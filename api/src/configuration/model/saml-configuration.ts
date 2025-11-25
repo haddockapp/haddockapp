@@ -9,6 +9,7 @@ export interface SamlConfiguration {
 export interface SamlConfigurationPublic {
   entryPoint: string;
   issuer: string;
+  cert: boolean;
   callbackUrl: string;
   enabled: boolean;
 }

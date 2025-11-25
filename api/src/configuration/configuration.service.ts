@@ -131,14 +131,13 @@ export class ConfigurationService {
 
   async getSamlConfigurationPublic(): Promise<SamlConfigurationPublic | null> {
     const config = await this.getSamlConfiguration();
-    if (!config) {
-      return null;
-    }
+    if (!config) return null;
 
     // Return public config without sensitive cert
     return {
       entryPoint: config.entryPoint,
       issuer: config.issuer,
+      cert: !!config.cert,
       callbackUrl: config.callbackUrl,
       enabled: config.enabled ?? false,
     };
