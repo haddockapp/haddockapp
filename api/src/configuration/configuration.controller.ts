@@ -10,6 +10,7 @@ import {
 import { SetupGitbubDto } from './dto/setup-github.dto';
 import { SetupSamlDto } from './dto/setup-saml.dto';
 import { ToggleSamlDto } from './dto/toggle-saml.dto';
+import { UpdateSamlDto } from './dto/update-saml.dto';
 import { ConfigurationService } from './configuration.service';
 import { Public, PublicConfig } from 'src/auth/auth.decorator';
 import { AdminGuard } from 'src/auth/guard/admin.guard';
@@ -83,6 +84,17 @@ export class ConfigurationController {
   @Patch('saml/enabled')
   async toggleSamlEnabled(@Body() data: ToggleSamlDto) {
     await this.configurationService.toggleSamlEnabled(data.enabled);
+  }
+
+  @UseGuards(AdminGuard)
+  @Patch('saml')
+  async updateSaml(@Body() data: UpdateSamlDto) {
+    await this.configurationService.updateSamlConfiguration(
+      data.entryPoint,
+      data.issuer,
+      data.cert,
+      data.callbackUrl,
+    );
   }
 
   @UseGuards(AdminGuard)

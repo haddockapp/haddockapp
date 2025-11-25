@@ -194,6 +194,26 @@ export class ConfigurationService {
     }
   }
 
+  async updateSamlConfiguration(
+    entryPoint?: string,
+    issuer?: string,
+    cert?: string,
+    callbackUrl?: string,
+  ): Promise<void> {
+    if (entryPoint !== undefined) {
+      await this.modifyConfiguration(SAML_ENTRY_POINT_KEY, entryPoint);
+    }
+    if (issuer !== undefined) {
+      await this.modifyConfiguration(SAML_ISSUER_KEY, issuer);
+    }
+    if (cert !== undefined) {
+      await this.modifyConfiguration(SAML_CERT_KEY, cert);
+    }
+    if (callbackUrl !== undefined) {
+      await this.modifyConfiguration(SAML_CALLBACK_URL_KEY, callbackUrl);
+    }
+  }
+
   async testSamlConfiguration(): Promise<{
     valid: boolean;
     errors: string[];
