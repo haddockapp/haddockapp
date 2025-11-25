@@ -20,6 +20,7 @@ import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import {
   useGetSSOConfigurationQuery,
   useUpdateSSOConfigurationMutation,
+  usePatchSSOConfigurationMutation,
   useToggleSSOEnabledMutation,
   useTestSSOConfigurationMutation,
 } from "@/services/backendApi/sso";
@@ -99,6 +100,8 @@ const SSO: FC = () => {
   const { data: ssoConfig, isLoading } = useGetSSOConfigurationQuery();
   const [updateSSOConfiguration, { isLoading: isSubmitting }] =
     useUpdateSSOConfigurationMutation();
+  const [patchSSOConfiguration, { isLoading: isPatching }] =
+    usePatchSSOConfigurationMutation();
   const [toggleSSOEnabled, { isLoading: isToggling }] =
     useToggleSSOEnabledMutation();
   const [testSSOConfiguration, { isLoading: isTesting }] =
@@ -118,6 +121,7 @@ const SSO: FC = () => {
 
   const isEnabled = form.watch("enabled");
   const isCertConfigured = ssoConfig?.cert === true;
+  const isSubmittingOrPatching = isSubmitting || isPatching;
 
   useEffect(() => {
     if (ssoConfig) {
@@ -194,7 +198,11 @@ const SSO: FC = () => {
           payload.cert = data.cert;
         }
 
-        await updateSSOConfiguration(payload).unwrap();
+        if (isCertConfigured) {
+          await patchSSOConfiguration(payload).unwrap();
+        } else {
+          await updateSSOConfiguration(payload).unwrap();
+        }
 
         form.clearErrors();
 
@@ -218,7 +226,13 @@ const SSO: FC = () => {
         });
       }
     },
-    [updateSSOConfiguration, isCertConfigured, isUpdatingCert, form]
+    [
+      updateSSOConfiguration,
+      patchSSOConfiguration,
+      isCertConfigured,
+      isUpdatingCert,
+      form,
+    ]
   );
 
   const handleTest = useCallback(async () => {
@@ -338,7 +352,7 @@ const SSO: FC = () => {
                   <Switch
                     checked={field.value}
                     onCheckedChange={handleToggleEnabled}
-                    disabled={isSubmitting || isToggling}
+                    disabled={isSubmittingOrPatching || isToggling}
                   />
                 </FormControl>
               </FormItem>
@@ -356,7 +370,7 @@ const SSO: FC = () => {
                     {...field}
                     type="url"
                     placeholder="https://sso.example.com/sso/login"
-                    disabled={isSubmitting || !isEnabled}
+                    disabled={isSubmittingOrPatching || !isEnabled}
                   />
                 </FormControl>
                 <FormDescription>
@@ -379,7 +393,7 @@ const SSO: FC = () => {
                     {...field}
                     type="url"
                     placeholder="https://sso.example.com"
-                    disabled={isSubmitting || !isEnabled}
+                    disabled={isSubmittingOrPatching || !isEnabled}
                   />
                 </FormControl>
                 <FormDescription>
@@ -401,7 +415,7 @@ const SSO: FC = () => {
                     {...field}
                     type="url"
                     placeholder="https://your-app.com/auth/callback"
-                    disabled={isSubmitting || !isEnabled}
+                    disabled={isSubmittingOrPatching || !isEnabled}
                   />
                 </FormControl>
                 <FormDescription>
@@ -445,7 +459,7 @@ const SSO: FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setIsUpdatingCert(true)}
-                        disabled={isSubmitting || !isEnabled}
+                        disabled={isSubmittingOrPatching || !isEnabled}
                         className="flex-shrink-0"
                       >
                         Update Certificate
@@ -459,7 +473,7 @@ const SSO: FC = () => {
                         {...field}
                         placeholder={CERT_PLACEHOLDER}
                         className="min-h-32 font-mono text-sm"
-                        disabled={isSubmitting || !isEnabled}
+                        disabled={isSubmittingOrPatching || !isEnabled}
                       />
                     </FormControl>
                     <FormDescription>
@@ -476,7 +490,7 @@ const SSO: FC = () => {
                           setIsUpdatingCert(false);
                           form.setValue("cert", "");
                         }}
-                        disabled={isSubmitting}
+                        disabled={isSubmittingOrPatching}
                         className="mt-2"
                       >
                         Cancel
@@ -494,12 +508,12 @@ const SSO: FC = () => {
               type="button"
               variant="outline"
               onClick={handleTest}
-              disabled={isSubmitting || isTesting || !isEnabled}
+              disabled={isSubmittingOrPatching || isTesting || !isEnabled}
             >
               {isTesting ? "Testing..." : "Test Configuration"}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Configuration"}
+            <Button type="submit" disabled={isSubmittingOrPatching}>
+              {isSubmittingOrPatching ? "Saving..." : "Save Configuration"}
             </Button>
           </div>
         </form>

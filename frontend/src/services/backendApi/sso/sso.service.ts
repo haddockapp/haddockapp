@@ -26,6 +26,14 @@ const ssoApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Configurations],
     }),
+    patchSSOConfiguration: builder.mutation<void, SSOConfigurationInputDto>({
+      query: (body) => ({
+        url: "/configuration/saml",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [QueryKeys.Configurations],
+    }),
     toggleSSOEnabled: builder.mutation<void, ToggleSSODto>({
       query: (body) => ({
         url: "/configuration/saml/enabled",
@@ -46,6 +54,7 @@ const ssoApi = backendApi.injectEndpoints({
 export const {
   useGetSSOConfigurationQuery,
   useUpdateSSOConfigurationMutation,
+  usePatchSSOConfigurationMutation,
   useToggleSSOEnabledMutation,
   useTestSSOConfigurationMutation,
 } = ssoApi;
