@@ -6,6 +6,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import { ProjectDto } from "@/services/backendApi/projects/projects.dto";
 import { VmState, VmProvider } from "@/types/vm/vm";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const meta = {
   title: "Organisms/SettingsTab",
@@ -58,12 +59,15 @@ const mockProject: ProjectDto = {
   vmId: "vm-123",
   source: {
     id: "source-123",
-    type: "github",
+    type: SourceType.GITHUB,
     authorizationId: "auth-123",
     settings: {
       branch: "main",
       repository: "demo-repo",
       organization: "demo-org",
+      composePath: "./docker-compose.yml",
+      path: "/",
+      status: "none",
     },
   },
   vm: {
