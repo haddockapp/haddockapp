@@ -42,7 +42,10 @@ const ProjectActionButton: FC<ProjectActionButtonProps> = ({
       variant={variant}
       onClick={onClick}
       disabled={isDisabled || isLoading}
-      className={cn("gap-2", className)}
+      className={cn(
+        "gap-2 shadow-sm hover:shadow-md transition-shadow",
+        className
+      )}
     >
       {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon}
       {label}

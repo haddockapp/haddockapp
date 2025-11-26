@@ -18,7 +18,7 @@ const GithubSignInButton: FC<GithubSignInButtonProps> = ({
       isSignedIn ? undefined : () => (window.location.href = redirectUrl)
     }
     disabled={isSignedIn || isDisabled}
-    className="p-4 gap-2"
+    className="p-4 gap-2 w-full"
   >
     {isSignedIn ? (
       <>

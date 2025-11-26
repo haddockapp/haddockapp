@@ -15,12 +15,15 @@ import { LogOutIcon } from "lucide-react";
 import { useAppDispatch } from "@/hooks/useStore";
 import { useNavigate } from "react-router-dom";
 import useSetup from "@/hooks/use-setup";
+import SSO from "./SSO";
+import { useGetSelfQuery, UserRole } from "@/services/backendApi/users";
 
 const settings: {
   key: string;
   name: string;
   Component: FC<{ onClose: () => void }>;
   isAuthRequired: boolean;
+  isAdminRequired?: boolean;
 }[] = [
   {
     key: "users",
@@ -41,6 +44,13 @@ const settings: {
     isAuthRequired: true,
   },
   {
+    key: "sso",
+    name: "Single Sign-On (SSO) Configuration",
+    Component: SSO,
+    isAuthRequired: true,
+    isAdminRequired: true,
+  },
+  {
     key: "about",
     name: "About",
     Component: About,
@@ -55,14 +65,18 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
   const dispatch = useAppDispatch();
 
   const { isSetupComplete } = useSetup();
+  const { data: connectedUser } = useGetSelfQuery();
+
+  const isAdmin = connectedUser?.role === UserRole.Admin;
+
+  const filteredSettings = (
+    isSetupComplete ? settings : settings.filter((s) => !s.isAuthRequired)
+  ).filter((s) => !s.isAdminRequired || isAdmin);
 
   return (
     <div className="space-y-4 h-full justify-between flex flex-col overflow-x-auto">
       <Accordion type="multiple" value={accordionOpen}>
-        {(isSetupComplete
-          ? settings
-          : settings.filter((s) => !s.isAuthRequired)
-        ).map(({ key, name, Component }) => (
+        {filteredSettings.map(({ key, name, Component }) => (
           <AccordionItem key={key} value={key}>
             <AccordionTrigger
               onClick={() =>
@@ -70,7 +84,7 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
                   pV.includes(key) ? pV.filter((v) => v !== key) : [...pV, key]
                 )
               }
-              className="text-xl px-2"
+              className="text-xl"
             >
               {name}
             </AccordionTrigger>

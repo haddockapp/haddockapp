@@ -88,6 +88,7 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
         <div
           className={cn(
             `inline-flex items-center gap-1.5 rounded-sm border font-medium cursor-pointer hover:brightness-95
+            shadow-sm hover:shadow-md transition-shadow
             ${isAlert ? "motion-safe:animate-scale-pulse transform-gpu" : ""}`,
             bgColor,
             textColor,
