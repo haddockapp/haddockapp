@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import JwtBody from './dto/JwtBody.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -8,14 +13,17 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
 import { UserRoleEnum } from 'src/user/types/user-role.enum';
 import { InvitationRepository } from 'src/invitation/invitation.repository';
+import { AutologinsService } from 'src/autologins/autologins.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
-    private prismaService: PrismaService,
-    private userRepository: UserRepository,
-    private invitationRepository: InvitationRepository,
+    private readonly jwtService: JwtService,
+    private readonly prismaService: PrismaService,
+    private readonly userRepository: UserRepository,
+    private readonly invitationRepository: InvitationRepository,
+    @Inject(forwardRef(() => AutologinsService))
+    private readonly autologinService: AutologinsService,
   ) {}
 
   generateJwt(user: User): string {
@@ -66,5 +74,12 @@ export class AuthService {
     if (invitation && count > 0)
       await this.invitationRepository.delete(invitation.id);
     return user;
+  }
+
+  async generateAutologinLink(userId: string): Promise<string> {
+    const autologinToken = await this.autologinService.generateToken(userId);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    return `${frontendUrl}/autologin?token=${autologinToken}`;
   }
 }
