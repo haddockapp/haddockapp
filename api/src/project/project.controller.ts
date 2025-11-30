@@ -24,6 +24,7 @@ import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
 import { EnvironmentVar } from './dto/environmentVar';
 import { ServiceActionDto } from './dto/serviceAction.dto';
+import { SecurityAdviceDto } from 'src/project/dto/securityAdvice.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -195,5 +196,13 @@ export class ProjectController {
     @Body() data: ServiceActionDto,
   ) {
     return await this.projectService.serviceAction(projectId, data);
+  }
+
+  @Get(':id/security-advices')
+  async getSecurityAdvices(
+    @Param('id') id: string,
+  ): Promise<{ advices: SecurityAdviceDto[] }> {
+    const advices = await this.projectService.getSecurityAdvices(id);
+    return { advices };
   }
 }

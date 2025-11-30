@@ -11,6 +11,7 @@ import { NetworksModule } from 'src/networks/networks.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { WebsocketModule } from 'src/websockets/websocket.module';
 import { BullModule } from '@nestjs/bull';
+import { SecurityAdvicesService } from 'src/project/security-advices.service';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { BullModule } from '@nestjs/bull';
     }),
   ],
   controllers: [ProjectController],
-  providers: [ProjectService, ProjectRepository],
+  providers: [ProjectService, ProjectRepository, SecurityAdvicesService],
   exports: [ProjectRepository, ProjectService],
 })
 export class ProjectModule {}

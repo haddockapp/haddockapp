@@ -25,6 +25,8 @@ import { ServiceStatus } from 'src/types/service.enum';
 import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { SecurityAdviceDto } from 'src/project/dto/securityAdvice.dto';
+import { SecurityAdvicesService } from 'src/project/security-advices.service';
 
 @Injectable()
 export class ProjectService {
@@ -39,6 +41,7 @@ export class ProjectService {
     private readonly webSocketService: WebSocketService,
     private readonly dockerService: DockerService,
     @InjectQueue('deploys') private readonly deployQueue: Queue,
+    private readonly securityAdvicesService: SecurityAdvicesService,
   ) {}
 
   async updateProject(
@@ -439,5 +442,17 @@ export class ProjectService {
       default:
         throw new BadRequestException('Invalid action');
     }
+  }
+
+  async getSecurityAdvices(projectId: string): Promise<SecurityAdviceDto[]> {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) throw new NotFoundException('Project not found');
+
+    const advices = await Promise.all([
+      this.securityAdvicesService.getComposeAdvices(project),
+      // add more checks here...
+    ]);
+
+    return advices.flat();
   }
 }
