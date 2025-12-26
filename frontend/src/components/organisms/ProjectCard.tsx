@@ -12,7 +12,7 @@ interface ProjectCardProps {
 const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
   return (
     <Card
-      className="w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-card/10"
+      className="bg-card/20 w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-card/80"
       onClick={onClick}
     >
       <CardContent className="p-4">

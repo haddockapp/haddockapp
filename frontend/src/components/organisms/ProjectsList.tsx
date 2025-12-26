@@ -19,7 +19,7 @@ const ProjectsList: FC<ProjectsListProps> = ({ isLoading, projects }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-8 mt-4">
+    <div>
       <div className="grid grid-cols-1 gap-4 w-full">
         {isLoading ? (
           <Skeleton className="h-32 w-full" />

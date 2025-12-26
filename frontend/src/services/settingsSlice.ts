@@ -7,10 +7,12 @@ export enum Theme {
 
 interface SettingsState {
   theme: Theme;
+  showCommands: boolean;
 }
 
 const initialState: SettingsState = {
-  theme: (localStorage.getItem("theme") as Theme) || Theme.LIGHT,
+  theme: (localStorage.getItem("theme") as Theme) || Theme.DARK,
+  showCommands: localStorage.getItem("showCommands") === "true" || true,
 };
 
 const settingsSlice = createSlice({
@@ -23,9 +25,14 @@ const settingsSlice = createSlice({
       localStorage.setItem("theme", action.payload);
       state.theme = action.payload;
     },
+    toggleShowCommands: (state) => {
+      const newValue = !state.showCommands;
+      localStorage.setItem("showCommands", newValue ? "true" : "false");
+      state.showCommands = newValue;
+    },
   },
 });
 
-export const { setTheme } = settingsSlice.actions;
+export const { setTheme, toggleShowCommands } = settingsSlice.actions;
 
 export default settingsSlice;

@@ -205,7 +205,11 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 ? "Project is currently stopping"
                 : undefined
             }
-            variant="default"
+            variant={
+              isRunning || isStarting || isLoading || isStopping
+                ? "default"
+                : "shine"
+            }
             isLoading={currentAction === "start" && isStartingMutation}
           />
 
