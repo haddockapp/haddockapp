@@ -6,7 +6,11 @@ import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { VmState } from '../types/vm.enum';
 import { VmService } from '../vm/vm.service';
-import { GithubSourceSettingsDto } from './dto/settings.dto';
+import {
+  GithubSourceSettingsDto,
+  TemplateSourceSettingsDto,
+  ZipUploadSourceSettingsDto,
+} from './dto/settings.dto';
 import { PersistedSourceDto } from './dto/source.dto';
 import { getSettings } from './utils/get-settings';
 import { DeployError } from './errors/deploy.error';
@@ -22,6 +26,9 @@ import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { ComposeService } from 'src/compose/compose.service';
 import { ServiceDto } from 'src/compose/model/Service';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
+import { SourceType } from './dto/create-source.dto';
+import { SourceService } from './source.service';
+import * as unzipper from 'unzipper';
 
 @Processor('deploys')
 export class DeployConsumer {
@@ -33,6 +40,7 @@ export class DeployConsumer {
     private readonly vmService: VmService,
     private readonly authorizationService: AuthorizationService,
     private readonly composeService: ComposeService,
+    private readonly sourceService: SourceService,
   ) {}
 
   @OnQueueFailed()
@@ -141,17 +149,119 @@ export class DeployConsumer {
     return deployPath;
   }
 
-  private getDeployPath(source: PersistedSourceDto): Promise<string> {
-    if (source.type === 'github') {
-      return this.deployGithubSource(source);
+  private async deployZipUploadSource(
+    source: PersistedSourceDto,
+  ): Promise<string | null> {
+    const settings = getSettings<ZipUploadSourceSettingsDto>(source.settings);
+    const deployPath = `../workspaces/${source.project?.id}`;
+    const extractPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (settings.status === 'none') {
+      return null;
     }
-    throw new Error(`Unknown source type ${source.type}`);
+
+    if (settings.status === 'deployed') {
+      return deployPath;
+    }
+
+    const zipPath = `../uploads/${source.project?.id}.zip`;
+
+    if (fs.existsSync(extractPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${extractPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(extractPath, { recursive: true });
+    }
+
+    this.logger.log(
+      `Deploying zip upload source for project ${source.project.id} to ${extractPath}...`,
+    );
+
+    try {
+      await fs
+        .createReadStream(zipPath)
+        .pipe(unzipper.Extract({ path: extractPath }))
+        .promise();
+
+      // Update settings only after successful unzip
+      await this.sourceService.updateSourceSettings(source.id, {
+        ...settings,
+        status: 'deployed',
+      });
+    } catch (err) {
+      throw new DeployError(`Failed to unzip project source: ${err.message}`);
+    }
+
+    return deployPath;
+  }
+
+  private async deployTemplateSource(
+    source: PersistedSourceDto,
+  ): Promise<string> {
+    const deployPath = `../workspaces/${source.project?.id}`;
+    const repoPath = `${deployPath}/${process.env.SOURCE_DIR || 'source'}`;
+
+    if (fs.existsSync(repoPath)) {
+      this.logger.log(
+        `Removing existing deployment path ${repoPath} for project ${source.project.id}`,
+      );
+      fs.rmSync(repoPath, { recursive: true });
+    }
+
+    this.logger.log(
+      `Deploying template source for project ${source.project.id} to ${repoPath}`,
+    );
+
+    const settings = getSettings<TemplateSourceSettingsDto>(source.settings);
+
+    try {
+      await execCommand(
+        `git clone --depth 1 --filter=blob:none --sparse https://github.com/haddockapp/templates.git ${deployPath}/tmp \
+        && cd ${deployPath}/tmp \
+        && git sparse-checkout set ${settings.path} \
+        && cd - \
+        && mv ${deployPath}/tmp/${settings.path} ${repoPath} \
+        && rm -rf ${deployPath}/tmp
+        `,
+      );
+    } catch (e) {
+      throw new DeployError('Failed to clone repository', [e.stdout, e.stderr]);
+    }
+
+    return deployPath;
+  }
+
+  private getDeployPath(source: PersistedSourceDto): Promise<string | null> {
+    switch (source.type) {
+      case SourceType.GITHUB:
+        return this.deployGithubSource(source);
+      case SourceType.ZIP_UPLOAD: {
+        return this.deployZipUploadSource(source);
+      }
+      case SourceType.TEMPLATE: {
+        return this.deployTemplateSource(source);
+      }
+      default:
+        throw new Error(`Unknown source type ${source.type}`);
+    }
   }
 
   private getComposePath(source: PersistedSourceDto): string {
     switch (source.type) {
-      case 'github': {
+      case SourceType.GITHUB: {
         const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+      }
+      case SourceType.ZIP_UPLOAD: {
+        const settings = getSettings<ZipUploadSourceSettingsDto>(
+          source.settings,
+        );
+        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
+      }
+      case SourceType.TEMPLATE: {
+        const settings = getSettings<TemplateSourceSettingsDto>(
+          source.settings,
+        );
         return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
       }
       default:
@@ -182,6 +292,29 @@ export class DeployConsumer {
     this.logger.log(`Added services to project ${projectId}`);
   }
 
+  private async handleErrorShutdown(vmId: string, logs: string[]) {
+    const vm: PersistedVmDto = await this.vmRepository.getVm({
+      id: vmId,
+    });
+
+    if (vm.status === VmState.Starting || vm.status === VmState.Running) {
+      try {
+        await this.vmService.downVm(vmId);
+      } catch (e) {
+        if (e instanceof ExecutionError) {
+          this.logger.error(
+            `Failed to stop vm: ${e.message}`,
+            e.stdout,
+            e.stderr,
+          );
+        }
+      }
+    }
+    await this.vmService.changeVmStatus(vmId, VmState.Error, {
+      logs: logs,
+    });
+  }
+
   @Process('deploy')
   async deploy(
     job: Job<{ source: PersistedSourceDto; startAfterDeploy: boolean }>,
@@ -191,6 +324,13 @@ export class DeployConsumer {
 
     try {
       const deployPath: string = await this.getDeployPath(source);
+
+      if (deployPath === null) {
+        this.logger.log(
+          `No deployable source found for project ${source.project.id}, skipping deployment.`,
+        );
+        return;
+      }
 
       await this.projectRepository.updateProject({
         where: { id: source.project.id },
@@ -214,7 +354,9 @@ export class DeployConsumer {
       const logs: string[] = [];
       if (e instanceof DeployError) {
         this.logger.error(`Failed to deploy source: ${e.message}`, e.logs);
-        e.logs.forEach((log) => logs.push(log));
+        for (const log of e.logs) {
+          logs.push(log);
+        }
       } else if (e instanceof ExecutionError) {
         this.logger.error(
           `Failed to execute command: ${e.message}`,
@@ -226,28 +368,7 @@ export class DeployConsumer {
         this.logger.error(`Unexpected error: ${e.message}`);
         logs.push(e.message);
       }
-
-      const vm: PersistedVmDto = await this.vmRepository.getVm({
-        id: source.project.vmId,
-      });
-
-      if (vm.status === VmState.Starting || vm.status === VmState.Running) {
-        try {
-          await this.vmService.downVm(source.project.vmId);
-        } catch (e) {
-          if (e instanceof ExecutionError) {
-            this.logger.error(
-              `Failed to stop vm: ${e.message}`,
-              e.stdout,
-              e.stderr,
-            );
-          }
-        }
-      }
-      await this.vmService.changeVmStatus(source.project.vmId, VmState.Error, {
-        logs: logs,
-      });
-      return;
+      await this.handleErrorShutdown(source.project.vmId, logs);
     }
   }
 
@@ -268,11 +389,10 @@ export class DeployConsumer {
         );
         logs.push(e.stdout, e.stderr);
       } else {
+        this.logger.error(`Failed to start vm: ${e.message}`);
         logs.push(e.message);
       }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error, {
-        logs: logs,
-      });
+      await this.handleErrorShutdown(project.vmId, logs);
     }
   }
 

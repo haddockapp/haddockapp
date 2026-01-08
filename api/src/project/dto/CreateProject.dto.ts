@@ -1,30 +1,75 @@
 import {
-  IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsString,
   IsUUID,
   Min,
+  Validate,
+  validateSync,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { AllowedValues } from '../validator/AllowedValues.validator';
+import {
+  CreateGithubSourceDto,
+  CreateSourceDto,
+  CreateTemplateSourceDto,
+  CreateZipUploadSourceDto,
+  SourceType,
+} from 'src/source/dto/create-source.dto';
+import { plainToInstance, Transform } from 'class-transformer';
+
+// Custom transformer for the union type
+function TransformSource() {
+  return Transform(({ value }) => {
+    if (!value || typeof value !== 'object') return value;
+
+    if (value.type === SourceType.GITHUB) {
+      return plainToInstance(CreateGithubSourceDto, value);
+    } else if (value.type === SourceType.ZIP_UPLOAD) {
+      return plainToInstance(CreateZipUploadSourceDto, value);
+    } else if (value.type === SourceType.TEMPLATE) {
+      return plainToInstance(CreateTemplateSourceDto, value);
+    }
+
+    return value;
+  });
+}
+
+@ValidatorConstraint({ name: 'validSource', async: false })
+class ValidSourceConstraint implements ValidatorConstraintInterface {
+  validate(source: any) {
+    if (!source || typeof source !== 'object') return false;
+
+    switch (source.type) {
+      case SourceType.TEMPLATE: {
+        const templateErrors = validateSync(
+          plainToInstance(CreateTemplateSourceDto, source),
+        );
+        return templateErrors.length === 0;
+      }
+      case SourceType.GITHUB: {
+        const githubErrors = validateSync(
+          plainToInstance(CreateGithubSourceDto, source),
+        );
+        return githubErrors.length === 0;
+      }
+      case SourceType.ZIP_UPLOAD: {
+        const zipErrors = validateSync(
+          plainToInstance(CreateZipUploadSourceDto, source),
+        );
+        return zipErrors.length === 0;
+      }
+      default:
+        return false;
+    }
+  }
+
+  defaultMessage() {
+    return 'Source must be a valid supported source type';
+  }
+}
 
 export class CreateProjectDto {
-  @IsString()
-  @IsNotEmpty()
-  repository_organisation: string;
-
-  @IsString()
-  @IsNotEmpty()
-  repository_name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  repository_branch: string;
-
-  @IsString()
-  @IsNotEmpty()
-  compose_path: string;
-
   @IsNumber()
   @AllowedValues([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192])
   vm_memory: number;
@@ -36,6 +81,10 @@ export class CreateProjectDto {
   @IsNumber()
   @AllowedValues([1, 2, 3, 4, 5, 6, 7, 8])
   vm_cpus: number;
+
+  @TransformSource()
+  @Validate(ValidSourceConstraint)
+  source: CreateSourceDto;
 
   @IsUUID()
   @IsOptional()

@@ -1,4 +1,5 @@
 import { ProjectDto } from "@/services/backendApi/projects";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 import { VmState, VmProvider } from "@/types/vm/vm";
 
 export const baseProject: ProjectDto = {
@@ -10,9 +11,12 @@ export const baseProject: ProjectDto = {
   vmId: "vm-1",
   source: {
     id: "source-1",
-    type: "github",
+    type: SourceType.GITHUB,
     authorizationId: "auth-1",
     settings: {
+      composePath: "./docker-compose.yml",
+      path: "/",
+      status: "none",
       branch: "main",
       repository: "my-project",
       organization: "my-org",

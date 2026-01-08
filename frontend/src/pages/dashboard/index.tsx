@@ -10,14 +10,15 @@ import useDisclosure from "@/hooks/use-disclosure";
 const Projects: FC = () => {
   const { data: projects, isLoading } = useGetProjectsQuery();
   const disclosureMethods = useDisclosure();
+
   return (
     <>
       <div className="flex flex-column justify-between mx-8">
         <h1 className="text-typography/90 text-3xl font-bold mt-8">Projects</h1>
         <SimpleDialog
           {...disclosureMethods}
+          size="xl"
           title="Create a project"
-          description="Fill the form to create a new project."
           Content={CreateProjectForm}
           Trigger={({ onOpen }) => (
             <Button onClick={onOpen} className="gap-2">

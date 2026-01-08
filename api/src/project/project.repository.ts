@@ -47,7 +47,10 @@ export class ProjectRepository {
     return `${prefix} ${suffix}`;
   }
 
-  async createProject(data: CreateProjectDto): Promise<Project> {
+  async createProject(
+    data: CreateProjectDto,
+    source_id: string,
+  ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
         name: this.generatePirateShipName(),
@@ -60,30 +63,15 @@ export class ProjectRepository {
           },
         },
         source: {
-          create: {
-            type: 'github',
-            settings: {
-              organization: data.repository_organisation,
-              repository: data.repository_name,
-              branch: data.repository_branch,
-              composePath: data.compose_path,
-            },
-            ...(data.authorization_id
-              ? {
-                  authorization: {
-                    connect: { id: data.authorization_id },
-                  },
-                }
-              : {}),
-          },
+          connect: { id: source_id },
         },
-        ...(data.workspace_id !== undefined
-          ? {
+        ...(data.workspace_id === undefined
+          ? {}
+          : {
               workspace: {
                 connect: { id: data.workspace_id },
               },
-            }
-          : {}),
+            }),
       },
     });
   }
@@ -126,27 +114,37 @@ export class ProjectRepository {
     });
   }
 
-  async setServicesToProject(projectId: string, services: ServiceDto[]) {
-    return this.prismaService.$transaction([
-      this.prismaService.service.deleteMany({
+  async setServicesToProject(
+    projectId: string,
+    services: ServiceDto[],
+  ): Promise<Service[]> {
+    return this.prismaService.$transaction(async (tx) => {
+      await tx.service.deleteMany({
         where: { projectId },
-      }),
-      this.prismaService.project.update({
+      });
+
+      if (services.length > 0) {
+        await tx.service.createMany({
+          data: services.map((service) => ({
+            projectId,
+            name: service.name,
+            image: service.image,
+            ports: service.ports,
+            networks: service.networks,
+            depends_on: service.depends_on,
+            environment: JSON.stringify(service.environment),
+            user: JSON.stringify(service.user),
+            deployment: JSON.stringify(service.deployment),
+          })),
+        });
+      }
+
+      const updatedProject = await tx.project.findUnique({
         where: { id: projectId },
-        data: {
-          services: {
-            createMany: {
-              data: services.map((service) => ({
-                ...service,
-                environment: JSON.stringify(service.environment),
-                user: JSON.stringify(service.user),
-                deployment: JSON.stringify(service.deployment),
-              })),
-            },
-          },
-        },
-      }),
-    ]);
+        include: { services: true },
+      });
+      return updatedProject.services;
+    });
   }
 
   async removeServiceFromProject(projectId: string, serviceId: string) {
