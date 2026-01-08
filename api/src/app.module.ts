@@ -21,6 +21,7 @@ import { AutologinsModule } from './autologins/autologins.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { WorkspacesModule } from 'src/workspaces/workspaces.module';
 import { TemplatesModule } from './templates/templates.module';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { TemplatesModule } from './templates/templates.module';
     AutologinsModule,
     WorkspacesModule,
     TemplatesModule,
+    SecurityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

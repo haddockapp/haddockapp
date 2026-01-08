@@ -246,34 +246,11 @@ export class DeployConsumer {
     }
   }
 
-  private getComposePath(source: PersistedSourceDto): string {
-    switch (source.type) {
-      case SourceType.GITHUB: {
-        const settings = getSettings<GithubSourceSettingsDto>(source.settings);
-        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
-      }
-      case SourceType.ZIP_UPLOAD: {
-        const settings = getSettings<ZipUploadSourceSettingsDto>(
-          source.settings,
-        );
-        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
-      }
-      case SourceType.TEMPLATE: {
-        const settings = getSettings<TemplateSourceSettingsDto>(
-          source.settings,
-        );
-        return `./${process.env.SOURCE_DIR}/${settings.composePath}`;
-      }
-      default:
-        throw new Error(`Unknown source type ${source.type}`);
-    }
-  }
-
   private async handleProjectServices(
     projectId: string,
     source: PersistedSourceDto,
   ) {
-    const composePath: string = this.getComposePath(source);
+    const composePath: string = this.sourceService.getComposePath(source);
 
     const rawCompose = this.composeService.readComposeFile(
       projectId,

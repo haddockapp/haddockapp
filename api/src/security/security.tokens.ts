@@ -1,0 +1,2 @@
+export const SECURITY_ANALYZERS = Symbol('SECURITY_ANALYZERS');
+export const SECURITY_RULES = Symbol('SECURITY_RULES');
