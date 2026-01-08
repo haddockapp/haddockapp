@@ -56,7 +56,7 @@ export class SourceService {
           this.logger.log(
             `Removing existing upload path ${uploadPath} for project ${source.project.id}`,
           );
-          fs.rmSync(uploadPath, { recursive: true });
+          fs.rmSync(uploadPath);
           this.logger.log(
             `Successfully removed upload path ${uploadPath} for project ${source.project.id}`,
           );

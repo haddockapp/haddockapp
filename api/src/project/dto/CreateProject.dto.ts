@@ -27,6 +27,8 @@ function TransformSource() {
       return plainToInstance(CreateGithubSourceDto, value);
     } else if (value.type === SourceType.ZIP_UPLOAD) {
       return plainToInstance(CreateZipUploadSourceDto, value);
+    } else if (value.type === SourceType.TEMPLATE) {
+      return plainToInstance(CreateTemplateSourceDto, value);
     }
 
     return value;
@@ -63,7 +65,7 @@ class ValidSourceConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage() {
-    return 'Source must be a valid suported source type';
+    return 'Source must be a valid supported source type';
   }
 }
 

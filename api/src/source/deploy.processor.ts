@@ -192,11 +192,6 @@ export class DeployConsumer {
       throw new DeployError(`Failed to unzip project source: ${err.message}`);
     }
 
-    await this.sourceService.updateSourceSettings(source.id, {
-      ...settings,
-      status: 'deployed',
-    });
-
     return deployPath;
   }
 
