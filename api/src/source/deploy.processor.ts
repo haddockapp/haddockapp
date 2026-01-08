@@ -297,6 +297,29 @@ export class DeployConsumer {
     this.logger.log(`Added services to project ${projectId}`);
   }
 
+  private async handleErrorShutdown(vmId: string, logs: string[]) {
+    const vm: PersistedVmDto = await this.vmRepository.getVm({
+      id: vmId,
+    });
+
+    if (vm.status === VmState.Starting || vm.status === VmState.Running) {
+      try {
+        await this.vmService.downVm(vmId);
+      } catch (e) {
+        if (e instanceof ExecutionError) {
+          this.logger.error(
+            `Failed to stop vm: ${e.message}`,
+            e.stdout,
+            e.stderr,
+          );
+        }
+      }
+    }
+    await this.vmService.changeVmStatus(vmId, VmState.Error, {
+      logs: logs,
+    });
+  }
+
   @Process('deploy')
   async deploy(
     job: Job<{ source: PersistedSourceDto; startAfterDeploy: boolean }>,
@@ -336,7 +359,9 @@ export class DeployConsumer {
       const logs: string[] = [];
       if (e instanceof DeployError) {
         this.logger.error(`Failed to deploy source: ${e.message}`, e.logs);
-        e.logs.forEach((log) => logs.push(log));
+        for (const log of e.logs) {
+          logs.push(log);
+        }
       } else if (e instanceof ExecutionError) {
         this.logger.error(
           `Failed to execute command: ${e.message}`,
@@ -348,28 +373,7 @@ export class DeployConsumer {
         this.logger.error(`Unexpected error: ${e.message}`);
         logs.push(e.message);
       }
-
-      const vm: PersistedVmDto = await this.vmRepository.getVm({
-        id: source.project.vmId,
-      });
-
-      if (vm.status === VmState.Starting || vm.status === VmState.Running) {
-        try {
-          await this.vmService.downVm(source.project.vmId);
-        } catch (e) {
-          if (e instanceof ExecutionError) {
-            this.logger.error(
-              `Failed to stop vm: ${e.message}`,
-              e.stdout,
-              e.stderr,
-            );
-          }
-        }
-      }
-      await this.vmService.changeVmStatus(source.project.vmId, VmState.Error, {
-        logs: logs,
-      });
-      return;
+      await this.handleErrorShutdown(source.project.vmId, logs);
     }
   }
 
@@ -390,11 +394,10 @@ export class DeployConsumer {
         );
         logs.push(e.stdout, e.stderr);
       } else {
+        this.logger.error(`Failed to start vm: ${e.message}`);
         logs.push(e.message);
       }
-      await this.vmService.changeVmStatus(project.vmId, VmState.Error, {
-        logs: logs,
-      });
+      await this.handleErrorShutdown(project.vmId, logs);
     }
   }
 

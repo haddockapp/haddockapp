@@ -60,7 +60,7 @@ export class TemplatesService {
           value: variables[variable.key],
           isSecret: variable.type === 'secret',
         });
-      } else if (variable.policy === 'generated') {
+      } else if (variable.policy === 'generate') {
         builtEnv.push({
           key: variable.key,
           value: generateSecret(16, 32),

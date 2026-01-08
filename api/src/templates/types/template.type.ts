@@ -18,5 +18,5 @@ export interface Env {
   label: string;
   key: string;
   type: 'plain' | 'secret';
-  policy: 'input' | 'generated';
+  policy: 'input' | 'generate';
 }

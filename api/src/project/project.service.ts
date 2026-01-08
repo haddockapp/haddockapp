@@ -27,6 +27,7 @@ import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { CreatedSource } from 'src/source/dto/source.dto';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProjectService {
@@ -199,10 +200,22 @@ export class ProjectService {
     await this.sourceService.deploySource(project.sourceId);
   }
 
+  private asStringArray(value: JsonValue): string[] {
+    if (Array.isArray(value) && value.every((i) => typeof i === 'string')) {
+      return value;
+    }
+    return [];
+  }
+
   async serviceEntityToDto(service: Service): Promise<ProjectServiceDto> {
     const result: ProjectServiceDto = {
       icon: 'https://img.icons8.com/?size=48&id=cdYUlRaag9G9&format=png',
       ...service,
+      name: service.name,
+      image: service.image,
+      ports: this.asStringArray(service.ports),
+      networks: this.asStringArray(service.networks),
+      depends_on: this.asStringArray(service.depends_on),
       environment: JSON.parse(service.environment),
       user: JSON.parse(service.user),
       deployment: JSON.parse(service.deployment),
