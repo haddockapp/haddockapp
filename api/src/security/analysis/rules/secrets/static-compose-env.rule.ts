@@ -18,16 +18,43 @@ export class StaticComposeEnvRule implements SecurityRule<EnvVarFact> {
       'Bind secrets to environment variables or use a secret manager.',
   };
 
+  private readonly SECRET_KEYWORDS = [
+    'PASSWORD',
+    'TOKEN',
+    'API_KEY',
+    'SECRET',
+    'ACCESS_KEY',
+    'PRIVATE_KEY',
+    'AUTH_KEY',
+    'CLIENT_SECRET',
+  ];
+
   supports(fact: SecurityFact): fact is EnvVarFact {
     return fact.type === 'env-var';
   }
 
   evaluate(fact: EnvVarFact): SecurityFinding[] {
-    const isPassword = fact.key.toUpperCase().includes('PASSWORD');
+    const keyUpper = fact.key.toUpperCase();
 
-    const isBoundToEnv = /^\$\{[A-Za-z_]\w*.*\}$/.test(fact.value);
+    const isSecretKey = this.SECRET_KEYWORDS.some((kw) =>
+      keyUpper.includes(kw),
+    );
 
-    if (!isPassword || isBoundToEnv) {
+    if (!isSecretKey) {
+      return [];
+    }
+
+    // Ignore env bindings (${VAR}, ${VAR:-default}, etc.)
+    const isBoundToEnv = /^\$\{[A-Za-z_]\w*(?:[:\-?].*)?\}$/.test(fact.value);
+
+    if (isBoundToEnv) {
+      return [];
+    }
+
+    // Basic entropy / length heuristic
+    const looksLikeSecret = /[A-Za-z0-9+/=_-]+/.test(fact.value);
+
+    if (!looksLikeSecret) {
       return [];
     }
 
