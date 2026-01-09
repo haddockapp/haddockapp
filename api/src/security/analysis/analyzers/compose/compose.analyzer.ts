@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ComposeService } from 'src/compose/compose.service';
 import { ServiceDto } from 'src/compose/model/Service';
-import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { SecurityAnalyzer } from 'src/security/types/analyzer.interface';
 import { SecurityFact } from 'src/security/types/facts';
 import { SourceService } from 'src/source/source.service';
 import { EnvVarFact } from './types';
+import { AnalysisContext } from 'src/security/types/analysis-context';
 
 @Injectable()
 export class ComposeAnalyzer implements SecurityAnalyzer {
@@ -14,8 +14,10 @@ export class ComposeAnalyzer implements SecurityAnalyzer {
     private readonly composeService: ComposeService,
   ) {}
 
-  async analyze(project: PersistedProjectDto): Promise<SecurityFact[]> {
-    const source = await this.sourceService.findSourceById(project.sourceId);
+  async analyze(context: AnalysisContext): Promise<SecurityFact[]> {
+    const source = await this.sourceService.findSourceById(
+      context.project.sourceId,
+    );
 
     if (!source) {
       return [];
@@ -24,7 +26,7 @@ export class ComposeAnalyzer implements SecurityAnalyzer {
     const composePath = this.sourceService.getComposePath(source);
 
     const rawCompose = this.composeService.readComposeFile(
-      project.id,
+      context.project.id,
       composePath,
     );
     if (!rawCompose) {

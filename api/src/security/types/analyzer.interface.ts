@@ -1,6 +1,6 @@
-import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { SecurityFact } from './facts';
+import { AnalysisContext } from './analysis-context';
 
 export interface SecurityAnalyzer {
-  analyze(project: PersistedProjectDto): Promise<SecurityFact[]>;
+  analyze(context: AnalysisContext): Promise<SecurityFact[]>;
 }

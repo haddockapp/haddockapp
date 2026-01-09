@@ -5,6 +5,9 @@ import { SecurityRule } from '../types/rule.interface';
 import { SecurityFinding } from '../types/findings';
 import { SecurityFact } from '../types/facts';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ProjectFileIndexService } from '../helpers/project-file-index.service';
+import { AnalysisContext } from '../types/analysis-context';
+import * as path from 'node:path';
 
 @Injectable()
 export class AnalysisService {
@@ -15,13 +18,10 @@ export class AnalysisService {
     @Inject(SECURITY_RULES)
     private readonly rules: SecurityRule[],
 
+    private readonly fileIndexService: ProjectFileIndexService,
+
     private readonly prismaService: PrismaService,
-  ) {
-    this.analyzers = Array.isArray(this.analyzers)
-      ? this.analyzers
-      : [this.analyzers];
-    this.rules = Array.isArray(this.rules) ? this.rules : [this.rules];
-  }
+  ) {}
 
   async analyzeProject(projectId: string): Promise<SecurityFinding[]> {
     const project = await this.prismaService.project.findUnique({
@@ -32,8 +32,18 @@ export class AnalysisService {
       throw new NotFoundException('Project not found');
     }
 
+    const projectPath: string | null =
+      project.path === undefined ? null : path.resolve(project.path);
+
+    const context: AnalysisContext = {
+      project,
+      fileIndex: projectPath
+        ? await this.fileIndexService.build(projectPath)
+        : null,
+    };
+
     const facts: SecurityFact[] = (
-      await Promise.all(this.analyzers.map((a) => a.analyze(project)))
+      await Promise.all(this.analyzers.map((a) => a.analyze(context)))
     ).flat();
 
     const findings: SecurityFinding[] = [];
