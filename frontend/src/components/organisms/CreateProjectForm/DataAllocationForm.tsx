@@ -51,7 +51,7 @@ function DataAllocationForm() {
             className={twMerge(
               "flex flex-col gap-2 flex-1 px-12 py-8 items-center hover:border-card-foreground hover:bg-primary/20 cursor-pointer duration-200",
               isPresetActive(preset) &&
-                "border-primary/40 hover:border-primary/40 cursor-default hover:bg-primary/10 bg-primary/10"
+                "border-primary/40 text-primary hover:border-primary/40 cursor-default hover:bg-primary/10 bg-primary/10"
             )}
           >
             {preset.icon}
