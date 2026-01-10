@@ -6,6 +6,7 @@ import { store } from "@/app/store";
 import { ProjectDto } from "@/services/backendApi/projects";
 import { VmState, VmProvider } from "@/types/vm/vm";
 import EditProjectDialog from "@/components/organisms/ProjectTabs/SettingsTab/EditProjectDialog";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const meta = {
   title: "Organisms/EditProjectDialog",
@@ -43,11 +44,13 @@ const baseProject: ProjectDto = {
   vmId: "vm-1",
   source: {
     id: "source-1",
-    type: "github",
+    type: SourceType.GITHUB,
     authorizationId: "auth-1",
     settings: {
       branch: "main",
       repository: "my-project",
+      composePath: "./docker-compose.yml",
+      path: "/",
       organization: "my-org",
     },
   },

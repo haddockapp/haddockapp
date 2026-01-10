@@ -7,9 +7,14 @@ import { readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { PersistedVmDto } from 'src/vm/dto/vm.dto';
 import { getSettings } from 'src/source/utils/get-settings';
-import { GithubSourceSettingsDto } from 'src/source/dto/settings.dto';
+import {
+  GithubSourceSettingsDto,
+  TemplateSourceSettingsDto,
+  ZipUploadSourceSettingsDto,
+} from 'src/source/dto/settings.dto';
 import { EnvironmentVar } from 'src/project/dto/environmentVar';
 import { ExecutionError } from 'src/types/error/execution.error';
+import { SourceType } from 'src/source/dto/create-source.dto';
 
 @Injectable()
 export class VagrantManager implements IVMManager {
@@ -37,8 +42,26 @@ export class VagrantManager implements IVMManager {
 
   private getComposePath(source: Source): string {
     switch (source.type) {
-      case 'github': {
+      case SourceType.GITHUB: {
         const settings = getSettings<GithubSourceSettingsDto>(source.settings);
+        if (settings.composePath === undefined || !settings.composePath) {
+          throw new Error('Compose path not set');
+        }
+        return settings.composePath;
+      }
+      case SourceType.ZIP_UPLOAD: {
+        const settings = getSettings<ZipUploadSourceSettingsDto>(
+          source.settings,
+        );
+        if (settings.composePath === undefined || !settings.composePath) {
+          throw new Error('Compose path not set');
+        }
+        return settings.composePath;
+      }
+      case SourceType.TEMPLATE: {
+        const settings = getSettings<TemplateSourceSettingsDto>(
+          source.settings,
+        );
         if (settings.composePath === undefined || !settings.composePath) {
           throw new Error('Compose path not set');
         }
@@ -54,7 +77,9 @@ export class VagrantManager implements IVMManager {
     source: Source,
   ): Promise<ExecResult> {
     switch (source.type) {
-      case 'github': {
+      case SourceType.GITHUB:
+      case SourceType.TEMPLATE:
+      case SourceType.ZIP_UPLOAD: {
         const composePath = this.getComposePath(source);
         const envArgs = project.environmentVars
           .flatMap((envVar: EnvironmentVar) => [
@@ -71,6 +96,7 @@ export class VagrantManager implements IVMManager {
         return res;
       }
       default:
+        this.logger.error(`Source type ${source.type} not supported for Vm ${project.vmId}`);
         throw new Error('Invalid source type');
     }
   }

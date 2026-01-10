@@ -28,14 +28,10 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "@/components/molecules/select";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const formSchema = z.object({
-  authorization: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .required(),
+  authorization: z.object({ label: z.string(), value: z.string() }).optional(),
   name: z.string(),
   description: z.string(),
 });
@@ -76,7 +72,7 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({
       body: {
         name: data.name,
         description: data.description,
-        authorization_id: data.authorization.value,
+        authorization_id: data.authorization?.value,
       },
     })
       .unwrap()
@@ -156,22 +152,24 @@ const EditProjectDialog: FC<EditProjectDialogProps> = ({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={control}
-                name="authorization"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label>Authorization</Label>
-                    <FormControl>
-                      <Select
-                        {...field}
-                        isLoading={isFetchingAuthorizations}
-                        options={authorizationsOptions}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {project?.source.type === SourceType.GITHUB && (
+                <FormField
+                  control={control}
+                  name="authorization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label>Authorization</Label>
+                      <FormControl>
+                        <Select
+                          {...field}
+                          isLoading={isFetchingAuthorizations}
+                          options={authorizationsOptions}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
               <DialogFooter className="justify-between my-4">
                 <Button
                   type="button"

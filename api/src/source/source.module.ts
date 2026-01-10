@@ -9,6 +9,7 @@ import { AuthorizationModule } from '../authorization/authorization.module';
 import { SourceRepository } from './source.repository';
 import { ProjectModule } from 'src/project/project.module';
 import { ComposeModule } from 'src/compose/compose.module';
+import { TemplatesModule } from 'src/templates/templates.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ComposeModule } from 'src/compose/compose.module';
     }),
     AuthorizationModule,
     ComposeModule,
+    TemplatesModule,
   ],
   providers: [SourceService, SourceFactory, DeployConsumer, SourceRepository],
   exports: [SourceService],

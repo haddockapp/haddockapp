@@ -1,56 +1,96 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
-import { FC, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FC, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProjectMutation } from "@/services/backendApi/projects";
-import { Slider } from "@/components/ui/slider";
-import {
-  useGetAllRepositoriesQuery,
-  useGetAllBranchesByRepositoryQuery,
-} from "@/services/backendApi/github";
-import {
-  AuthorizationEnum,
-  useGetAllAuthorizationsQuery,
-} from "@/services/backendApi/authorizations";
-import Select from "@/components/molecules/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import CreateSelect from "@/components/molecules/create-select";
+import { Form } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
+import { Card } from "@/components/ui/card";
+import { FolderArchive, Presentation } from "lucide-react";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { twMerge } from "tailwind-merge";
+import { motion } from "framer-motion";
+import GithubSourceForm from "./GithubSourceForm";
+import DataAllocationForm from "./DataAllocationForm";
+import ZipSourceForm from "./ZipSourceForm";
+import TemplateSourceForm from "./TemplateSourceForm";
 
-const formSchema = z.object({
-  authorization: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .optional(),
-  repository: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .required(),
-  branch: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .required(),
-  memory: z.number().int().min(512).max(8192),
-  disk: z.number().int().min(256).max(2048),
-  vcpus: z.number().int().min(1).max(8),
-  composePath: z.string(),
-});
+const MotionWrapper: FC<{ children: React.ReactNode; key: string }> = ({
+  key,
+  children,
+}) => (
+  <motion.div
+    key={key}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+  >
+    {children}
+  </motion.div>
+);
+
+type SourceTypeCardProps = {
+  icon: React.ReactNode;
+  label: string;
+  value: SourceType;
+  onChangeValue: (value: SourceType) => void;
+  isActive: boolean;
+};
+
+const SourceTypeCard: FC<SourceTypeCardProps> = ({
+  icon,
+  label,
+  value,
+  onChangeValue,
+  isActive,
+}) => (
+  <Card
+    onClick={() => onChangeValue(value)}
+    className={twMerge(
+      "p-2 md:p-8 flex flex-row items-center gap-2 text-typography/70",
+      isActive
+        ? "text-primary cursor-default"
+        : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow"
+    )}
+  >
+    {icon}
+    <span className="text-md md:text-xl">{label}</span>
+  </Card>
+);
+
+const formSchema = z.discriminatedUnion("source", [
+  z.object({
+    source: z.literal(SourceType.GITHUB),
+    composePath: z.string(),
+    authorization: z.object({ label: z.string(), value: z.string() }),
+    repository: z.object({ label: z.string(), value: z.string() }),
+    branch: z.object({ label: z.string(), value: z.string() }),
+    variables: z.record(z.string()).optional(),
+    memory: z.number().int().min(512).max(8192),
+    disk: z.number().int().min(256).max(2048),
+    vcpus: z.number().int().min(1).max(8),
+  }),
+  z.object({
+    source: z.literal(SourceType.ZIP_UPLOAD),
+    composePath: z.string(),
+    variables: z.record(z.string()).optional(),
+    memory: z.number().int().min(512).max(8192),
+    disk: z.number().int().min(256).max(2048),
+    vcpus: z.number().int().min(1).max(8),
+  }),
+  z.object({
+    source: z.literal(SourceType.TEMPLATE),
+    templateId: z.object({ label: z.string(), value: z.string() }),
+    templateVersionId: z.object({ label: z.string(), value: z.string() }),
+    variables: z.record(z.string()).optional(),
+    memory: z.number().int().min(512).max(8192),
+    disk: z.number().int().min(256).max(2048),
+    vcpus: z.number().int().min(1).max(8),
+  }),
+]);
 
 interface CreateProjectFormProps {
   onClose?: () => void;
@@ -68,44 +108,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
       composePath: "compose.yml",
     },
   });
-  const { handleSubmit, reset, control, watch } = form;
+  const { handleSubmit, reset, watch, control } = form;
 
   const [formStep, setFormStep] = useState<number>(0);
 
-  const watchAuthorization = watch("authorization")?.value;
-  const watchRepository = watch("repository")?.value;
-
-  const { currentData: authorizations, isFetching: isFetchingAuthorizations } =
-    useGetAllAuthorizationsQuery();
-
-  const canFetchReposAndBranches = useMemo(() => {
-    if (!watchAuthorization) return false;
-    const authorization = authorizations?.find(
-      (authorization) => authorization.id === watchAuthorization
-    );
-    if (!authorization) return false;
-    return authorization?.type !== AuthorizationEnum.DEPLOY_KEY;
-  }, [authorizations, watchAuthorization]);
-
-  const { currentData: repositories, isFetching: isFetchingRepositories } =
-    useGetAllRepositoriesQuery(
-      {
-        authorization: watchAuthorization!,
-      },
-      { skip: !watchAuthorization || !canFetchReposAndBranches }
-    );
-  const { currentData: branches, isFetching: isFetchingBranches } =
-    useGetAllBranchesByRepositoryQuery(
-      {
-        repository: watchRepository,
-        authorization: watchAuthorization!,
-      },
-      {
-        skip: !watchRepository || !canFetchReposAndBranches,
-      }
-    );
-
-  const [createProject] = useCreateProjectMutation();
+  const [createProject, { isLoading }] = useCreateProjectMutation();
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     switch (formStep) {
@@ -113,26 +120,42 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
         setFormStep(1);
         break;
       case 1:
+        setFormStep(2);
+        break;
+      case 2:
         createProject({
-          repository_branch: data.branch.value,
-          repository_name: data.repository.value.split("/")[1],
-          repository_organisation: data.repository.value.split("/")[0],
           vm_cpus: +data.vcpus,
           vm_memory: +data.memory,
           vm_disk: +data.disk,
-          compose_path: data.composePath,
-          authorization_id: data.authorization
-            ? data.authorization?.value.length > 0
-              ? data.authorization?.value
-              : undefined
-            : undefined,
+          source:
+            data.source === SourceType.ZIP_UPLOAD
+              ? {
+                  type: SourceType.ZIP_UPLOAD,
+                  compose_path: data.composePath,
+                }
+              : data.source === SourceType.TEMPLATE
+              ? {
+                  type: SourceType.TEMPLATE,
+                  templateId: data.templateId!.value,
+                  versionId: data.templateVersionId!.value,
+                  variables: data.variables!,
+                }
+              : {
+                  type: SourceType.GITHUB,
+                  authorization_id: data.authorization
+                    ? data.authorization?.value.length > 0
+                      ? data.authorization?.value
+                      : undefined
+                    : undefined,
+                  branch: data.branch!.value,
+                  organization: data.repository!.value.split("/")[0],
+                  repository: data.repository!.value.split("/")[1],
+                  compose_path: data.composePath,
+                },
         })
           .unwrap()
           .then((res) => {
-            toast({
-              title: "Project created !",
-              duration: 1000,
-            });
+            toast({ title: "Project created !", duration: 1000 });
             reset();
             onClose?.();
             navigate(`/project/${res.id}`);
@@ -150,191 +173,83 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
     }
   };
 
-  const authorizationsOptions = useMemo(
-    () =>
-      authorizations?.map((authorization) => ({
-        label: `${authorization.name} (${authorization.type})`,
-        value: authorization.id,
-      })) ?? [],
-    [authorizations]
-  );
-
-  const repositoriesOptions = useMemo(
-    () =>
-      repositories?.map((repository) => ({
-        label: repository.full_name,
-        value: repository.full_name,
-      })) ?? [],
-    [repositories]
-  );
-
-  const branchesOptions = useMemo(
-    () =>
-      branches?.map((branch) => ({
-        label: branch,
-        value: branch,
-      })) ?? [],
-    [branches]
-  );
+  const watchSourceType = watch("source");
 
   return (
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-between space-y-8"
+        className="flex flex-col justify-between space-y-8 w-full"
       >
-        {formStep === 0 && (
-          <div className="flex flex-col justify-between space-y-4">
-            <FormField
-              control={control}
-              name="authorization"
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Authorization</Label>
-                  <FormControl>
-                    <Select
-                      {...field}
-                      isLoading={isFetchingAuthorizations}
-                      options={[
-                        { value: "", label: "N/A" },
-                        ...authorizationsOptions,
-                      ]}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+        <FormProvider {...form}>
+          {formStep === 0 && (
+            <MotionWrapper key="source-selection">
+              <div className="flex flex-row items-center justify-around p-8">
+                <Controller
+                  control={control}
+                  name="source"
+                  render={({ field }) => (
+                    <div className="flex flex-row items-center justify-around w-full gap-4">
+                      <SourceTypeCard
+                        icon={<FolderArchive className="shrink-0" />}
+                        label="ZIP File"
+                        value={SourceType.ZIP_UPLOAD}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.ZIP_UPLOAD);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.ZIP_UPLOAD}
+                      />
+                      <SourceTypeCard
+                        icon={<GitHubLogoIcon className="size-6 shrink-0" />}
+                        label="GitHub"
+                        value={SourceType.GITHUB}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.GITHUB);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.GITHUB}
+                      />
+                      <SourceTypeCard
+                        icon={<Presentation className="shrink-0" />}
+                        label="Template"
+                        value={SourceType.TEMPLATE}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.TEMPLATE);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.TEMPLATE}
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+            </MotionWrapper>
+          )}
+          {formStep === 1 && (
+            <MotionWrapper key="source-form">
+              {watchSourceType === SourceType.GITHUB && <GithubSourceForm />}
+              {watchSourceType === SourceType.ZIP_UPLOAD && <ZipSourceForm />}
+              {watchSourceType === SourceType.TEMPLATE && (
+                <TemplateSourceForm />
               )}
-            />
-            <FormField
-              control={control}
-              name="repository"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Repository</Label>
-                  <FormControl>
-                    <CreateSelect
-                      isLoading={isFetchingRepositories}
-                      options={repositoriesOptions}
-                      isSelect={canFetchReposAndBranches}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="branch"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Branch</Label>
-                  <FormControl>
-                    <CreateSelect
-                      isLoading={isFetchingBranches}
-                      isDisabled={!watch("repository")}
-                      options={branchesOptions}
-                      isSelect={canFetchReposAndBranches}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="composePath"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Compose path</Label>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        )}
-        {formStep === 1 && (
-          <div className="flex flex-col justify-between space-y-6">
-            <FormField
-              control={control}
-              name="vcpus"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <Label className="flex justify-between">
-                    <span>CPUs</span>
-                    <span className="text-typography/40">{field.value}</span>
-                  </Label>
-                  <FormControl>
-                    <Slider
-                      value={[field.value]}
-                      onValueChange={([v]) => field.onChange(v)}
-                      min={1}
-                      max={8}
-                      step={1}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="memory"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <Label className="flex justify-between">
-                    <span>Memory</span>
-                    <span className="text-typography/40">{field.value} MB</span>
-                  </Label>
-                  <FormControl>
-                    <Slider
-                      value={[field.value]}
-                      onValueChange={([v]) => field.onChange(v)}
-                      min={1024}
-                      max={8192}
-                      step={1024}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="disk"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <Label className="flex justify-between">
-                    <span>Disk</span>
-                    <span className="text-typography/40">{field.value} MB</span>
-                  </Label>
-                  <FormControl>
-                    <Slider
-                      value={[field.value]}
-                      onValueChange={([v]) => field.onChange(v)}
-                      min={256}
-                      max={2048}
-                      step={256}
-                    />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        )}
-        <Button type="submit">{formStep === 0 ? "Next" : "Create"}</Button>
+            </MotionWrapper>
+          )}
+          {formStep === 2 && (
+            <MotionWrapper key="data-allocation-form">
+              <DataAllocationForm />
+            </MotionWrapper>
+          )}
+          {formStep > 0 && (
+            <Button
+              disabled={isLoading}
+              type="submit"
+              className="self-end w-full max-w-24"
+            >
+              {formStep !== 2 ? "Next" : "Create"}
+            </Button>
+          )}
+        </FormProvider>
       </form>
     </Form>
   );

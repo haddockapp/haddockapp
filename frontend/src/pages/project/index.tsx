@@ -11,7 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setAlert, setProjectId } from "@/services/metricSlice";
 import { ProjectTabsValue } from "./projectTabsType";
-import { AnimatePresence, motion } from "framer-motion";
+import SimpleDialog from "@/components/organisms/SimpleDialog";
+import UploadZipDialog from "@/components/organisms/UploadZipDialog";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
@@ -50,20 +52,22 @@ const ProjectDetails: FC = () => {
   }
 
   return (
-    <div className="px-6">
-      <AnimatePresence>
-        <motion.div
-          key={currentProject.id}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-        >
-          <ProjectManagementPanel
-            onChangeTab={setSelectedTab}
-            project={currentProject}
+    <>
+      {currentProject.source.type === SourceType.ZIP_UPLOAD &&
+        "status" in currentProject.source.settings &&
+        currentProject.source.settings.status === "none" && (
+          <SimpleDialog
+            isOpen
+            title="Upload a ZIP file"
+            description="Drag and drop or browse to upload a ZIP file containing your project."
+            Content={UploadZipDialog}
           />
-        </motion.div>
-      </AnimatePresence>
+        )}
+
+      <ProjectManagementPanel
+        onChangeTab={setSelectedTab}
+        project={currentProject}
+      />
 
       <Tabs value={selectedTab}>
         <div className="w-full text-right">
@@ -127,7 +131,7 @@ const ProjectDetails: FC = () => {
           <SettingsTab />
         </TabsContent>
       </Tabs>
-    </div>
+    </>
   );
 };
 

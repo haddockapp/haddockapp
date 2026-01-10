@@ -9,7 +9,7 @@ import {
   usePullProjectMutation,
   useRecreateProjectMutation,
 } from "@/services/backendApi/projects";
-import { Play, Square, RefreshCw, RotateCcw } from "lucide-react";
+import { Play, Square, RefreshCw, RotateCcw, Upload } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -23,13 +23,16 @@ import { QueryKeys, backendApi } from "@/services/backendApi";
 import { useAppDispatch } from "@/hooks/useStore";
 import useMetrics from "@/hooks/use-metrics";
 import { ProjectTabsValue } from "@/pages/project/projectTabsType";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
+import SimpleDialog from "../SimpleDialog";
+import UploadZipDialog from "../UploadZipDialog";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
   onChangeTab: (tab: ProjectTabsValue) => void;
 }
 
-type ActionType = "start" | "stop" | "pull" | "recreate" | null;
+type ActionType = "start" | "stop" | "pull" | "recreate" | "reupload" | null;
 
 const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   project,
@@ -87,6 +90,8 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
             description: "Your project has been stopped successfully.",
           });
           break;
+        case "reupload":
+          break;
         case "pull":
           await pullProject(project.id).unwrap();
           setTimeout(() => {
@@ -133,6 +138,8 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           icon: <Square className="h-5 w-5 text-red-600" />,
           isDestructive: true,
         };
+      case "reupload":
+        return null;
       case "pull":
         return {
           title: "Update Project",
@@ -152,13 +159,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
           isDestructive: true,
         };
       default:
-        return {
-          title: "",
-          description: "",
-          confirmLabel: "",
-          icon: null,
-          isDestructive: false,
-        };
+        return null;
     }
   };
 
@@ -167,120 +168,154 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   const { buildLogs, isAlert } = useMetrics();
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-xl text-typography">
-              Project Management
-            </CardTitle>
-            <CardDescription>
-              Manage the lifecycle of your project
-            </CardDescription>
+    <>
+      {project.source.type === SourceType.ZIP_UPLOAD &&
+        "status" in project.source.settings && (
+          <SimpleDialog
+            isOpen={currentAction === "reupload"}
+            onOpen={() => {}}
+            onClose={() => setCurrentAction(null)}
+            title="Upload a ZIP file"
+            description="Drag and drop or browse to upload a ZIP file containing your project."
+            Content={UploadZipDialog}
+          />
+        )}
+
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-xl text-typography">
+                Project Management
+              </CardTitle>
+              <CardDescription>
+                Manage the lifecycle of your project
+              </CardDescription>
+            </div>
+            <ProjectStatusBadge
+              isAlert={isAlert}
+              onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
+              tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
+              status={projectStatus}
+              size="lg"
+            />
           </div>
-          <ProjectStatusBadge
-            isAlert={isAlert}
-            onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
-            tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
-            status={projectStatus}
-            size="lg"
-          />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-3">
-          <ProjectActionButton
-            label="Start"
-            icon={<Play className="h-4 w-4" />}
-            onClick={() => handleActionClick("start")}
-            isDisabled={isRunning || isStarting || isLoading || isStopping}
-            disabledReason={
-              isRunning
-                ? "Project is already running"
-                : isStarting
-                ? "Project is currently starting"
-                : isLoading
-                ? "Another action is in progress"
-                : isStopping
-                ? "Project is currently stopping"
-                : undefined
-            }
-            variant={
-              isRunning || isStarting || isLoading || isStopping
-                ? "default"
-                : "shine"
-            }
-            isLoading={currentAction === "start" && isStartingMutation}
-          />
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <ProjectActionButton
+              label="Start"
+              icon={<Play className="h-4 w-4" />}
+              onClick={() => handleActionClick("start")}
+              isDisabled={isRunning || isStarting || isLoading || isStopping}
+              disabledReason={
+                isRunning
+                  ? "Project is already running"
+                  : isStarting
+                  ? "Project is currently starting"
+                  : isLoading
+                  ? "Another action is in progress"
+                  : isStopping
+                  ? "Project is currently stopping"
+                  : undefined
+              }
+              variant="default"
+              isLoading={currentAction === "start" && isStartingMutation}
+            />
 
-          <ProjectActionButton
-            label="Stop"
-            icon={<Square className="h-4 w-4" />}
-            onClick={() => handleActionClick("stop")}
-            isDisabled={!isRunning || isLoading || isStopping}
-            disabledReason={
-              !isRunning
-                ? "Project must be running to stop it"
-                : isLoading
-                ? "Another action is in progress"
-                : isStopping
-                ? "Project is currently stopping"
-                : undefined
-            }
-            variant="outline"
-            isLoading={currentAction === "stop" && isStopping}
-          />
+            <ProjectActionButton
+              label="Stop"
+              icon={<Square className="h-4 w-4" />}
+              onClick={() => handleActionClick("stop")}
+              isDisabled={!isRunning || isLoading || isStopping}
+              disabledReason={
+                !isRunning
+                  ? "Project must be running to stop it"
+                  : isLoading
+                  ? "Another action is in progress"
+                  : isStopping
+                  ? "Project is currently stopping"
+                  : undefined
+              }
+              variant="outline"
+              isLoading={currentAction === "stop" && isStopping}
+            />
 
-          <ProjectActionButton
-            label="Update"
-            icon={<RefreshCw className="h-4 w-4" />}
-            onClick={() => handleActionClick("pull")}
-            isDisabled={(!isStopped && !isError) || isLoading || isStopping}
-            disabledReason={
-              !isStopped && !isError
-                ? "Project must be stopped to update it"
-                : isLoading
-                ? "Another action is in progress"
-                : isStopping
-                ? "Project is currently stopping"
-                : undefined
-            }
-            variant="outline"
-            isLoading={currentAction === "pull" && isPulling}
-          />
+            {project.source.type === SourceType.ZIP_UPLOAD && (
+              <ProjectActionButton
+                label="Reupload"
+                icon={<Upload className="h-4 w-4" />}
+                onClick={() => handleActionClick("reupload")}
+                isDisabled={(!isStopped && !isError) || isLoading || isStopping}
+                disabledReason={
+                  !isStopped && !isError
+                    ? "Project must be stopped to reupload it"
+                    : isLoading
+                    ? "Another action is in progress"
+                    : isStopping
+                    ? "Project is currently stopping"
+                    : undefined
+                }
+                variant="outline"
+                isLoading={currentAction === "reupload"}
+              />
+            )}
 
-          <ProjectActionButton
-            label="Recreate"
-            icon={<RotateCcw className="h-4 w-4" />}
-            onClick={() => handleActionClick("recreate")}
-            isDisabled={(!isStopped && !isError) || isLoading || isStopping}
-            disabledReason={
-              !isStopped && !isError
-                ? "Project must be stopped to recreate it"
-                : isLoading
-                ? "Another action is in progress"
-                : isStopping
-                ? "Project is currently stopping"
-                : undefined
-            }
-            variant="outline"
-            isLoading={currentAction === "recreate" && isRecreating}
-          />
-        </div>
-      </CardContent>
+            {project.source.type === SourceType.GITHUB && (
+              <ProjectActionButton
+                label="Update"
+                icon={<RefreshCw className="h-4 w-4" />}
+                onClick={() => handleActionClick("pull")}
+                isDisabled={(!isStopped && !isError) || isLoading || isStopping}
+                disabledReason={
+                  !isStopped && !isError
+                    ? "Project must be stopped to update it"
+                    : isLoading
+                    ? "Another action is in progress"
+                    : isStopping
+                    ? "Project is currently stopping"
+                    : undefined
+                }
+                variant="outline"
+                isLoading={currentAction === "pull" && isPulling}
+              />
+            )}
 
-      <ProjectActionConfirmDialog
-        isOpen={confirmDialogOpen}
-        onClose={() => setConfirmDialogOpen(false)}
-        onConfirm={() => executeAction(currentAction)}
-        title={dialogConfig.title}
-        description={dialogConfig.description}
-        confirmLabel={dialogConfig.confirmLabel}
-        icon={dialogConfig.icon}
-        isDestructive={dialogConfig.isDestructive}
-        isLoading={isLoading}
-      />
-    </Card>
+            <ProjectActionButton
+              label="Recreate"
+              icon={<RotateCcw className="h-4 w-4" />}
+              onClick={() => handleActionClick("recreate")}
+              isDisabled={(!isStopped && !isError) || isLoading || isStopping}
+              disabledReason={
+                !isStopped && !isError
+                  ? "Project must be stopped to recreate it"
+                  : isLoading
+                  ? "Another action is in progress"
+                  : isStopping
+                  ? "Project is currently stopping"
+                  : undefined
+              }
+              variant="outline"
+              isLoading={currentAction === "recreate" && isRecreating}
+            />
+          </div>
+        </CardContent>
+
+        {dialogConfig && (
+          <ProjectActionConfirmDialog
+            isOpen={confirmDialogOpen}
+            onClose={() => setConfirmDialogOpen(false)}
+            onConfirm={() => executeAction(currentAction)}
+            title={dialogConfig.title}
+            description={dialogConfig.description}
+            confirmLabel={dialogConfig.confirmLabel}
+            icon={dialogConfig.icon}
+            isDestructive={dialogConfig.isDestructive}
+            isLoading={isLoading}
+          />
+        )}
+      </Card>
+    </>
   );
 };
 

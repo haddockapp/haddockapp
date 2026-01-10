@@ -20,6 +20,7 @@ import { InvitationModule } from './invitation/invitation.module';
 import { AutologinsModule } from './autologins/autologins.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { WorkspacesModule } from 'src/workspaces/workspaces.module';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { WorkspacesModule } from 'src/workspaces/workspaces.module';
     InvitationModule,
     AutologinsModule,
     WorkspacesModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

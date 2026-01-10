@@ -23,6 +23,7 @@ const selectStyles = {
   placeholder: (provided: object) => ({
     ...provided,
     cursor: "text",
+    color: "hsl(var(--typography)/50%)",
   }),
   menu: (provided: object) => ({
     ...provided,
@@ -53,6 +54,7 @@ const CreateSelect: FC<CreateSelectProps> = ({
   isSelect,
   onChange,
   value,
+  isDisabled,
   ...props
 }) => {
   function handleChange(newValue: string) {
@@ -61,6 +63,7 @@ const CreateSelect: FC<CreateSelectProps> = ({
 
   return (
     <CreatableSelect
+      isDisabled={isDisabled}
       theme={(theme) => ({
         ...theme,
         colors: {
