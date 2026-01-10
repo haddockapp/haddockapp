@@ -1,53 +1,40 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "@/components/organisms/Header";
-import LiquidEther from "@/components/atoms/liquid-ether";
-import { useAppSelector } from "@/hooks/useStore";
-import { Theme } from "@/services/settingsSlice";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarProvider,
   useSidebar,
-} from "../ui/sidebar";
+} from "@/components/ui/sidebar";
 import { ArrowRight } from "lucide-react";
-import Divider from "../atoms/divider";
-import { Button } from "../ui/button";
-import Settings from "../organisms/Settings";
-import Kbd from "../atoms/kbd";
+import Divider from "@/components/atoms/divider";
+import { Button } from "@/components/ui/button";
+import Settings from "@/components/organisms/Settings";
+import Kbd from "@/components/atoms/kbd";
+import fluidCursor from "@/hooks/use-canvas-cursor";
 
 const Content: FC = () => {
-  const selectedTheme = useAppSelector((state) => state.settings.theme);
+  useEffect(() => {
+    fluidCursor();
+  }, []);
 
   return (
-    <div className="h-full w-full space-y-8 mb-2 px-2 py-2">
-      <Header />
+    <div className="h-full w-full">
       <div
         className="-z-10"
         style={{ width: "100%", height: "100%", position: "absolute" }}
       >
-        {selectedTheme === Theme.DARK && (
-          <LiquidEther
-            colors={["#855CD6", "#B19EEF"]}
-            mouseForce={12}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={9.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        )}
+        <div className="fixed top-0 left-0 z-2">
+          <canvas id="fluid" className="w-screen h-screen" />
+        </div>
       </div>
-      <div className="w-full h-full">
+      <header className="sticky top-0 bg-gradient-to-b from-card to-card/80 z-10 shadow-sm border-b">
+        <Header />
+      </header>
+      <div className="px-2 py-6 relative">
+        <div className="h-4 w-full absolute top-0 left-0 bg-gradient-to-b from-card/80 to-transparent pointer-events-none z-10" />
         <Outlet />
       </div>
     </div>
@@ -77,10 +64,8 @@ const SettingsSidebar: FC = () => {
 };
 
 const Layout: FC = () => {
-  const { isAuth } = useAppSelector((state) => state.auth);
-
   return (
-    <SidebarProvider defaultOpen={isAuth}>
+    <SidebarProvider defaultOpen={false}>
       <Content />
       <SettingsSidebar />
     </SidebarProvider>

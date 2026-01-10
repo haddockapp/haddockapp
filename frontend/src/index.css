@@ -98,3 +98,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Main container */
+.react-lazylog {
+  background-color: transparent !important;
+}
+
+/* Searchbar */
+.react-lazylog-searchbar {
+  padding: 0px;
+  background-color: transparent !important; 
+}
+
+/* SearchbarInput */
+.react-lazylog-searchbar-input {
+  border-radius: 4px;
+  background-color: var(--card) !important;
+}
+
+/* Log lines wrapper */
+.react-lazylog-wrapper {
+  background-color: transparent !important;
+}
+
+/* Individual log lines */
+.react-lazylog-line {
+  background-color: transparent !important;
+}
+
+/* Gutter / line numbers */
+.react-lazylog-gutter {
+  background-color: transparent !important;
+}

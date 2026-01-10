@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Skeleton } from "../ui/skeleton";
 
 const pathTranslations: Record<string, string> = {
   ["/"]: "/ authentication",
@@ -25,10 +26,10 @@ const Header: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { data: projects } = useGetProjectsQuery();
+  const { data: projects = [], isFetching } = useGetProjectsQuery();
 
   const projectName = useMemo(
-    () => projects?.find((p) => p.id === projectId)?.name,
+    () => projects.find((p) => p.id === projectId)?.name ?? "",
     [projects, projectId]
   );
 
@@ -52,19 +53,29 @@ const Header: FC = () => {
   const { isAuth } = useAppSelector((state) => state.auth);
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between w-full pt-4 px-8 items-center">
+    <div className="flex flex-col sm:flex-row justify-between w-full py-4 px-8 items-center">
       <div className="flex flex-col sm:flex-row items-center">
         <img
           className="w-12 sm:w-16 cursor-pointer"
           src="/haddock.png"
           onClick={() => navigate("/dashboard")}
         />
-        <h3 className="text-typography text-sm sm:text-2xl ml-2 text-nowrap">
-          {projectId
-            ? `/ project / ${projectName}`
-            : pathTranslations[window.location.pathname] ??
-              window.location.pathname}
-        </h3>
+        <div className="text-typography text-sm sm:text-2xl ml-2 text-nowrap flex flex-row items-center gap-2">
+          {projectId ? (
+            <>
+              / project /
+              <Skeleton
+                loading={isFetching}
+                className="inline-block min-w-[200px] h-8"
+              >
+                {projectName}
+              </Skeleton>
+            </>
+          ) : (
+            pathTranslations[window.location.pathname] ??
+            window.location.pathname
+          )}
+        </div>
       </div>
       <div className="flex flex-row items-center">
         <AnimatePresence>

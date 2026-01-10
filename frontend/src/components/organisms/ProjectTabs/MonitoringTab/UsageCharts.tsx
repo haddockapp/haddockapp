@@ -1,6 +1,7 @@
 import RadialTextChart from "@/components/ui/charts/radial-text-chart";
 import { CpuIcon, DiscIcon, MemoryStickIcon } from "lucide-react";
 import { FC } from "react";
+import { motion } from "framer-motion";
 
 type UsageChartsProps = {
   cpuUsage: number;
@@ -36,24 +37,42 @@ const UsageCharts: FC<UsageChartsProps> = ({
   diskUsage,
 }) => (
   <>
-    <UsageChart
-      title="CPU Usage"
-      color="hsl(var(--chart-2))"
-      icon={<CpuIcon />}
-      value={cpuUsage}
-    />
-    <UsageChart
-      title="Memory Usage"
-      color="hsl(var(--chart-1))"
-      icon={<MemoryStickIcon />}
-      value={memoryUsage}
-    />
-    <UsageChart
-      title="Disk Usage"
-      color="hsl(var(--chart-4))"
-      icon={<DiscIcon />}
-      value={diskUsage}
-    />
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+    >
+      <UsageChart
+        title="CPU Usage"
+        color="hsl(var(--chart-2))"
+        icon={<CpuIcon />}
+        value={cpuUsage}
+      />
+    </motion.div>
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+    >
+      <UsageChart
+        title="Memory Usage"
+        color="hsl(var(--chart-1))"
+        icon={<MemoryStickIcon />}
+        value={memoryUsage}
+      />
+    </motion.div>
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+    >
+      <UsageChart
+        title="Disk Usage"
+        color="hsl(var(--chart-4))"
+        icon={<DiscIcon />}
+        value={diskUsage}
+      />
+    </motion.div>
   </>
 );
 
