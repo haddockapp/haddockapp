@@ -104,7 +104,7 @@ const ServiceDrawer: FC<ServiceDrawerProps> = ({
   return (
     <div
       className={cn(
-        "w-[500px] border-l  shadow-lg transition-all duration-300 ease-in-out",
+        "w-[500px] bg-card border-l shadow-lg transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
