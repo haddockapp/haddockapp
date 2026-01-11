@@ -13,6 +13,7 @@ import {
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -141,6 +142,7 @@ const MonitoringTab: FC<MonitoringTabProps> = () => {
                   )}
                 </div>
               </DrawerTitle>
+              <DrawerDescription />
             </DrawerHeader>
             <div className="w-full p-4">
               <Histograms

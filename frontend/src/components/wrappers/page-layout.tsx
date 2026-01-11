@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "@/components/organisms/Header";
 import {
@@ -13,33 +13,18 @@ import Divider from "@/components/atoms/divider";
 import { Button } from "@/components/ui/button";
 import Settings from "@/components/organisms/Settings";
 import Kbd from "@/components/atoms/kbd";
-import fluidCursor from "@/hooks/use-canvas-cursor";
 
-const Content: FC = () => {
-  useEffect(() => {
-    fluidCursor();
-  }, []);
-
-  return (
-    <div className="h-full w-full">
-      <div
-        className="-z-10"
-        style={{ width: "100%", height: "100%", position: "absolute" }}
-      >
-        <div className="fixed top-0 left-0 z-2">
-          <canvas id="fluid" className="w-screen h-screen" />
-        </div>
-      </div>
-      <header className="sticky top-0 bg-gradient-to-b from-card to-card/80 z-10 shadow-sm border-b">
-        <Header />
-      </header>
-      <div className="px-2 py-6 relative">
-        <div className="h-4 w-full absolute top-0 left-0 bg-gradient-to-b from-card/80 to-transparent pointer-events-none z-10" />
-        <Outlet />
-      </div>
+const Content: FC = () => (
+  <div className="h-full w-full">
+    <header className="sticky top-0 bg-gradient-to-b from-card to-card/80 z-10 shadow-sm border-b">
+      <Header />
+    </header>
+    <div className="px-2 py-6 relative">
+      <div className="h-4 w-full absolute top-0 left-0 bg-gradient-to-b from-card/80 to-transparent pointer-events-none z-10" />
+      <Outlet />
     </div>
-  );
-};
+  </div>
+);
 
 const SettingsSidebar: FC = () => {
   const { toggleSidebar } = useSidebar();
@@ -63,13 +48,11 @@ const SettingsSidebar: FC = () => {
   );
 };
 
-const Layout: FC = () => {
-  return (
-    <SidebarProvider defaultOpen={false}>
-      <Content />
-      <SettingsSidebar />
-    </SidebarProvider>
-  );
-};
+const Layout: FC = () => (
+  <SidebarProvider defaultOpen={false}>
+    <Content />
+    <SettingsSidebar />
+  </SidebarProvider>
+);
 
 export default Layout;
