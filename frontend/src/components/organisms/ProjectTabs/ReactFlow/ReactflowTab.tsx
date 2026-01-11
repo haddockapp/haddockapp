@@ -29,6 +29,7 @@ import ServiceDrawer from "../../ServicesDrawer/ServiceDrawer";
 import { useAppSelector } from "@/hooks/useStore";
 import { Theme } from "@/services/settingsSlice";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -263,7 +264,11 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       />
 
       <div className="absolute inset-0 flex">
-        <div className="flex-grow relative">
+        <motion.div
+          className="flex-grow relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
           <ReactFlow
             nodes={nodes}
             edges={showEdges ? edges : []}
@@ -390,7 +395,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               </div>
             </Panel>
           </ReactFlow>
-        </div>
+        </motion.div>
 
         <ServiceDrawer
           service={selectedService}

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { ScrollFollow, LazyLog } from "@melloware/react-logviewer";
 import { FC, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 type LogsSectionProps = {
   lines: string[];
@@ -19,21 +20,23 @@ const LogsSection: FC<LogsSectionProps> = ({ lines }) => {
   }, [lines]);
 
   return (
-    <Card className="w-full h-96 p-8">
-      <ScrollFollow
-        startFollowing={true}
-        render={({ follow, onScroll }) => (
-          <LazyLog
-            lineClassName="text-sm text-typography hover:bg-primary/10 duration-200"
-            selectableLines
-            enableSearch
-            text={logText}
-            follow={follow}
-            onScroll={onScroll}
-          />
-        )}
-      />
-    </Card>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <Card className="w-full h-96 p-8">
+        <ScrollFollow
+          startFollowing={true}
+          render={({ follow, onScroll }) => (
+            <LazyLog
+              lineClassName="text-sm text-typography hover:bg-primary/10 duration-200"
+              selectableLines
+              enableSearch
+              text={logText}
+              follow={follow}
+              onScroll={onScroll}
+            />
+          )}
+        />
+      </Card>
+    </motion.div>
   );
 };
 
