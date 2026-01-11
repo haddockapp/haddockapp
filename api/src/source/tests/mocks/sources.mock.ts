@@ -14,6 +14,7 @@ export const generateCreateGithubSourceDto = (): CreateGithubSourceDto => ({
   branch: faker.git.branch(),
   compose_path: 'docker-compose.yml',
   authorization_id: faker.string.uuid(),
+  environmentVars: [],
 });
 
 export const generateSourceDto = (

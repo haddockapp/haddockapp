@@ -22,6 +22,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { WorkspacesModule } from 'src/workspaces/workspaces.module';
 import { TemplatesModule } from './templates/templates.module';
 import { SecurityModule } from './security/security.module';
+import { UnifiedDeployModule } from './unified-deploy/unified-deploy.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SecurityModule } from './security/security.module';
     WorkspacesModule,
     TemplatesModule,
     SecurityModule,
+    UnifiedDeployModule,
   ],
   controllers: [AppController],
   providers: [AppService],

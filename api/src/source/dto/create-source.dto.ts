@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { EnvironmentVar } from 'src/project/dto/environmentVar';
 
 export enum SourceType {
   GITHUB = 'github',
@@ -8,10 +9,13 @@ export enum SourceType {
 
 export interface DefaultSource {
   type: SourceType;
+  environmentVars: EnvironmentVar[];
 }
 
 export class CreateGithubSourceDto implements DefaultSource {
   type = SourceType.GITHUB;
+
+  environmentVars: EnvironmentVar[] = [];
 
   @IsUUID()
   @IsNotEmpty()
@@ -37,6 +41,8 @@ export class CreateGithubSourceDto implements DefaultSource {
 export class CreateZipUploadSourceDto implements DefaultSource {
   type = SourceType.ZIP_UPLOAD;
 
+  environmentVars: EnvironmentVar[] = [];
+
   @IsString()
   @IsNotEmpty()
   compose_path: string;
@@ -44,6 +50,8 @@ export class CreateZipUploadSourceDto implements DefaultSource {
 
 export class CreateTemplateSourceDto implements DefaultSource {
   type = SourceType.TEMPLATE;
+
+  environmentVars: EnvironmentVar[] = [];
 
   @IsString()
   @IsNotEmpty()

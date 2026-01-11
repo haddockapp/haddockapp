@@ -1,0 +1,121 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { RedirectDto, UnifiedDeployDto } from './dto/unified-project.dto';
+import { Project } from '@prisma/client';
+import { CreateZipUploadSourceDto } from 'src/source/dto/create-source.dto';
+import { CreateProjectDto } from 'src/project/dto/CreateProject.dto';
+import { DomainsService } from 'src/domains/domains.service';
+import { ProjectService } from 'src/project/project.service';
+import { CreateNetworkConnectionDto } from 'src/networks/dto/CreateNetworkConnectionDto';
+import { NetworksService } from 'src/networks/networks.service';
+import { PersistedProjectDto } from 'src/project/dto/project.dto';
+import { SourceService } from 'src/source/source.service';
+import * as fs from 'node:fs';
+import { ZipUploadSourceSettingsDto } from 'src/source/dto/settings.dto';
+
+@Injectable()
+export class UnifiedDeployService {
+  constructor(
+    private readonly projectService: ProjectService,
+    private readonly domainService: DomainsService,
+    private readonly networkService: NetworksService,
+    private readonly sourceService: SourceService,
+  ) {}
+
+  private async resolveRedirectionsDomains(
+    project: Project,
+    redirects: RedirectDto[],
+  ): Promise<CreateNetworkConnectionDto[]> {
+    const domainIdCache: Map<string, string> = new Map<string, string>();
+
+    const dtos: CreateNetworkConnectionDto[] = [];
+
+    for (const redirect of redirects) {
+      const domainId: string = domainIdCache.get(redirect.domain);
+
+      if (domainId === undefined) {
+        const domain = await this.domainService.findDomainByName(
+          redirect.domain,
+        );
+
+        if (!domain) {
+          throw new Error(`Domain not found: ${redirect.domain}`);
+        }
+
+        domainIdCache.set(redirect.domain, domain.id);
+
+        dtos.push({
+          domainId: domain.id,
+          projectId: project.id,
+          port: redirect.port,
+          prefix: redirect.prefix ?? '',
+        });
+      } else {
+        dtos.push({
+          domainId,
+          projectId: project.id,
+          port: redirect.port,
+          prefix: redirect.prefix ?? '',
+        });
+      }
+    }
+    return dtos;
+  }
+
+  async deploy(
+    file: Express.Multer.File,
+    dto: UnifiedDeployDto,
+  ): Promise<Project> {
+    if (!file) {
+      throw new BadRequestException('ZIP file is required');
+    }
+
+    const createSourceDto: CreateZipUploadSourceDto =
+      new CreateZipUploadSourceDto();
+    createSourceDto.compose_path = dto.compose_path;
+    createSourceDto.environmentVars = dto.env || [];
+
+    const projectCreationData: CreateProjectDto = {
+      vm_memory: dto.ram,
+      vm_disk: dto.disk,
+      vm_cpus: dto.cpu,
+      source: createSourceDto,
+    };
+
+    try {
+      const project: PersistedProjectDto =
+        await this.projectService.createProject(projectCreationData);
+
+      if (dto.redirects && dto.redirects.length > 0) {
+        const networkConnectionDtos: CreateNetworkConnectionDto[] =
+          await this.resolveRedirectionsDomains(project, dto.redirects);
+
+        for (const netDto of networkConnectionDtos) {
+          await this.networkService.createNetworkConnection(netDto);
+        }
+      }
+
+      const finalZipPath = `../uploads/${project.id}.zip`;
+
+      fs.renameSync(file.path, finalZipPath);
+
+      const newSettings: Partial<ZipUploadSourceSettingsDto> = {
+        status: 'uploaded',
+      };
+
+      await this.sourceService.updateSourceSettings(
+        project.sourceId,
+        newSettings,
+      );
+
+      await this.sourceService.deploySource(project.sourceId, false);
+
+      const updatedProject: PersistedProjectDto =
+        await this.projectService.findProjectById(project.id);
+
+      return updatedProject;
+    } catch (error) {
+      fs.unlinkSync(file.path);
+      throw error;
+    }
+  }
+}
