@@ -1,5 +1,5 @@
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
-import { FC, useState, useCallback, useMemo, useEffect } from "react";
+import { FC, useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Controls,
@@ -28,6 +28,7 @@ import { RefreshCw } from "lucide-react";
 import ServiceDrawer from "../../ServicesDrawer/ServiceDrawer";
 import { useAppSelector } from "@/hooks/useStore";
 import { Theme } from "@/services/settingsSlice";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -42,6 +43,8 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   } = useGetServicesByProjectIdQuery(projectId ?? "");
 
   const theme = useAppSelector((state) => state.settings.theme);
+  const showCommands = useAppSelector((state) => state.settings.showCommands);
+  const { toast } = useToast();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -168,8 +171,42 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     );
   };
 
+  const lastClickedNodeIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "d" || e.code === "KeyD")) {
+        e.preventDefault();
+
+        if (isDrawerOpen) {
+          setIsDrawerOpen(false);
+          setSelectedServiceId(null);
+        } else {
+          const lastId = lastClickedNodeIdRef.current;
+
+          if (lastId) {
+            setSelectedServiceId(lastId);
+            setIsDrawerOpen(true);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "No node selected",
+              description:
+                "Click on a service node first to enable this shortcut.",
+              duration: 3000,
+            });
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isDrawerOpen, toast]);
+
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedServiceId(node.id);
+    lastClickedNodeIdRef.current = node.id;
     setIsDrawerOpen(true);
   };
 
@@ -266,9 +303,9 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               )}
               nodeColor={(n) => {
                 const status = n.data?.status as ServiceState;
-                if (status === ServiceState.Running) return "#10b981"; // emerald-500
-                if (status === ServiceState.Starting) return "#f59e0b"; // amber-500
-                return "#f43f5e"; // rose-500
+                if (status === ServiceState.Running) return "#10b981";
+                if (status === ServiceState.Starting) return "#f59e0b";
+                return "#f43f5e";
               }}
               maskColor={
                 theme === Theme.DARK
@@ -319,6 +356,39 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
                     REFRESH
                   </span>
                 </Button>
+
+                {/* Shortcut Information */}
+                {showCommands && (
+                  <div
+                    className={cn(
+                      "pt-2 mt-1 border-t flex items-center justify-between",
+                      theme === Theme.DARK
+                        ? "border-white/10"
+                        : "border-black/5"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "text-[10px] font-medium",
+                        theme === Theme.DARK
+                          ? "text-white/40"
+                          : "text-slate-400"
+                      )}
+                    >
+                      Open Last Node
+                    </span>
+                    <kbd
+                      className={cn(
+                        "pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100",
+                        theme === Theme.DARK
+                          ? "bg-white/5 border-white/10 text-white/50"
+                          : "bg-slate-100 border-slate-200 text-slate-500"
+                      )}
+                    >
+                      <span className="text-xs">⌘</span>D
+                    </kbd>
+                  </div>
+                )}
               </div>
             </Panel>
           </ReactFlow>
