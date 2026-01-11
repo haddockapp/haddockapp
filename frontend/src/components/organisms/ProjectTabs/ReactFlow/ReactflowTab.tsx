@@ -244,15 +244,15 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       )}
     >
       {/* Background Grid Pattern */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.1]"
-        style={{
-          backgroundImage: `radial-gradient(${
-            theme === Theme.DARK ? "#ffffff" : "#000000"
-          } 1px, transparent 1px)`,
-          backgroundSize: "24px 24px",
-        }}
-      />
+      {theme !== Theme.DARK && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: "radial-gradient(#000000 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+      )}
 
       {/* Ambient Glow */}
       <div
