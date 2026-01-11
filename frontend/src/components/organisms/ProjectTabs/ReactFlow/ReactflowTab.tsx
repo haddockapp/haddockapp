@@ -273,7 +273,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
             nodeTypes={nodeTypes}
             colorMode={theme === Theme.DARK ? "dark" : "light"}
             fitView
-            className="bg-transparent"
+            className="bg-card/70"
             defaultEdgeOptions={{
               type: "default", // Bezier
               animated: true,
@@ -318,9 +318,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
               position="top-left"
               className={cn(
                 "backdrop-blur-xl border py-2 px-4 rounded-xl shadow-sm m-4 flex items-center gap-4 transition-all",
-                theme === Theme.DARK
-                  ? "bg-white/10 border-white/10 hover:border-white/20 hover:bg-white/20"
-                  : "bg-white/60 border-black/5 hover:border-black/10 hover:bg-white/80"
+                "bg-card/10 border-border/80 hover:border-border hover:bg-card/20"
               )}
             >
               <div className="flex flex-col gap-2">
@@ -385,7 +383,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
                           : "bg-slate-100 border-slate-200 text-slate-500"
                       )}
                     >
-                      <span className="text-xs">⌘</span>D
+                      ⌘ + D
                     </kbd>
                   </div>
                 )}
