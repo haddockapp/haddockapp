@@ -35,7 +35,7 @@ const UsersSettings: FC = () => {
               <InviteUserForm onSuccess={onCloseInviteUserDialog} />
             )}
             Trigger={({ onOpen }) => (
-              <Button className="space-x-2" onClick={onOpen}>
+              <Button variant="shine" className="space-x-2" onClick={onOpen}>
                 <MailPlusIcon size={20} />
                 <span>Invite User</span>
               </Button>

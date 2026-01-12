@@ -1,6 +1,13 @@
 import { FC, useState } from "react";
 import { useGetVersionQuery } from "@/services/backendApi/version";
-import { AlertCircle, CheckCircle2, RefreshCw, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  RefreshCw,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +31,9 @@ const About: FC = () => {
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
             <div>
-              <p className="font-medium text-destructive">Error loading version information</p>
+              <p className="font-medium text-destructive">
+                Error loading version information
+              </p>
               <p className="text-sm text-typography/70 mt-1">
                 Failed to load version information. Please try again later.
               </p>
@@ -37,8 +46,9 @@ const About: FC = () => {
 
   return (
     <div className="flex flex-col space-y-4">
-      <p className="text-zinc-600">
-        Below you can find information about your current Haddock installation, including version details and update status.
+      <p className="text-foreground/60">
+        Below you can find information about your current Haddock installation,
+        including version details and update status.
       </p>
 
       {/* Version Information */}
@@ -55,16 +65,20 @@ const About: FC = () => {
             Refresh
           </Button>
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
             <span className="text-typography/70">Current Version:</span>
-            <span className="font-mono font-medium">{versionInfo?.currentVersion}</span>
+            <span className="font-mono font-medium">
+              {versionInfo?.currentVersion}
+            </span>
           </div>
           {versionInfo?.latestVersion && (
             <div className="flex justify-between items-center text-sm">
               <span className="text-typography/70">Latest Version:</span>
-              <span className="font-mono font-medium">{versionInfo.latestVersion}</span>
+              <span className="font-mono font-medium">
+                {versionInfo.latestVersion}
+              </span>
             </div>
           )}
         </div>
@@ -81,7 +95,8 @@ const About: FC = () => {
                   Update Available
                 </p>
                 <p className="text-sm text-orange-800 dark:text-orange-200 mt-1">
-                  A new version ({versionInfo.latestVersion}) of Haddock is available!
+                  A new version ({versionInfo.latestVersion}) of Haddock is
+                  available!
                 </p>
               </div>
 
@@ -92,12 +107,18 @@ const About: FC = () => {
                     onClick={() => setShowChangelog(!showChangelog)}
                     className="flex items-center gap-1 text-sm font-medium text-orange-900 dark:text-orange-100 hover:underline"
                   >
-                    {showChangelog ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    {showChangelog ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
                     {showChangelog ? "Hide" : "Show"} Changelog
                   </button>
                   {showChangelog && (
                     <div className="bg-black/10 dark:bg-white/10 rounded p-3 text-xs text-orange-900 dark:text-orange-100 max-h-60 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap font-sans">{versionInfo.changelog}</pre>
+                      <pre className="whitespace-pre-wrap font-sans">
+                        {versionInfo.changelog}
+                      </pre>
                     </div>
                   )}
                 </div>
@@ -110,7 +131,12 @@ const About: FC = () => {
                 </p>
                 <div className="text-xs font-mono text-orange-900 dark:text-orange-100 space-y-1">
                   <p>1. SSH into your server</p>
-                  <p>2. Run: <span className="bg-black/20 dark:bg-white/20 px-1 py-0.5 rounded">sudo haddockctl</span></p>
+                  <p>
+                    2. Run:{" "}
+                    <span className="bg-black/20 dark:bg-white/20 px-1 py-0.5 rounded">
+                      sudo haddockctl
+                    </span>
+                  </p>
                   <p>3. Select option 2 "Check for Updates"</p>
                   <p>4. Follow the prompts</p>
                 </div>
@@ -150,26 +176,37 @@ const About: FC = () => {
       {/* About Section */}
       <div className="border-t border-border pt-4 mt-4 space-y-3">
         <h3 className="text-base font-medium">About Haddock</h3>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Haddock is a modern, developer-friendly Platform-as-a-Service (PaaS) designed to
-          streamline application deployment through containerization.
+        <p className="text-sm text-foreground/60">
+          Haddock is a modern, developer-friendly Platform-as-a-Service (PaaS)
+          designed to streamline application deployment through
+          containerization.
         </p>
-        
+
         <div className="space-y-2 text-sm">
           <div className="flex items-start gap-2">
-            <span className="text-typography/70 w-24 flex-shrink-0">Project:</span>
-            <span className="text-typography">Haddock - Your All-in-One Platform Engineer</span>
+            <span className="text-typography/70 w-24 flex-shrink-0">
+              Project:
+            </span>
+            <span className="text-typography">
+              Haddock - Your All-in-One Platform Engineer
+            </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-typography/70 w-24 flex-shrink-0">License:</span>
+            <span className="text-typography/70 w-24 flex-shrink-0">
+              License:
+            </span>
             <span className="text-typography">Custom Educational License</span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-typography/70 w-24 flex-shrink-0">Contact:</span>
+            <span className="text-typography/70 w-24 flex-shrink-0">
+              Contact:
+            </span>
             <span className="text-typography">contact@haddock.ovh</span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-typography/70 w-24 flex-shrink-0">Repository:</span>
+            <span className="text-typography/70 w-24 flex-shrink-0">
+              Repository:
+            </span>
             <a
               href="https://github.com/haddockapp/haddockapp"
               target="_blank"
@@ -187,4 +224,3 @@ const About: FC = () => {
 };
 
 export default About;
-

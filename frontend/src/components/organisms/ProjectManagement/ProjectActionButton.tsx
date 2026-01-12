@@ -22,7 +22,8 @@ interface ProjectActionButtonProps {
     | "secondary"
     | "ghost"
     | "link"
-    | "dark";
+    | "dark"
+    | "shine";
   isLoading?: boolean;
   className?: string;
 }

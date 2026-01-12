@@ -107,6 +107,43 @@ export const calculateCircularPositions = (
   return positions;
 };
 
+import dagre from "dagre";
+
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+export const getLayoutedElements = (
+  nodes: any[],
+  edges: Edge[],
+  direction = "LR"
+) => {
+  dagreGraph.setGraph({ rankdir: direction });
+
+  nodes.forEach((node) => {
+    // Width/Height matches CustomNode dimensions approximately
+    dagreGraph.setNode(node.id, { width: 280, height: 100 });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  const layoutedNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    // Adjusted position to account for node center
+    node.position = {
+      x: nodeWithPosition.x - 280 / 2,
+      y: nodeWithPosition.y - 100 / 2,
+    };
+
+    return node;
+  });
+
+  return { nodes: layoutedNodes, edges };
+};
+
 export const generateServiceNodes = (
   services: ServiceDto[],
   positions: Record<string, { x: number; y: number }>

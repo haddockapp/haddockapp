@@ -1,8 +1,7 @@
 import { useGetServicesByProjectIdQuery } from "@/services/backendApi/services";
-import { FC, useState, useCallback, useMemo, useEffect } from "react";
+import { FC, useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,
-  Background,
   Controls,
   applyNodeChanges,
   Edge,
@@ -12,11 +11,15 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import type { ReactFlowStateStorage } from "@/types/services/services";
 import {
-  calculateCircularPositions,
+  ServiceState,
+  type ReactFlowStateStorage,
+} from "@/types/services/services";
+import { cn } from "@/lib/utils";
+import {
   generateServiceNodes,
   defineInitialEdges,
+  getLayoutedElements,
 } from "./utils";
 import CustomNode from "./CustomNode";
 import SwitchWithText from "@/components/molecules/text-switch";
@@ -25,6 +28,8 @@ import { RefreshCw } from "lucide-react";
 import ServiceDrawer from "../../ServicesDrawer/ServiceDrawer";
 import { useAppSelector } from "@/hooks/useStore";
 import { Theme } from "@/services/settingsSlice";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 interface ReactflowTabProps {
   projectId: string;
@@ -39,10 +44,13 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   } = useGetServicesByProjectIdQuery(projectId ?? "");
 
   const theme = useAppSelector((state) => state.settings.theme);
+  const showCommands = useAppSelector((state) => state.settings.showCommands);
+  const { toast } = useToast();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [showEdges, setShowEdges] = useState(true);
+  // @ts-expect-error not using
   const [isNodesInitialized, setIsNodesInitialized] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null
@@ -81,36 +89,46 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }, [isFetching, isActuallyRefreshing]);
 
   useEffect(() => {
-    if (services && services.length > 0) {
-      if (!isNodesInitialized) {
-        const positions = calculateCircularPositions(services, projectId);
-        const newNodes = generateServiceNodes(services, positions);
-        setNodes(newNodes);
-        setIsNodesInitialized(true);
-      } else {
-        setNodes((prevNodes) =>
-          prevNodes.map((node) => {
-            const service = services.find((s) => s.name === node.id);
-            if (!service) return node;
-            return {
-              ...node,
-              data: {
-                label: service.name,
-                status: service.status ?? undefined,
-                icon: service.icon,
-              },
-            };
-          })
-        );
-      }
-      const newEdges = defineInitialEdges(services);
-      setEdges(newEdges);
-      const initialState: ReactFlowStateStorage = JSON.parse(
-        localStorage.getItem(`${projectId}FlowState`) ?? "{}"
-      );
-      setShowEdges(initialState.showEdges ?? true);
-    }
-  }, [projectId, services, isNodesInitialized]);
+    if (!services || services.length === 0) return;
+
+    // Load saved state
+    const currentFlowState: ReactFlowStateStorage = JSON.parse(
+      localStorage.getItem(`${projectId}FlowState`) ?? "{}"
+    );
+
+    // Generate edges based on networks
+    const generatedEdges = defineInitialEdges(services);
+
+    // Generate initial nodes structure
+    let initialNodes = generateServiceNodes(services, {});
+
+    // Calculate default layout using Dagre (for ALL nodes)
+    const layouted = getLayoutedElements(
+      [...initialNodes],
+      [...generatedEdges],
+      "LR"
+    );
+    const defaultPositions: Record<string, { x: number; y: number }> = {};
+    layouted.nodes.forEach((node) => {
+      defaultPositions[node.id] = node.position;
+    });
+
+    // Load saved positions
+    const savedPositions = currentFlowState.servicesPositions || {};
+
+    // Apply positions: Prioritize Saved, fallback to Default (Dagre), fallback to 0,0
+    initialNodes = initialNodes.map((node) => ({
+      ...node,
+      position: savedPositions[node.id] ||
+        defaultPositions[node.id] || { x: 0, y: 0 },
+    }));
+
+    setNodes(initialNodes);
+    setEdges(generatedEdges);
+
+    setShowEdges(currentFlowState.showEdges ?? true);
+    setIsNodesInitialized(true);
+  }, [services, projectId]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -155,8 +173,42 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     );
   };
 
+  const lastClickedNodeIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "d" || e.code === "KeyD")) {
+        e.preventDefault();
+
+        if (isDrawerOpen) {
+          setIsDrawerOpen(false);
+          setSelectedServiceId(null);
+        } else {
+          const lastId = lastClickedNodeIdRef.current;
+
+          if (lastId) {
+            setSelectedServiceId(lastId);
+            setIsDrawerOpen(true);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "No node selected",
+              description:
+                "Click on a service node first to enable this shortcut.",
+              duration: 3000,
+            });
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isDrawerOpen, toast]);
+
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedServiceId(node.id);
+    lastClickedNodeIdRef.current = node.id;
     setIsDrawerOpen(true);
   };
 
@@ -187,9 +239,37 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   }
 
   return (
-    <div className="mt-2 h-[55vh] pt-8 relative">
+    <div
+      className={cn(
+        "mt-2 h-[55vh] pt-8 relative w-full overflow-hidden rounded-2xl border border-border shadow-xl transition-colors duration-300",
+        theme === Theme.DARK ? "bg-[#09090b]" : "bg-white"
+      )}
+    >
+      {/* Background Grid Pattern */}
+      {theme !== Theme.DARK && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: "radial-gradient(#000000 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+      )}
+
+      {/* Ambient Glow */}
+      <div
+        className={cn(
+          "absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none",
+          theme === Theme.DARK ? "bg-primary/10" : "bg-primary/5"
+        )}
+      />
+
       <div className="absolute inset-0 flex">
-        <div className="flex-grow relative">
+        <motion.div
+          className="flex-grow relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
           <ReactFlow
             nodes={nodes}
             edges={showEdges ? edges : []}
@@ -199,44 +279,124 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
             nodeTypes={nodeTypes}
             colorMode={theme === Theme.DARK ? "dark" : "light"}
             fitView
-            className="bg-background"
+            className="bg-card/70"
+            defaultEdgeOptions={{
+              type: "default", // Bezier
+              animated: true,
+              style: {
+                strokeWidth: 1.5,
+                stroke:
+                  theme === Theme.DARK
+                    ? "rgba(255,255,255,0.3)"
+                    : "rgba(0,0,0,0.15)",
+              },
+            }}
           >
-            <Background
-              color="hsl(var(--typography)/0.5)"
-              bgColor="hsl(var(--background))"
-              gap={16}
-              size={1}
+            <Controls
+              className={cn(
+                "m-4 !backdrop-blur-md !shadow-lg !rounded-lg overflow-hidden [&>button]:!bg-transparent",
+                theme === Theme.DARK
+                  ? "!bg-white/10 !border-white/10 [&>button]:!border-white/10 [&>button]:!fill-white/70 [&>button:hover]:!bg-white/10 [&>button:hover]:!fill-white"
+                  : "!bg-white/60 !border-black/5 [&>button]:!border-black/5 [&>button]:!fill-black/70 [&>button:hover]:!bg-black/5 [&>button:hover]:!fill-black"
+              )}
             />
-            <Controls className="m-2" />
-            <MiniMap className="m-2" />
+            <MiniMap
+              className={cn(
+                "m-4 !backdrop-blur-md !shadow-lg !rounded-lg overflow-hidden",
+                theme === Theme.DARK
+                  ? "!bg-white/10 !border-white/10"
+                  : "!bg-white/60 !border-black/5"
+              )}
+              nodeColor={(n) => {
+                const status = n.data?.status as ServiceState;
+                if (status === ServiceState.Running) return "#10b981";
+                if (status === ServiceState.Starting) return "#f59e0b";
+                return "#f43f5e";
+              }}
+              maskColor={
+                theme === Theme.DARK
+                  ? "rgba(0,0,0,0.6)"
+                  : "rgba(255,255,255,0.6)"
+              }
+            />
 
             <Panel
               position="top-left"
-              className="bg-card border border-border py-2 px-6 rounded-md shadow-md m-2"
+              className={cn(
+                "backdrop-blur-xl border py-2 px-4 rounded-xl shadow-sm m-4 flex items-center gap-4 transition-all",
+                "bg-card/10 border-border/80 hover:border-border hover:bg-card/20"
+              )}
             >
               <div className="flex flex-col gap-2">
-                <SwitchWithText
-                  id="showEdges"
-                  text="Show Connections"
-                  checked={showEdges}
-                  onCheckedChange={onChangeShowEdges}
-                />
+                <div
+                  className={cn(
+                    "text-sm font-medium",
+                    theme === Theme.DARK ? "text-white/90" : "text-slate-800"
+                  )}
+                >
+                  <SwitchWithText
+                    id="showEdges"
+                    text="Show Connections"
+                    checked={showEdges}
+                    onCheckedChange={onChangeShowEdges}
+                  />
+                </div>
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="flex items-center gap-2"
+                  variant="ghost"
+                  className={cn(
+                    "h-8 flex items-center gap-2 justify-start px-2 p-0 w-full",
+                    theme === Theme.DARK
+                      ? "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-black/5"
+                  )}
                   onClick={() => refetch()}
                 >
                   <RefreshCw
                     size={14}
-                    className={isActuallyRefreshing ? "animate-spin" : ""}
+                    className={cn(isActuallyRefreshing ? "animate-spin" : "")}
                   />
-                  <span>Refresh</span>
+                  <span className="text-xs tracking-wide font-semibold">
+                    REFRESH
+                  </span>
                 </Button>
+
+                {/* Shortcut Information */}
+                {showCommands && (
+                  <div
+                    className={cn(
+                      "pt-2 mt-1 border-t flex items-center justify-between",
+                      theme === Theme.DARK
+                        ? "border-white/10"
+                        : "border-black/5"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "text-[10px] font-medium",
+                        theme === Theme.DARK
+                          ? "text-white/40"
+                          : "text-slate-400"
+                      )}
+                    >
+                      Open Last Node
+                    </span>
+                    <kbd
+                      className={cn(
+                        "pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100",
+                        theme === Theme.DARK
+                          ? "bg-white/5 border-white/10 text-white/50"
+                          : "bg-slate-100 border-slate-200 text-slate-500"
+                      )}
+                    >
+                      ⌘ + D
+                    </kbd>
+                  </div>
+                )}
               </div>
             </Panel>
           </ReactFlow>
-        </div>
+        </motion.div>
 
         <ServiceDrawer
           service={selectedService}

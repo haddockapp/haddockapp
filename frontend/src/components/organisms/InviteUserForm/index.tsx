@@ -73,7 +73,7 @@ const InviteUserForm: FC<InviteUserFormProps> = ({ onSuccess }) => {
             </FormItem>
           )}
         />
-        <Button className="space-x-2" type="submit">
+        <Button variant="shine" className="space-x-2" type="submit">
           <UserPlusIcon size={20} />
           <span>Send invitation</span>
         </Button>
