@@ -21,7 +21,7 @@ export class AnalysisService {
     private readonly fileIndexService: ProjectFileIndexService,
 
     private readonly prismaService: PrismaService,
-  ) {}
+  ) { }
 
   async analyzeProject(projectId: string): Promise<SecurityFinding[]> {
     const project = await this.prismaService.project.findUnique({
@@ -43,15 +43,28 @@ export class AnalysisService {
     };
 
     const facts: SecurityFact[] = (
-      await Promise.all(this.analyzers.map((a) => a.analyze(context)))
+      await Promise.all(this.analyzers.map(async (a) => {
+        try {
+          return await a.analyze(context);
+        } catch (error) {
+          console.error('Error running analyzer', error);
+          return [];
+        }
+      }))
     ).flat();
 
     const findings: SecurityFinding[] = [];
 
     for (const fact of facts) {
       for (const rule of this.rules) {
-        if (rule.supports(fact)) {
-          findings.push(...rule.evaluate(fact));
+        try {
+          if (rule.supports(fact)) {
+            const ruleFindings = await rule.evaluate(fact);
+            findings.push(...ruleFindings);
+          }
+        }
+        catch (error) {
+          console.error('Error evaluating rule', error);
         }
       }
     }

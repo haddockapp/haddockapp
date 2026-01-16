@@ -7,3 +7,9 @@ export interface EnvVarFact extends SecurityFact {
   value: string;
   file: string;
 }
+export interface ImageFact extends SecurityFact {
+  type: 'docker-image';
+  service: string;
+  image: string;
+  file: string;
+}

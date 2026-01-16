@@ -33,7 +33,7 @@ export class StaticComposeEnvRule implements SecurityRule<EnvVarFact> {
     return fact.type === 'env-var';
   }
 
-  evaluate(fact: EnvVarFact): SecurityFinding[] {
+  async evaluate(fact: EnvVarFact): Promise<SecurityFinding[]> {
     const keyUpper = fact.key.toUpperCase();
 
     const isSecretKey = this.SECRET_KEYWORDS.some((kw) =>

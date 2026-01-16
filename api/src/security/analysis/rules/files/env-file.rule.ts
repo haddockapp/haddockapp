@@ -21,7 +21,7 @@ export class EnvFileRule implements SecurityRule<EnvFileFact> {
     return fact.type === 'env-file';
   }
 
-  evaluate(fact: EnvFileFact): SecurityFinding[] {
+  async evaluate(fact: EnvFileFact): Promise<SecurityFinding[]> {
     return [
       {
         severity: this.definition.severity,

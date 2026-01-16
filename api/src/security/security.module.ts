@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AnalysisService } from './analysis/analysis.service';
 import { SecurityController } from './security.controller';
 import { analyzerProviders } from './analysis/analyzers';
@@ -12,6 +13,7 @@ import { SecurityHelpersModule } from './helpers/helpers.module';
   controllers: [SecurityController],
   providers: [AnalysisService, ...analyzerProviders, ...ruleProviders],
   imports: [
+    CacheModule.register(),
     PrismaModule,
     SourceModule,
     ComposeModule,

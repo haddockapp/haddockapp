@@ -4,7 +4,7 @@ import { ServiceDto } from 'src/compose/model/Service';
 import { SecurityAnalyzer } from 'src/security/types/analyzer.interface';
 import { SecurityFact } from 'src/security/types/facts';
 import { SourceService } from 'src/source/source.service';
-import { EnvVarFact } from './types';
+import { EnvVarFact, ImageFact } from './types';
 import { AnalysisContext } from 'src/security/types/analysis-context';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class ComposeAnalyzer implements SecurityAnalyzer {
   constructor(
     private readonly sourceService: SourceService,
     private readonly composeService: ComposeService,
-  ) {}
+  ) { }
 
   async analyze(context: AnalysisContext): Promise<SecurityFact[]> {
     const source = await this.sourceService.findSourceById(
@@ -35,7 +35,27 @@ export class ComposeAnalyzer implements SecurityAnalyzer {
 
     const services = this.composeService.parseServices(rawCompose.toString());
 
-    return this.extractEnvVarFacts(services, composePath);
+    const envVars = this.extractEnvVarFacts(services, composePath);
+    const imageFacts = this.listImageFacts(services);
+    return [...envVars, ...imageFacts];
+  }
+
+  private listImageFacts(services: ServiceDto[]): ImageFact[] {
+    const facts: ImageFact[] = [];
+
+    for (const service of services) {
+      if (service.image) {
+        facts.push({
+          type: 'docker-image',
+          source: 'docker-compose',
+          service: service.name,
+          image: service.image,
+          file: 'docker-compose.yml',
+        });
+      }
+    }
+
+    return facts;
   }
 
   private extractEnvVarFacts(
