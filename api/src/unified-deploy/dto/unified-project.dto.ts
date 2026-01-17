@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Length,
   Min,
 } from 'class-validator';
 import { EnvironmentVar } from 'src/project/dto/environmentVar';
@@ -29,6 +30,10 @@ function TransformJson() {
 }
 
 export class UnifiedDeployDto {
+  @IsString()
+  @Length(6, 6)
+  deploy_code: string;
+
   @IsNumber()
   @AllowedValues([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192])
   ram: number;

@@ -5,10 +5,11 @@ import { ProjectModule } from 'src/project/project.module';
 import { DomainsModule } from 'src/domains/domains.module';
 import { NetworksModule } from 'src/networks/networks.module';
 import { SourceModule } from 'src/source/source.module';
+import { DeployCodeService } from './deploy-code/deploy-code.service';
 
 @Module({
   imports: [ProjectModule, DomainsModule, NetworksModule, SourceModule],
   controllers: [UnifiedDeployController],
-  providers: [UnifiedDeployService],
+  providers: [UnifiedDeployService, DeployCodeService],
 })
 export class UnifiedDeployModule {}

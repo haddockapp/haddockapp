@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -12,11 +13,23 @@ import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'node:fs';
 import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { randomUUID } from 'node:crypto';
+import { Public } from 'src/auth/auth.decorator';
+import { DeployCodeService } from './deploy-code/deploy-code.service';
 
 @Controller('unified-deploy')
 export class UnifiedDeployController {
-  constructor(private readonly unifiedDeployService: UnifiedDeployService) {}
+  constructor(
+    private readonly unifiedDeployService: UnifiedDeployService,
+    private readonly deployCodeService: DeployCodeService,
+  ) {}
 
+  @Get()
+  async getCode(): Promise<{ deploy_code: string }> {
+    const code = await this.deployCodeService.generateOrGetCode();
+    return { deploy_code: code };
+  }
+
+  @Public()
   @Post()
   @UseInterceptors(
     FileInterceptor('code', {

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RedirectDto, UnifiedDeployDto } from './dto/unified-project.dto';
 import { Project } from '@prisma/client';
 import { CreateZipUploadSourceDto } from 'src/source/dto/create-source.dto';
@@ -11,6 +15,7 @@ import { PersistedProjectDto } from 'src/project/dto/project.dto';
 import { SourceService } from 'src/source/source.service';
 import * as fs from 'node:fs';
 import { ZipUploadSourceSettingsDto } from 'src/source/dto/settings.dto';
+import { DeployCodeService } from './deploy-code/deploy-code.service';
 
 @Injectable()
 export class UnifiedDeployService {
@@ -19,6 +24,7 @@ export class UnifiedDeployService {
     private readonly domainService: DomainsService,
     private readonly networkService: NetworksService,
     private readonly sourceService: SourceService,
+    private readonly deployCodeService: DeployCodeService,
   ) {}
 
   private async resolveRedirectionsDomains(
@@ -65,6 +71,22 @@ export class UnifiedDeployService {
     file: Express.Multer.File,
     dto: UnifiedDeployDto,
   ): Promise<Project> {
+    try {
+      await this.deployCodeService.validateAndRevoke(dto.deploy_code);
+    } catch (error) {
+      if (file) {
+        fs.unlinkSync(file.path);
+      }
+
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      } else {
+        throw new UnauthorizedException(
+          'Invalid, expired, or already used deploy code',
+        );
+      }
+    }
+
     if (!file) {
       throw new BadRequestException('ZIP file is required');
     }
