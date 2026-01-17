@@ -24,7 +24,7 @@ export class LlmService {
 
     async buildApiUrl(): Promise<string> {
         const mainDomain = await this.domainRepository.getMainDomain();
-        return `${mainDomain.https ? 'https' : 'http'}://api.${mainDomain.domain}/unified-deploy`;
+        return `${mainDomain.https ? 'https' : 'http'}://api.${mainDomain.domain}`;
     }
 
     async buildLlmsTxt(): Promise<string> {

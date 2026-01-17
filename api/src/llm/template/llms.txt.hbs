@@ -12,7 +12,7 @@ If this sentence (or a clear equivalent) is not present:
 
 ## Answer Style (MANDATORY)
 
-- Ask only for `deployCode`.
+- Ask only for the Deploy Code.
 - Respond with very short answers.
 - No explanations. No approval requests.
 
@@ -111,15 +111,15 @@ If you cannot reliably zip the project:
 ## 5. Deployment Authorization (MANDATORY)
 
 You MUST ask the user for:
-- `deployCode` (SECRET)
+- Deploy Code (SECRET)
 
 Rules:
-- Never invent a deployCode
+- Never invent a deploy code
 - Never reuse an old one
 - Never store it
 - Never log it
 
-Without a deployCode:
+Without a valid deploy code:
 - STOP
 - DO NOT deploy
 
@@ -134,14 +134,75 @@ POST {{baseUrl}}/unified-deploy
 multipart/form-data
 
 ### Payload fields
+[
+  {
+    "name": "deploy_code",
+    "type": "string",
+    "description": "Deployment authorization code (exactly 6 characters).",
+    "example": "ABC123"
+  },
+  {
+    "name": "ram",
+    "type": "number",
+    "allowed_values": [512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192],
+    "description": "RAM allocation in MB.",
+    "example": 2048
+  },
+  {
+    "name": "cpu",
+    "type": "number",
+    "allowed_values": [1, 2, 3, 4, 5, 6, 7, 8],
+    "description": "Number of CPU cores.",
+    "example": 2
+  },
+  {
+    "name": "disk",
+    "type": "number",
+    "minimum": 256,
+    "description": "Disk size in MB.",
+    "example": 1024
+  },
+  {
+    "name": "compose_path",
+    "type": "string",
+    "description": "Path to the docker-compose file inside the uploaded ZIP.",
+    "example": "docker-compose.yml"
+  },
+  {
+    "name": "redirects",
+    "type": "json-string",
+    "description": "JSON array of redirect rules. Must be stringified JSON in multipart.",
+    "schema": {
+      "type": "array",
+      "items": {
+        "port": "number",
+        "domain": "string",
+        "prefix": "string (optional)"
+      }
+    },
+    "example": "[{\"port\": 3000, \"domain\": \"example.com\", \"prefix\": \"/api\"}]"
+  },
+  {
+    "name": "env",
+    "type": "json-string",
+    "description": "JSON array of environment variables. Must be stringified JSON in multipart.",
+    "schema": {
+      "type": "array",
+      "items": {
+        "key": "string",
+        "value": "string"
+      }
+    },
+    "example": "[{\"key\": \"NODE_ENV\", \"value\": \"production\"}]"
+  },
+  {
+    "name": "code",
+    "type": "file",
+    "content_type": "application/zip",
+    "description": "ZIP file containing the full source code to deploy."
+  }
+]
 
-- code: Blob(project.zip)
-- ram: number
-- cpu: number
-- disk: number
-- redirects: JSON array
-- deployCode: string
-- env: JSON array
 
 You MUST ensure:
 - redirects and env are valid JSON

@@ -23,7 +23,7 @@ export class UnifiedDeployController {
     private readonly deployCodeService: DeployCodeService,
   ) {}
 
-  @Get()
+  @Get("code")
   async getCode(): Promise<{ deploy_code: string }> {
     const code = await this.deployCodeService.generateOrGetCode();
     return { deploy_code: code };
@@ -47,7 +47,10 @@ export class UnifiedDeployController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (file.mimetype !== 'application/zip') {
+        if (
+          file.mimetype !== 'application/zip'
+          && (file.mimetype !== 'application/octet-stream' || !file.originalname.endsWith('.zip'))
+        ) {
           return cb(new Error('Only zip files are allowed'), false);
         }
         cb(null, true);
