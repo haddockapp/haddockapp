@@ -14,7 +14,6 @@ import { AutologinsService } from '../autologins/autologins.service';
 
 @Injectable()
 export class DomainsService {
-
   constructor(
     private readonly domainRepository: DomainRepository,
     private readonly bindingService: BindingService,
@@ -23,11 +22,12 @@ export class DomainsService {
     private readonly caddyService: CaddyService,
     private readonly configurationService: ConfigurationService,
     private readonly autologinService: AutologinsService,
-  ) { }
+  ) {}
 
   private generateDomainChallenge() {
     return Array.from({ length: 32 }, () => {
-      const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       return characters.charAt(Math.floor(Math.random() * characters.length));
     }).join('');
   }
@@ -57,14 +57,17 @@ export class DomainsService {
     }
 
     const challenge = this.generateDomainChallenge();
-    const domain = await this.domainRepository.createDomain(createDomainDto, challenge);
+    const domain = await this.domainRepository.createDomain(
+      createDomainDto,
+      challenge,
+    );
 
     return this.domainToResponse(domain);
   }
 
   async findAll() {
     const domains = await this.domainRepository.findAllDomains();
-    return domains.map(d => this.domainToResponse(d));
+    return domains.map((d) => this.domainToResponse(d));
   }
 
   async findOne(id: string) {
@@ -76,7 +79,6 @@ export class DomainsService {
     await this.domainRepository.linkDomain(domain.id, canBeLinked);
   }
 
-
   async getDomainStatus(id: string): Promise<DomainStatusDto> {
     const domain = await this.domainRepository.findDomainById(id);
 
@@ -84,7 +86,8 @@ export class DomainsService {
     const wildcardStatus = await this.dnsService.getWildcardStatus(domain);
     const challengeStatus = await this.dnsService.getChallengeStatus(domain);
 
-    const canBeLinked = primaryStatus && challengeStatus && (!domain.main || wildcardStatus);
+    const canBeLinked =
+      primaryStatus && challengeStatus && (!domain.main || wildcardStatus);
 
     await this.linkDomain(domain, canBeLinked);
 
@@ -97,8 +100,8 @@ export class DomainsService {
       wildcardStatus,
       challengeStatus,
 
-      canBeLinked
-    }
+      canBeLinked,
+    };
   }
 
   async remove(id: string) {
@@ -121,7 +124,9 @@ export class DomainsService {
     const status = await this.getDomainStatus(mainDomain.id);
 
     if (!status.canBeLinked) {
-      throw new ForbiddenException('Cannot apply with the current domain status');
+      throw new ForbiddenException(
+        'Cannot apply with the current domain status',
+      );
     }
 
     const dest = `${process.env.CADDY_ROOT_DIR}/${process.env.CADDY_APP_FILE}`;
@@ -132,12 +137,12 @@ export class DomainsService {
           {
             hostname: `${caddyPrefix}api.${mainDomain.domain}`,
             ip: '127.0.0.1',
-            port: +process.env.PORT
+            port: +process.env.PORT,
           },
           {
             hostname: `${caddyPrefix}ws.${mainDomain.domain}`,
             ip: '127.0.0.1',
-            port: +process.env.WS_PORT
+            port: +process.env.WS_PORT,
           },
         ],
         frontend: {
@@ -151,9 +156,14 @@ export class DomainsService {
       dest,
     });
 
-
-    await this.frontendService.setFrontendConfigValue('backendUrl', `${protocol}://api.${mainDomain.domain}`);
-    await this.frontendService.setFrontendConfigValue('socketUrl', `${protocol}://ws.${mainDomain.domain}`);
+    await this.frontendService.setFrontendConfigValue(
+      'backendUrl',
+      `${protocol}://api.${mainDomain.domain}`,
+    );
+    await this.frontendService.setFrontendConfigValue(
+      'socketUrl',
+      `${protocol}://ws.${mainDomain.domain}`,
+    );
     await this.configurationService.modifyConfiguration(CONFIGURED_KEY, true);
     const autologinToken = await this.autologinService.generateToken(userId);
 
@@ -162,7 +172,11 @@ export class DomainsService {
       frontendUrl: `${protocol}://${mainDomain.domain}`,
       backendUrl: `${protocol}://api.${mainDomain.domain}`,
       socketUrl: `${protocol}://ws.${mainDomain.domain}`,
-      autologin: autologinToken
-    }
+      autologin: autologinToken,
+    };
+  }
+
+  async findDomainByName(domainName: string): Promise<Domain | null> {
+    return this.domainRepository.findDomainByName(domainName);
   }
 }

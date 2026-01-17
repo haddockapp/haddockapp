@@ -88,9 +88,9 @@ export class CreateProjectDto {
 
   @IsUUID()
   @IsOptional()
-  authorization_id: string | null;
+  authorization_id?: string | null;
 
   @IsUUID()
   @IsOptional()
-  workspace_id: string | null;
+  workspace_id?: string | null;
 }

@@ -11,16 +11,15 @@ import { ConfigurationModule } from 'src/configuration/configuration.module';
 import { AutologinsModule } from '../autologins/autologins.module';
 
 @Module({
-  imports: [PrismaModule, FrontendModule, CaddyModule, ConfigurationModule, AutologinsModule],
+  imports: [
+    PrismaModule,
+    FrontendModule,
+    CaddyModule,
+    ConfigurationModule,
+    AutologinsModule,
+  ],
   controllers: [DomainsController],
-  providers: [
-    DomainsService,
-    BindingService,
-    DnsService,
-    DomainRepository
-  ],
-  exports: [
-    DomainRepository
-  ],
+  providers: [DomainsService, BindingService, DnsService, DomainRepository],
+  exports: [DomainRepository, DomainsService],
 })
 export class DomainsModule {}

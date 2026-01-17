@@ -28,6 +28,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { CreatedSource } from 'src/source/dto/source.dto';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { PersistedProjectDto } from './dto/project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -44,29 +45,56 @@ export class ProjectService {
     @InjectQueue('deploys') private readonly deployQueue: Queue,
   ) {}
 
+  private envVarMerger(
+    existingVars: EnvironmentVar[],
+    newVars: EnvironmentVar[],
+  ): EnvironmentVar[] {
+    const map = new Map<string, EnvironmentVar>();
+
+    for (const env of existingVars) {
+      map.set(env.key, env);
+    }
+
+    for (const env of newVars) {
+      map.set(env.key, env);
+    }
+
+    return Array.from(map.values());
+  }
+
   async createProject(data: CreateProjectDto): Promise<Project> {
     const source: CreatedSource = await this.sourceService.registerSource(
       data.source,
     );
-
     const project = await this.projectRepository.createProject(data, source.id);
 
+    const environmentVars: EnvironmentVar[] = data.source.environmentVars;
+
     if (source.environmentVars) {
-      await this.projectRepository.updateEnvironmentVars(
-        project.id,
+      const mergedEnvVars = this.envVarMerger(
+        environmentVars,
         source.environmentVars,
       );
-      const updatedProject = await this.projectRepository.findProjectById(
+
+      await this.projectRepository.updateEnvironmentVars(
         project.id,
+        mergedEnvVars,
       );
-      if (updatedProject) {
-        return updatedProject;
-      } else {
-        throw new NotFoundException('Project not found after creation.');
-      }
+    } else {
+      await this.projectRepository.updateEnvironmentVars(
+        project.id,
+        environmentVars,
+      );
     }
 
-    return project;
+    const updatedProject: PersistedProjectDto =
+      await this.projectRepository.findProjectById(project.id);
+
+    if (updatedProject) {
+      return updatedProject;
+    } else {
+      throw new NotFoundException('Project not found after creation.');
+    }
   }
 
   async updateProject(
@@ -135,6 +163,12 @@ export class ProjectService {
     await execCommand(`rm -rf ${project.path}`);
 
     this.logger.log(`Project ${projectId} deleted`);
+  }
+
+  async findProjectById(
+    projectId: string,
+  ): Promise<PersistedProjectDto | null> {
+    return this.projectRepository.findProjectById(projectId);
   }
 
   async stopProject(projectId: string) {
