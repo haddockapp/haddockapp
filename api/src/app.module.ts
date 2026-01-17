@@ -23,6 +23,7 @@ import { WorkspacesModule } from 'src/workspaces/workspaces.module';
 import { TemplatesModule } from './templates/templates.module';
 import { SecurityModule } from './security/security.module';
 import { UnifiedDeployModule } from './unified-deploy/unified-deploy.module';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { UnifiedDeployModule } from './unified-deploy/unified-deploy.module';
     TemplatesModule,
     SecurityModule,
     UnifiedDeployModule,
+    LlmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
