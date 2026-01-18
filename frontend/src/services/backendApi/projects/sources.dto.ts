@@ -2,6 +2,14 @@ export enum SourceType {
   GITHUB = "github",
   ZIP_UPLOAD = "zip_upload",
   TEMPLATE = "template",
+  AI = "ai",
+}
+
+export enum AITools {
+  VSCODE = "vscode",
+  CURSOR = "cursor",
+  ZED = "zed",
+  WINDSURF = "windsurf",
 }
 
 export type CreateSourceDto =

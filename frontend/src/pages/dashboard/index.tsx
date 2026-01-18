@@ -62,7 +62,7 @@ const Projects: FC = () => {
         </div>
         <SimpleDialog
           {...disclosureMethods}
-          size="xl"
+          size="2xl"
           title="Create a project"
           Content={CreateProjectForm}
           Trigger={CreateProjectTrigger}

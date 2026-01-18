@@ -209,6 +209,11 @@ const projectsApi = backendApi.injectEndpoints({
         invalidatesTags: [QueryKeys.Projects],
       }
     ),
+    getDeploymentCode: builder.query<{ deploy_code: string }, void>({
+      query: () => ({
+        url: "/unified-deploy/code",
+      }),
+    }),
   }),
 });
 
@@ -227,4 +232,5 @@ export const {
   usePullProjectMutation,
   useRecreateProjectMutation,
   useUploadProjectZipMutation,
+  useGetDeploymentCodeQuery,
 } = projectsApi;

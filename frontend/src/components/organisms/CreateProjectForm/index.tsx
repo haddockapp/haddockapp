@@ -7,9 +7,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import { SourceType } from "@/services/backendApi/projects/sources.dto";
+import {
+  AITools,
+  SourceType,
+} from "@/services/backendApi/projects/sources.dto";
 import { Card } from "@/components/ui/card";
-import { FolderArchive, Presentation } from "lucide-react";
+import { FolderArchive, Presentation, SparklesIcon } from "lucide-react";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
@@ -17,6 +20,9 @@ import GithubSourceForm from "./GithubSourceForm";
 import DataAllocationForm from "./DataAllocationForm";
 import ZipSourceForm from "./ZipSourceForm";
 import TemplateSourceForm from "./TemplateSourceForm";
+import { useAppDispatch } from "@/hooks/useStore";
+import { backendApi, QueryKeys } from "@/services/backendApi";
+import AISourceForm from "./AISourceForm";
 
 const MotionWrapper: FC<{ children: React.ReactNode; key: string }> = ({
   key,
@@ -34,7 +40,7 @@ const MotionWrapper: FC<{ children: React.ReactNode; key: string }> = ({
 
 type SourceTypeCardProps = {
   icon: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
   value: SourceType;
   onChangeValue: (value: SourceType) => void;
   isActive: boolean;
@@ -90,6 +96,10 @@ const formSchema = z.discriminatedUnion("source", [
     disk: z.number().int().min(256).max(2048),
     vcpus: z.number().int().min(1).max(8),
   }),
+  z.object({
+    source: z.literal(SourceType.AI),
+    tool: z.nativeEnum(AITools),
+  }),
 ]);
 
 interface CreateProjectFormProps {
@@ -97,6 +107,7 @@ interface CreateProjectFormProps {
 }
 const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -120,55 +131,64 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
         setFormStep(1);
         break;
       case 1:
-        setFormStep(2);
+        if (data.source === SourceType.AI) {
+          onClose?.();
+          dispatch(backendApi.util.invalidateTags([QueryKeys.Projects]));
+          setFormStep(0);
+        } else setFormStep(2);
         break;
       case 2:
-        createProject({
-          vm_cpus: +data.vcpus,
-          vm_memory: +data.memory,
-          vm_disk: +data.disk,
-          source:
-            data.source === SourceType.ZIP_UPLOAD
-              ? {
-                  type: SourceType.ZIP_UPLOAD,
-                  compose_path: data.composePath,
-                }
-              : data.source === SourceType.TEMPLATE
-              ? {
-                  type: SourceType.TEMPLATE,
-                  templateId: data.templateId!.value,
-                  versionId: data.templateVersionId!.value,
-                  variables: data.variables!,
-                }
-              : {
-                  type: SourceType.GITHUB,
-                  authorization_id: data.authorization
-                    ? data.authorization?.value.length > 0
-                      ? data.authorization?.value
-                      : undefined
-                    : undefined,
-                  branch: data.branch!.value,
-                  organization: data.repository!.value.split("/")[0],
-                  repository: data.repository!.value.split("/")[1],
-                  compose_path: data.composePath,
-                },
-        })
-          .unwrap()
-          .then((res) => {
-            toast({ title: "Project created !", duration: 1000 });
-            reset();
-            onClose?.();
-            navigate(`/project/${res.id}`);
-            setFormStep(0);
+        if (data.source === SourceType.AI) {
+          onClose?.();
+          dispatch(backendApi.util.invalidateTags([QueryKeys.Projects]));
+          setFormStep(0);
+        } else
+          createProject({
+            vm_cpus: +data.vcpus,
+            vm_memory: +data.memory,
+            vm_disk: +data.disk,
+            source:
+              data.source === SourceType.ZIP_UPLOAD
+                ? {
+                    type: SourceType.ZIP_UPLOAD,
+                    compose_path: data.composePath,
+                  }
+                : data.source === SourceType.TEMPLATE
+                  ? {
+                      type: SourceType.TEMPLATE,
+                      templateId: data.templateId!.value,
+                      versionId: data.templateVersionId!.value,
+                      variables: data.variables!,
+                    }
+                  : {
+                      type: SourceType.GITHUB,
+                      authorization_id: data.authorization
+                        ? data.authorization?.value.length > 0
+                          ? data.authorization?.value
+                          : undefined
+                        : undefined,
+                      branch: data.branch!.value,
+                      organization: data.repository!.value.split("/")[0],
+                      repository: data.repository!.value.split("/")[1],
+                      compose_path: data.composePath,
+                    },
           })
-          .catch(() => {
-            toast({
-              title: "An error occurred.",
-              description: "Unable to create project",
-              duration: 1500,
-              variant: "destructive",
+            .unwrap()
+            .then((res) => {
+              toast({ title: "Project created !", duration: 1000 });
+              reset();
+              onClose?.();
+              navigate(`/project/${res.id}`);
+              setFormStep(0);
+            })
+            .catch(() => {
+              toast({
+                title: "An error occurred.",
+                description: "Unable to create project",
+                duration: 1500,
+                variant: "destructive",
+              });
             });
-          });
         break;
     }
   };
@@ -220,6 +240,18 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                         }}
                         isActive={field.value === SourceType.TEMPLATE}
                       />
+                      <SourceTypeCard
+                        icon={
+                          <SparklesIcon className="shrink-0 text-orange-200 fill-orange-100" />
+                        }
+                        label={<span>Deploy with AI</span>}
+                        value={SourceType.AI}
+                        onChangeValue={() => {
+                          field.onChange(SourceType.AI);
+                          setFormStep(1);
+                        }}
+                        isActive={field.value === SourceType.AI}
+                      />
                     </div>
                   )}
                 />
@@ -233,6 +265,7 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               {watchSourceType === SourceType.TEMPLATE && (
                 <TemplateSourceForm />
               )}
+              {watchSourceType === SourceType.AI && <AISourceForm />}
             </MotionWrapper>
           )}
           {formStep === 2 && (
@@ -246,7 +279,11 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               type="submit"
               className="self-end w-full max-w-24"
             >
-              {formStep !== 2 ? "Next" : "Create"}
+              {watchSourceType === SourceType.AI
+                ? "Done"
+                : formStep !== 2
+                  ? "Next"
+                  : "Create"}
             </Button>
           )}
         </FormProvider>
