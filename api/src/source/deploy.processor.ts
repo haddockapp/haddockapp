@@ -326,6 +326,13 @@ export class DeployConsumer {
         await this.vmService.upVm(source.project.vmId);
       }
 
+      await this.projectRepository.updateProject({
+        where: { id: source.project.id },
+        data: {
+          lastDeployedAt: new Date(),
+        },
+      });
+
       this.logger.log(`Deployed project ${source.project.id}`);
     } catch (e) {
       const logs: string[] = [];
