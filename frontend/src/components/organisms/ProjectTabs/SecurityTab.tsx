@@ -143,6 +143,9 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
   const { data, isLoading, refetch } = useGetFindingsQuery(projectId);
   const [analyze, { isLoading: isAnalyzing }] = useAnalyzeProjectMutation();
   const { toast } = useToast();
+  const [filter, setFilter] = useState<"ALL" | "CRITICAL" | "HIGH" | "OTHER">(
+    "ALL",
+  );
 
   const handleAnalyze = async () => {
     try {
@@ -170,6 +173,17 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
   ).length;
   const otherCount = findings.length - criticalCount - highCount;
 
+  const filteredFindings = findings.filter((f) => {
+    if (filter === "ALL") return true;
+    if (filter === "CRITICAL") return f.severity === SeverityLevel.CRITICAL;
+    if (filter === "HIGH") return f.severity === SeverityLevel.HIGH;
+    if (filter === "OTHER")
+      return (
+        f.severity === SeverityLevel.MEDIUM || f.severity === SeverityLevel.LOW
+      );
+    return true;
+  });
+
   if (isLoading) {
     return (
       <div className="flex h-[400px] items-center justify-center">
@@ -181,7 +195,16 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
   return (
     <div className="space-y-6 p-4 animate-in fade-in duration-500">
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="relative overflow-hidden border-l-4 border-l-red-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-red-500/5">
+        <Card
+          className={cn(
+            "relative overflow-hidden border-l-4 border-l-red-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-red-500/5 cursor-pointer",
+            filter === "CRITICAL" && "bg-red-500/10 shadow-md scale-[1.02]",
+            filter !== "ALL" &&
+              filter !== "CRITICAL" &&
+              "opacity-50 grayscale scale-[0.98]",
+          )}
+          onClick={() => setFilter(filter === "CRITICAL" ? "ALL" : "CRITICAL")}
+        >
           <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
             <ShieldAlert className="h-full w-full text-red-600" />
           </div>
@@ -204,7 +227,16 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
             </div>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden border-l-4 border-l-orange-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-orange-500/5">
+        <Card
+          className={cn(
+            "relative overflow-hidden border-l-4 border-l-orange-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-orange-500/5 cursor-pointer",
+            filter === "HIGH" && "bg-orange-500/10 shadow-md scale-[1.02]",
+            filter !== "ALL" &&
+              filter !== "HIGH" &&
+              "opacity-50 grayscale scale-[0.98]",
+          )}
+          onClick={() => setFilter(filter === "HIGH" ? "ALL" : "HIGH")}
+        >
           <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
             <AlertTriangle className="h-full w-full text-orange-600" />
           </div>
@@ -227,7 +259,16 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
             </div>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-blue-500/5">
+        <Card
+          className={cn(
+            "relative overflow-hidden border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-blue-500/5 cursor-pointer",
+            filter === "OTHER" && "bg-blue-500/10 shadow-md scale-[1.02]",
+            filter !== "ALL" &&
+              filter !== "OTHER" &&
+              "opacity-50 grayscale scale-[0.98]",
+          )}
+          onClick={() => setFilter(filter === "OTHER" ? "ALL" : "OTHER")}
+        >
           <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
             <Info className="h-full w-full text-blue-600" />
           </div>
@@ -261,19 +302,31 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
               misconfigurations.
             </CardDescription>
           </div>
-          <Button
-            onClick={handleAnalyze}
-            disabled={isAnalyzing}
-            size="sm"
-            className="gap-2"
-          >
-            {isAnalyzing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCcw className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            {filter !== "ALL" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFilter("ALL")}
+                className="h-8 px-2 lg:px-3"
+              >
+                Reset Filter
+              </Button>
             )}
-            {isAnalyzing ? "Analyzing..." : "Run Analysis"}
-          </Button>
+            <Button
+              onClick={handleAnalyze}
+              disabled={isAnalyzing}
+              size="sm"
+              className="gap-2"
+            >
+              {isAnalyzing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="h-4 w-4" />
+              )}
+              {isAnalyzing ? "Analyzing..." : "Run Analysis"}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="px-0">
           {findings.length === 0 ? (
@@ -285,10 +338,18 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
                 an analysis if you haven't already.
               </p>
             </div>
+          ) : filteredFindings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg border-dashed bg-muted/10">
+              <ShieldCheck className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="font-semibold text-lg">No Issues Match Filter</h3>
+              <p className="text-muted-foreground text-sm max-w-sm mt-2">
+                There are no issues for the selected severity level.
+              </p>
+            </div>
           ) : (
             <ScrollArea className="h-[600px] pr-4">
               <div className="space-y-4">
-                {findings.map((finding, index) => (
+                {filteredFindings.map((finding, index) => (
                   <SecurityFindingItem key={index} finding={finding} />
                 ))}
               </div>
