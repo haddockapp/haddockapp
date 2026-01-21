@@ -34,7 +34,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { FC, useState } from "react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -142,19 +142,23 @@ const SecurityFindingItem: FC<{ finding: SecurityFinding }> = ({ finding }) => {
 const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
   const { data, isLoading, refetch } = useGetFindingsQuery(projectId);
   const [analyze, { isLoading: isAnalyzing }] = useAnalyzeProjectMutation();
+  const { toast } = useToast();
 
-  const handleAnalyze = () => {
-    toast.promise(
-      async () => {
-        await analyze(projectId).unwrap();
-        await refetch();
-      },
-      {
-        loading: "Running security analysis...",
-        success: "Security analysis completed successfully",
-        error: "Failed to run security analysis",
-      },
-    );
+  const handleAnalyze = async () => {
+    try {
+      await analyze(projectId).unwrap();
+      await refetch();
+      toast({
+        title: "Success",
+        description: "Security analysis completed successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to run security analysis",
+      });
+    }
   };
 
   const findings = data?.findings ?? [];
@@ -177,35 +181,74 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
   return (
     <div className="space-y-6 p-4 animate-in fade-in duration-500">
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-gradient-to-br from-red-500/10 to-transparent border-red-500/20">
+        <Card className="relative overflow-hidden border-l-4 border-l-red-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-red-500/5">
+          <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
+            <ShieldAlert className="h-full w-full text-red-600" />
+          </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold text-red-600">
-              {criticalCount}
-            </CardTitle>
-            <CardDescription className="text-red-700/80 font-medium">
-              Critical Issues
-            </CardDescription>
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-red-600" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Critical Issues
+              </CardTitle>
+            </div>
           </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-red-600">
+                {criticalCount}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Requires immediate attention
+              </p>
+            </div>
+          </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-orange-500/10 to-transparent border-orange-500/20">
+        <Card className="relative overflow-hidden border-l-4 border-l-orange-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-orange-500/5">
+          <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
+            <AlertTriangle className="h-full w-full text-orange-600" />
+          </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold text-orange-600">
-              {highCount}
-            </CardTitle>
-            <CardDescription className="text-orange-700/80 font-medium">
-              High Severity Issues
-            </CardDescription>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                High Severity Issues
+              </CardTitle>
+            </div>
           </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-orange-600">
+                {highCount}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Should be fixed soon
+              </p>
+            </div>
+          </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+        <Card className="relative overflow-hidden border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-card to-blue-500/5">
+          <div className="absolute right-0 top-0 h-24 w-24 -translate-y-6 translate-x-6 opacity-[0.03]">
+            <Info className="h-full w-full text-blue-600" />
+          </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold text-blue-600">
-              {otherCount}
-            </CardTitle>
-            <CardDescription className="text-blue-700/80 font-medium">
-              Medium & Low Issues
-            </CardDescription>
+            <div className="flex items-center gap-2">
+              <Info className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Medium & Low Issues
+              </CardTitle>
+            </div>
           </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-blue-600">
+                {otherCount}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Monitor and fix when possible
+              </p>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
