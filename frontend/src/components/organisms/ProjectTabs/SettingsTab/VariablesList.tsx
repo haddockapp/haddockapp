@@ -148,7 +148,7 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
 
   const updateEditedVariable = (
     key: string,
-    updates: Partial<EnvironmentVariableDto>
+    updates: Partial<EnvironmentVariableDto>,
   ) => {
     setEditedVariables((prev) => ({
       ...prev,
@@ -161,11 +161,6 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
 
   return (
     <div className="flex-col space-y-4">
-      <p className="text-sm text-typography/60">
-        Environment variables are used to configure the behavior of your
-        application.
-      </p>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Table>
