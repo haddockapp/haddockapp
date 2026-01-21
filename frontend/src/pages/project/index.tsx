@@ -1,3 +1,4 @@
+import SecurityTab from "@/components/organisms/ProjectTabs/SecurityTab";
 import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
 import ReactflowTab from "@/components/organisms/ProjectTabs/ReactFlow/ReactflowTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
@@ -19,7 +20,7 @@ const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
   const [selectedTab, setSelectedTab] = useState<ProjectTabsValue>(
-    ProjectTabsValue.Topology
+    ProjectTabsValue.Topology,
   );
 
   const { data: projects, isLoading } = useGetProjectsQuery();
@@ -103,6 +104,21 @@ const ProjectDetails: FC = () => {
               </span>
             </TabsTrigger>
             <TabsTrigger
+              value={ProjectTabsValue.Security}
+              onClick={() => setSelectedTab(ProjectTabsValue.Security)}
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <span
+                className={
+                  selectedTab === ProjectTabsValue.Security
+                    ? "text-primary"
+                    : ""
+                }
+              >
+                Security
+              </span>
+            </TabsTrigger>
+            <TabsTrigger
               value={ProjectTabsValue.Settings}
               onClick={() => setSelectedTab(ProjectTabsValue.Settings)}
               className="shadow-sm hover:shadow-md transition-shadow"
@@ -126,6 +142,9 @@ const ProjectDetails: FC = () => {
         </TabsContent>
         <TabsContent value="monitoring">
           <MonitoringTab projectId={projectId ?? ""} />
+        </TabsContent>
+        <TabsContent value="security">
+          <SecurityTab projectId={projectId ?? ""} />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsTab />
