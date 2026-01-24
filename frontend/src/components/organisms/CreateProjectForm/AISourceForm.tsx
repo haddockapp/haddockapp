@@ -172,6 +172,11 @@ function AISourceForm() {
                 </span>
               )}
             </div>
+            {watchTool && (
+              <Button type="submit" className="w-fit self-center mt-8">
+                Done
+              </Button>
+            )}
           </div>
         )}
       </div>
