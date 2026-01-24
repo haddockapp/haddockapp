@@ -273,17 +273,13 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
               <DataAllocationForm />
             </MotionWrapper>
           )}
-          {formStep > 0 && (
+          {watchSourceType !== SourceType.AI && formStep > 0 && (
             <Button
               disabled={isLoading}
               type="submit"
               className="self-end w-full max-w-24"
             >
-              {watchSourceType === SourceType.AI
-                ? "Done"
-                : formStep !== 2
-                  ? "Next"
-                  : "Create"}
+              {formStep !== 2 ? "Next" : "Create"}
             </Button>
           )}
         </FormProvider>
