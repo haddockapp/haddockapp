@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { type FC, useMemo, useState } from "react";
 import { VmState } from "@/types/vm/vm";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import ProjectActionButton from "./ProjectActionButton";
@@ -173,12 +173,14 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   const { buildLogs, isAlert } = useMetrics();
   const { data: securityData } = useGetFindingsQuery(project.id);
 
-  const securityFindings = securityData?.findings ?? [];
-  const criticalIssuesCount = securityFindings.filter(
-    (f) =>
-      f.severity === SeverityLevel.CRITICAL ||
-      f.severity === SeverityLevel.HIGH,
-  ).length;
+  const criticalIssuesCount = useMemo(() => {
+    const findings = securityData?.findings ?? [];
+    return findings.filter(
+      (f) =>
+        f.severity === SeverityLevel.CRITICAL ||
+        f.severity === SeverityLevel.HIGH,
+    ).length;
+  }, [securityData]);
 
   return (
     <>
