@@ -1,11 +1,5 @@
 import Select from "@/components/molecules/select";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
   FormField,
   FormItem,
   FormControl,
@@ -14,9 +8,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useGetTemplatesQuery } from "@/services/backendApi/templates";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { twMerge } from "tailwind-merge";
 
 function TemplateSourceForm() {
   const { data = [], isFetching } = useGetTemplatesQuery();
@@ -27,14 +20,14 @@ function TemplateSourceForm() {
 
   const selectedTemplate = useMemo(
     () => data.find((template) => template.id === watchTemplateId),
-    [data, watchTemplateId]
+    [data, watchTemplateId],
   );
   const selectedVersion = useMemo(
     () =>
       selectedTemplate?.versions.find(
-        (version) => version.id === watchVersionId
+        (version) => version.id === watchVersionId,
       ),
-    [selectedTemplate, watchVersionId]
+    [selectedTemplate, watchVersionId],
   );
 
   const templateOptions = useMemo(
@@ -43,7 +36,7 @@ function TemplateSourceForm() {
         label: template.name,
         value: template.id,
       })) ?? [],
-    [data]
+    [data],
   );
   const versionOptions = useMemo(
     () =>
@@ -51,85 +44,101 @@ function TemplateSourceForm() {
         label: version.label,
         value: version.id,
       })) ?? [],
-    [selectedTemplate]
+    [selectedTemplate],
   );
 
   const canSelectVersions = Boolean(watchTemplateId);
   const variableList = useMemo(
     () => selectedVersion?.variables ?? [],
-    [selectedVersion]
+    [selectedVersion],
   );
 
+  // Track previous template ID to detect changes
+  const prevTemplateIdRef = useRef<string | undefined>(watchTemplateId);
+
   useEffect(() => {
-    if (versionOptions.map((o) => o.value).includes(watchVersionId)) return;
-    setValue("templateVersionId", null);
-  }, [versionOptions, watchVersionId, control, setValue]);
+    // If template changed, reset version and variables
+    if (prevTemplateIdRef.current !== watchTemplateId) {
+      setValue("templateVersionId", null);
+      setValue("variables", {});
+      prevTemplateIdRef.current = watchTemplateId;
+      return;
+    }
+
+    // If version is no longer valid for the current template, reset it
+    if (
+      watchVersionId &&
+      !versionOptions.map((o) => o.value).includes(watchVersionId)
+    ) {
+      setValue("templateVersionId", null);
+      setValue("variables", {});
+    }
+  }, [watchTemplateId, versionOptions, watchVersionId, setValue]);
 
   return (
-    <div className="flex flex-col justify-between space-y-4">
-      <FormField
-        control={control}
-        name="templateId"
-        render={({ field }) => (
-          <FormItem>
-            <Label>Template</Label>
-            <FormControl>
-              <Select
-                {...field}
-                formatOptionLabel={(option) => (
-                  <>
-                    <img
-                      src={data.find((t) => t.id === option.value)?.icon}
-                      alt={`${option.label} icon`}
-                      className="inline-block w-6 h-6 mr-2"
-                    />
-                    {option.label}
-                  </>
-                )}
-                isLoading={isFetching}
-                options={templateOptions}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="templateVersionId"
-        rules={{ required: true }}
-        render={({ field }) => (
-          <FormItem>
-            <Label>Version</Label>
-            <FormControl>
-              <Select
-                placeholder={
-                  canSelectVersions
-                    ? undefined
-                    : "Please select a template first"
-                }
-                isLoading={isFetching}
-                options={versionOptions}
-                isDisabled={!canSelectVersions}
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <Accordion
-        className={twMerge(variableList.length === 0 && "hidden")}
-        type="single"
-        value={variableList.length > 0 ? "variables" : undefined}
-        disabled
-        collapsible
-      >
-        <AccordionItem value="variables" className="border-none">
-          <AccordionTrigger className="p-1 text-typography">
-            Variables
-          </AccordionTrigger>
-          <AccordionContent className="p-1 flex flex-col gap-2 py-1">
+    <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FormField
+          control={control}
+          name="templateId"
+          render={({ field }) => (
+            <FormItem>
+              <Label>Template</Label>
+              <FormControl>
+                <Select
+                  {...field}
+                  formatOptionLabel={(option) => (
+                    <div className="flex items-center gap-2">
+                      {data.find((t) => t.id === option.value)?.icon && (
+                        <img
+                          src={data.find((t) => t.id === option.value)?.icon}
+                          alt={`${option.label} icon`}
+                          className="w-5 h-5 object-contain"
+                        />
+                      )}
+                      <span>{option.label}</span>
+                    </div>
+                  )}
+                  isLoading={isFetching}
+                  options={templateOptions}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="templateVersionId"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormItem>
+              <Label>Version</Label>
+              <FormControl>
+                <Select
+                  placeholder={
+                    canSelectVersions
+                      ? "Select a version"
+                      : "Please select a template first"
+                  }
+                  isLoading={isFetching}
+                  options={versionOptions}
+                  isDisabled={!canSelectVersions}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      {variableList.length > 0 && (
+        <div className="border border-border/50 rounded-lg overflow-hidden bg-background/50">
+          <div className="bg-muted/50 px-4 py-3 border-b border-border/50">
+            <h4 className="font-medium text-sm">Template Variables</h4>
+          </div>
+          <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             {variableList.map((variable) => (
               <FormField
                 key={variable.key}
@@ -138,13 +147,13 @@ function TemplateSourceForm() {
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-typography/80">
+                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       {variable.label}
                     </Label>
                     <FormControl>
                       <Input
                         type={variable.type === "secret" ? "password" : "text"}
-                        className="col-span-2"
+                        placeholder={`Enter ${variable.label}`}
                         {...field}
                       />
                     </FormControl>
@@ -153,9 +162,9 @@ function TemplateSourceForm() {
                 )}
               />
             ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

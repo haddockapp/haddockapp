@@ -45,7 +45,7 @@ const Projects: FC = () => {
 
   const filteredProjects = useMemo(
     () => projects.filter((p) => p.name.includes(query)),
-    [projects, query]
+    [projects, query],
   );
 
   return (
@@ -62,7 +62,7 @@ const Projects: FC = () => {
         </div>
         <SimpleDialog
           {...disclosureMethods}
-          size="2xl"
+          size="3xl"
           title="Create a project"
           Content={CreateProjectForm}
           Trigger={CreateProjectTrigger}
