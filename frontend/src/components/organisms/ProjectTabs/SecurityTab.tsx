@@ -83,6 +83,39 @@ const CategoryIcon: FC<{ category: string }> = ({ category }) => {
   }
 };
 
+// Component to parse and render URLs as clickable links
+const Linkify: FC<{ text: string; className?: string }> = ({
+  text,
+  className,
+}) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return (
+    <span className={className}>
+      {parts.map((part, index) => {
+        if (urlRegex.test(part)) {
+          // Reset regex lastIndex since we're reusing it
+          urlRegex.lastIndex = 0;
+          return (
+            <a
+              key={index}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <span key={index}>{part}</span>;
+      })}
+    </span>
+  );
+};
+
 const SecurityFindingRow: FC<{ finding: SecurityFinding }> = ({ finding }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -148,7 +181,7 @@ const SecurityFindingRow: FC<{ finding: SecurityFinding }> = ({ finding }) => {
                 <div className="space-y-1">
                   <span className="text-muted-foreground">Description:</span>
                   <div className="text-foreground/90 whitespace-pre-wrap">
-                    {finding.description}
+                    <Linkify text={finding.description} />
                   </div>
                 </div>
 
@@ -157,8 +190,8 @@ const SecurityFindingRow: FC<{ finding: SecurityFinding }> = ({ finding }) => {
                     <span className="text-muted-foreground">
                       Recommendation:
                     </span>
-                    <div className="text-foreground/90 text-blue-400">
-                      {finding.recommendation}
+                    <div className="text-foreground/90">
+                      <Linkify text={finding.recommendation} />
                     </div>
                   </div>
                 )}
@@ -170,10 +203,10 @@ const SecurityFindingRow: FC<{ finding: SecurityFinding }> = ({ finding }) => {
                         {key.replace(/([A-Z])/g, " $1").trim()}:
                       </span>
                       <div
-                        className="text-foreground/90 font-mono text-xs max-w-full truncate"
+                        className="text-foreground/90 font-mono text-xs max-w-full"
                         title={String(value)}
                       >
-                        {String(value)}
+                        <Linkify text={String(value)} />
                       </div>
                     </div>
                   ))}
@@ -189,16 +222,6 @@ const SecurityFindingRow: FC<{ finding: SecurityFinding }> = ({ finding }) => {
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <Button
-                  variant="link"
-                  className="text-blue-400 h-auto p-0 text-sm"
-                >
-                  View details on external scanner{" "}
-                  <ChevronRight className="w-3 h-3 ml-1" />
-                </Button>
               </div>
             </div>
           </TableCell>
@@ -246,14 +269,6 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
       );
     return true;
   });
-
-  const handleFilterClick = (filter: "critical" | "high" | "other") => {
-    if (selectedFilter === filter) {
-      setSelectedFilter(null);
-    } else {
-      setSelectedFilter(filter);
-    }
-  };
 
   if (isLoading) {
     return (

@@ -38,7 +38,7 @@ function DataAllocationForm() {
       (preset.vcpus ? preset.vcpus === watchVcpus : true) &&
       (preset.memory ? preset.memory === watchMemory : true) &&
       (preset.disk ? preset.disk === watchDisk : true),
-    [watchDisk, watchMemory, watchVcpus]
+    [watchDisk, watchMemory, watchVcpus],
   );
 
   return (
@@ -49,87 +49,115 @@ function DataAllocationForm() {
             key={preset.label}
             onClick={() => applyPreset(preset)}
             className={twMerge(
-              "flex flex-col gap-2 flex-1 px-12 py-8 items-center hover:border-card-foreground hover:bg-primary/20 cursor-pointer duration-200",
+              "flex flex-col gap-3 flex-1 px-8 py-6 items-center justify-center text-center hover:border-primary/50 hover:bg-muted/50 cursor-pointer duration-300 transition-all group relative border-2",
               isPresetActive(preset) &&
-                "border-primary/40 text-primary hover:border-primary/40 cursor-default hover:bg-primary/10 bg-primary/10"
+                "border-primary bg-primary/5 text-primary shadow-md hover:border-primary cursor-default",
             )}
           >
-            {preset.icon}
-            <span>{preset.label}</span>
+            <div
+              className={twMerge(
+                "p-3 rounded-full bg-background shadow-sm transition-transform duration-300 group-hover:scale-110",
+                isPresetActive(preset) && "bg-primary/20",
+              )}
+            >
+              {preset.icon}
+            </div>
+            <div className="space-y-1">
+              <span className="font-semibold text-lg">{preset.label}</span>
+              <div className="text-xs text-muted-foreground flex flex-col gap-0.5">
+                <span>{preset.vcpus} vCPUs</span>
+                <span>{preset.memory} MB RAM</span>
+                <span>{preset.disk} MB Disk</span>
+              </div>
+            </div>
+            {isPresetActive(preset) && (
+              <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary animate-pulse" />
+            )}
           </Card>
         ))}
       </div>
       <div className="flex flex-col justify-between space-y-6">
-        <FormField
-          control={control}
-          name="vcpus"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <FormItem className="space-y-2">
-              <Label className="flex justify-between">
-                <span>CPUs</span>
-                <span className="text-typography/40">{field.value}</span>
-              </Label>
-              <FormControl>
-                <Slider
-                  value={[field.value]}
-                  onValueChange={([v]) => field.onChange(v)}
-                  min={1}
-                  max={8}
-                  step={1}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="memory"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <FormItem className="space-y-2">
-              <Label className="flex justify-between">
-                <span>Memory</span>
-                <span className="text-typography/40">{field.value} MB</span>
-              </Label>
-              <FormControl>
-                <Slider
-                  value={[field.value]}
-                  onValueChange={([v]) => field.onChange(v)}
-                  min={1024}
-                  max={8192}
-                  step={1024}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="disk"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <FormItem className="space-y-2">
-              <Label className="flex justify-between">
-                <span>Disk</span>
-                <span className="text-typography/40">{field.value} MB</span>
-              </Label>
-              <FormControl>
-                <Slider
-                  value={[field.value]}
-                  onValueChange={([v]) => field.onChange(v)}
-                  min={256}
-                  max={2048}
-                  step={256}
-                />
-              </FormControl>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 bg-muted/30 rounded-xl border border-border/50">
+          <FormField
+            control={control}
+            name="vcpus"
+            rules={{ required: true }}
+            render={({ field }) => (
+              <FormItem className="space-y-4">
+                <Label className="flex justify-between items-center">
+                  <span className="font-medium">CPUs</span>
+                  <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded text-sm">
+                    {field.value} Core{field.value > 1 ? "s" : ""}
+                  </span>
+                </Label>
+                <FormControl>
+                  <Slider
+                    className="py-4"
+                    value={[field.value]}
+                    onValueChange={([v]) => field.onChange(v)}
+                    min={1}
+                    max={8}
+                    step={1}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="memory"
+            rules={{ required: true }}
+            render={({ field }) => (
+              <FormItem className="space-y-4">
+                <Label className="flex justify-between items-center">
+                  <span className="font-medium">Memory</span>
+                  <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded text-sm">
+                    {field.value} MB
+                  </span>
+                </Label>
+                <FormControl>
+                  <Slider
+                    className="py-4"
+                    value={[field.value]}
+                    onValueChange={([v]) => field.onChange(v)}
+                    min={1024}
+                    max={8192}
+                    step={512}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="disk"
+            rules={{ required: true }}
+            render={({ field }) => (
+              <FormItem className="space-y-4">
+                <Label className="flex justify-between items-center">
+                  <span className="font-medium">Disk</span>
+                  <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded text-sm">
+                    {field.value} MB
+                  </span>
+                </Label>
+                <FormControl>
+                  <Slider
+                    className="py-4"
+                    value={[field.value]}
+                    onValueChange={([v]) => field.onChange(v)}
+                    min={256}
+                    max={2048}
+                    step={256}
+                  />
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

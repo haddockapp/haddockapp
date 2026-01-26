@@ -12,7 +12,7 @@ function ZipSourceForm() {
   const { control } = useFormContext();
 
   return (
-    <div className="flex flex-row items-center justify-around">
+    <div className="flex flex-col gap-6">
       <FormField
         control={control}
         name="composePath"
@@ -21,8 +21,11 @@ function ZipSourceForm() {
           <FormItem className="w-full">
             <Label>Compose path</Label>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} placeholder="e.g., docker-compose.yml" />
             </FormControl>
+            <p className="text-[0.8rem] text-muted-foreground">
+              Path to the compose file within your ZIP archive.
+            </p>
             <FormMessage />
           </FormItem>
         )}
