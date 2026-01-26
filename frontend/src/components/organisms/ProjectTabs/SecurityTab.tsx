@@ -7,14 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   useAnalyzeProjectMutation,
   useGetFindingsQuery,
@@ -41,7 +34,6 @@ import {
 import { FC, useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SecurityTabProps {
   projectId: string;
