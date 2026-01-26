@@ -1,4 +1,4 @@
-import { type FC, useMemo, useState } from "react";
+import { type FC, useState } from "react";
 import { VmState } from "@/types/vm/vm";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import ProjectActionButton from "./ProjectActionButton";
@@ -27,10 +27,7 @@ import { SourceType } from "@/services/backendApi/projects/sources.dto";
 import SimpleDialog from "../SimpleDialog";
 import UploadZipDialog from "../UploadZipDialog";
 import { useGetFindingsQuery } from "@/services/backendApi/security/security";
-import { SeverityLevel } from "@/services/backendApi/security/types";
-
-import { Button } from "@/components/ui/button";
-import { ShieldAlert, ArrowRight } from "lucide-react";
+import SecuritySummaryBar from "./SecuritySummaryBar";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
@@ -173,49 +170,8 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   const { buildLogs, isAlert } = useMetrics();
   const { data: securityData } = useGetFindingsQuery(project.id);
 
-  const criticalIssuesCount = useMemo(() => {
-    const findings = securityData?.findings ?? [];
-    return findings.filter(
-      (f) =>
-        f.severity === SeverityLevel.CRITICAL ||
-        f.severity === SeverityLevel.HIGH,
-    ).length;
-  }, [securityData]);
-
   return (
     <>
-      {criticalIssuesCount > 0 && (
-        <div className="mb-6 relative overflow-hidden rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 opacity-10 rotate-12 bg-red-500 rounded-full blur-2xl" />
-
-          <div className="relative flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-red-950/50 shadow-sm border border-red-100 dark:border-red-900">
-                <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="space-y-0.5">
-                <h4 className="font-semibold text-red-900 dark:text-red-200">
-                  Security Vulnerabilities Detected
-                </h4>
-                <p className="text-sm text-red-700 dark:text-red-300">
-                  {criticalIssuesCount} critical or high severity issues require
-                  your immediate attention.
-                </p>
-              </div>
-            </div>
-
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-red-700 hover:text-red-800 hover:bg-red-500/10 px-3 gap-2 font-medium bg-transparent"
-              onClick={() => onChangeTab(ProjectTabsValue.Security)}
-            >
-              Review Issues <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
       {project.source.type === SourceType.ZIP_UPLOAD &&
         "status" in project.source.settings && (
           <SimpleDialog
@@ -239,13 +195,16 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 Manage the lifecycle of your project
               </CardDescription>
             </div>
-            <ProjectStatusBadge
-              isAlert={isAlert}
-              onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
-              tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
-              status={projectStatus}
-              size="lg"
-            />
+            <div className="flex flex-col items-end gap-2">
+              <ProjectStatusBadge
+                isAlert={isAlert}
+                onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
+                tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
+                status={projectStatus}
+                size="lg"
+              />
+              <SecuritySummaryBar findings={securityData?.findings ?? []} />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
