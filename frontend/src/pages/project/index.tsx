@@ -25,6 +25,11 @@ const ProjectDetails: FC = () => {
 
   const { data: projects, isLoading } = useGetProjectsQuery();
   const currentProject = projects?.find((project) => project.id === projectId);
+  const shouldShowUploadDialog =
+    currentProject?.source.type === SourceType.ZIP_UPLOAD &&
+    "status" in currentProject.source.settings &&
+    currentProject.source.settings.status === "none";
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(shouldShowUploadDialog);
 
   useEffect(() => {
     if (projectId) dispatch(setProjectId(projectId));
@@ -38,6 +43,10 @@ const ProjectDetails: FC = () => {
     if (selectedTab === ProjectTabsValue.Monitoring && !!projectId)
       dispatch(setAlert({ projectId, isAlert: false }));
   }, [dispatch, projectId, selectedTab]);
+
+  useEffect(() => {
+    setIsUploadDialogOpen(shouldShowUploadDialog);
+  }, [shouldShowUploadDialog]);
 
   if (isLoading) {
     return (
@@ -54,16 +63,15 @@ const ProjectDetails: FC = () => {
 
   return (
     <>
-      {currentProject.source.type === SourceType.ZIP_UPLOAD &&
-        "status" in currentProject.source.settings &&
-        currentProject.source.settings.status === "none" && (
-          <SimpleDialog
-            isOpen
-            title="Upload a ZIP file"
-            description="Drag and drop or browse to upload a ZIP file containing your project."
-            Content={UploadZipDialog}
-          />
-        )}
+      {shouldShowUploadDialog && (
+        <SimpleDialog
+          isOpen={isUploadDialogOpen}
+          title="Upload a ZIP file"
+          description="Drag and drop or browse to upload a ZIP file containing your project."
+          Content={UploadZipDialog}
+          onClose={() => setIsUploadDialogOpen(false)}
+        />
+      )}
 
       <ProjectManagementPanel
         onChangeTab={setSelectedTab}

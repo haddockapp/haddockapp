@@ -247,14 +247,6 @@ const SecurityTab: FC<SecurityTabProps> = ({ projectId }) => {
     return true;
   });
 
-  const handleFilterClick = (filter: "critical" | "high" | "other") => {
-    if (selectedFilter === filter) {
-      setSelectedFilter(null);
-    } else {
-      setSelectedFilter(filter);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex h-[400px] items-center justify-center">
