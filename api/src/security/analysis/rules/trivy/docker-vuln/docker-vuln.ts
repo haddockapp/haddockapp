@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SecurityFact } from 'src/security/types/facts';
-import {
-  SecurityFinding,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Severity,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  SeverityLevel,
-} from 'src/security/types/findings';
+import { SecurityFinding } from 'src/security/types/findings';
 import { SecurityRule } from 'src/security/types/rule.interface';
 import { ImageFact } from '../../../analyzers/compose/types';
 import { execCommand } from '../../../../../utils/exec-utils';

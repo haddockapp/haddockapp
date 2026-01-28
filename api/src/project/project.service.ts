@@ -266,8 +266,7 @@ export class ProjectService {
       .then((icon) => {
         result.icon = icon;
       })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .catch((e) => {});
+      .catch(() => {});
     return result;
   }
 
