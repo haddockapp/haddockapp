@@ -13,6 +13,7 @@ import Divider from "@/components/atoms/divider";
 import { Button } from "@/components/ui/button";
 import Settings from "@/components/organisms/Settings";
 import Kbd from "@/components/atoms/kbd";
+import { formatShortcut } from "@/lib/utils";
 
 const Content: FC = () => (
   <div className="h-full w-full">
@@ -37,7 +38,7 @@ const SettingsSidebar: FC = () => {
             <ArrowRight className="text-primary/70 group-hover:text-primary duration-500" />
           </Button>
           <span>Settings</span>
-          <Kbd>⌘ + B</Kbd>
+          <Kbd>{formatShortcut("⌘ + B")}</Kbd>
         </div>
       </SidebarHeader>
       <SidebarContent className="flex flex-col">
