@@ -9,6 +9,7 @@ import { useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Skeleton } from "../ui/skeleton";
+import { formatShortcut } from "@/lib/utils";
 
 const pathTranslations: Record<string, string> = {
   ["/"]: "/ authentication",
@@ -96,7 +97,7 @@ const Header: FC = () => {
                     <Home className="text-primary/70 group-hover:text-primary" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>⌘ + Shift + H</TooltipContent>
+                <TooltipContent>{formatShortcut("⌘ + Shift + H")}</TooltipContent>
               </Tooltip>
             </motion.div>
           )}
@@ -137,7 +138,7 @@ const Header: FC = () => {
               <Settings className="text-primary/70 group-hover:text-primary" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>⌘ + B</TooltipContent>
+          <TooltipContent>{formatShortcut("⌘ + B")}</TooltipContent>
         </Tooltip>
       </div>
     </div>

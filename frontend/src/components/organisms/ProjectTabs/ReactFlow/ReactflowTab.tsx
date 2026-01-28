@@ -15,7 +15,7 @@ import {
   ServiceState,
   type ReactFlowStateStorage,
 } from "@/types/services/services";
-import { cn } from "@/lib/utils";
+import { cn, formatShortcut } from "@/lib/utils";
 import {
   generateServiceNodes,
   defineInitialEdges,
@@ -50,8 +50,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [showEdges, setShowEdges] = useState(true);
-  // @ts-expect-error not using
-  const [isNodesInitialized, setIsNodesInitialized] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null
   );
@@ -113,10 +111,8 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
       defaultPositions[node.id] = node.position;
     });
 
-    // Load saved positions
     const savedPositions = currentFlowState.servicesPositions || {};
 
-    // Apply positions: Prioritize Saved, fallback to Default (Dagre), fallback to 0,0
     initialNodes = initialNodes.map((node) => ({
       ...node,
       position: savedPositions[node.id] ||
@@ -127,7 +123,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
     setEdges(generatedEdges);
 
     setShowEdges(currentFlowState.showEdges ?? true);
-    setIsNodesInitialized(true);
   }, [services, projectId]);
 
   const onNodesChange = useCallback(
@@ -361,7 +356,6 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
                   </span>
                 </Button>
 
-                {/* Shortcut Information */}
                 {showCommands && (
                   <div
                     className={cn(
@@ -389,7 +383,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
                           : "bg-slate-100 border-slate-200 text-slate-500"
                       )}
                     >
-                      ⌘ + D
+                      {formatShortcut("⌘ + D")}
                     </kbd>
                   </div>
                 )}

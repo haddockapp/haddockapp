@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import useDisclosure from "@/hooks/use-disclosure";
 import { SearchBar } from "@/components/atoms/search";
 import Kbd from "@/components/atoms/kbd";
+import { formatShortcut } from "@/lib/utils";
 
 const CreateProjectTrigger = ({ onOpen }: { onOpen: () => void }) => {
   useEffect(() => {
@@ -28,7 +29,7 @@ const CreateProjectTrigger = ({ onOpen }: { onOpen: () => void }) => {
 
   return (
     <div className="flex flex-row gap-2">
-      <Kbd>⌘ + Shift + P</Kbd>
+      <Kbd>{formatShortcut("⌘ + Shift + P")}</Kbd>
       <Button variant="shine" onClick={onOpen} className="gap-2 h-full">
         <PackagePlus className="text-primary-foreground/50" />
         <span>Deploy a project</span>
@@ -57,7 +58,7 @@ const Projects: FC = () => {
             <div className="w-full max-w-[400px]">
               <SearchBar searchValue={query} onChangeSearchValue={setQuery} />
             </div>
-            <Kbd>⌘ + Shift + S</Kbd>
+            <Kbd>{formatShortcut("⌘ + Shift + S")}</Kbd>
           </div>
         </div>
         <SimpleDialog
