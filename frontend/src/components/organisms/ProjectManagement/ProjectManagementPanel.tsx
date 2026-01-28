@@ -26,6 +26,8 @@ import { ProjectTabsValue } from "@/pages/project/projectTabsType";
 import { SourceType } from "@/services/backendApi/projects/sources.dto";
 import SimpleDialog from "../SimpleDialog";
 import UploadZipDialog from "../UploadZipDialog";
+import { useGetFindingsQuery } from "@/services/backendApi/security/security";
+import SecuritySummaryBar from "./SecuritySummaryBar";
 
 interface ProjectManagementPanelProps {
   project: ProjectDto;
@@ -166,6 +168,7 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
   const dialogConfig = getDialogConfig();
 
   const { buildLogs, isAlert } = useMetrics();
+  const { data: securityData } = useGetFindingsQuery(project.id);
 
   return (
     <>
@@ -192,13 +195,16 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 Manage the lifecycle of your project
               </CardDescription>
             </div>
-            <ProjectStatusBadge
-              isAlert={isAlert}
-              onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
-              tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
-              status={projectStatus}
-              size="lg"
-            />
+            <div className="flex flex-col items-end gap-2">
+              <ProjectStatusBadge
+                isAlert={isAlert}
+                onClick={() => onChangeTab(ProjectTabsValue.Monitoring)}
+                tooltip={buildLogs.length > 0 ? "View build logs" : undefined}
+                status={projectStatus}
+                size="lg"
+              />
+              <SecuritySummaryBar findings={securityData?.findings ?? []} />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -212,12 +218,12 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 isRunning
                   ? "Project is already running"
                   : isStarting
-                  ? "Project is currently starting"
-                  : isLoading
-                  ? "Another action is in progress"
-                  : isStopping
-                  ? "Project is currently stopping"
-                  : undefined
+                    ? "Project is currently starting"
+                    : isLoading
+                      ? "Another action is in progress"
+                      : isStopping
+                        ? "Project is currently stopping"
+                        : undefined
               }
               variant="default"
               isLoading={currentAction === "start" && isStartingMutation}
@@ -232,10 +238,10 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 !isRunning
                   ? "Project must be running to stop it"
                   : isLoading
-                  ? "Another action is in progress"
-                  : isStopping
-                  ? "Project is currently stopping"
-                  : undefined
+                    ? "Another action is in progress"
+                    : isStopping
+                      ? "Project is currently stopping"
+                      : undefined
               }
               variant="outline"
               isLoading={currentAction === "stop" && isStopping}
@@ -251,10 +257,10 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                   !isStopped && !isError
                     ? "Project must be stopped to reupload it"
                     : isLoading
-                    ? "Another action is in progress"
-                    : isStopping
-                    ? "Project is currently stopping"
-                    : undefined
+                      ? "Another action is in progress"
+                      : isStopping
+                        ? "Project is currently stopping"
+                        : undefined
                 }
                 variant="outline"
                 isLoading={currentAction === "reupload"}
@@ -271,10 +277,10 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                   !isStopped && !isError
                     ? "Project must be stopped to update it"
                     : isLoading
-                    ? "Another action is in progress"
-                    : isStopping
-                    ? "Project is currently stopping"
-                    : undefined
+                      ? "Another action is in progress"
+                      : isStopping
+                        ? "Project is currently stopping"
+                        : undefined
                 }
                 variant="outline"
                 isLoading={currentAction === "pull" && isPulling}
@@ -290,10 +296,10 @@ const ProjectManagementPanel: FC<ProjectManagementPanelProps> = ({
                 !isStopped && !isError
                   ? "Project must be stopped to recreate it"
                   : isLoading
-                  ? "Another action is in progress"
-                  : isStopping
-                  ? "Project is currently stopping"
-                  : undefined
+                    ? "Another action is in progress"
+                    : isStopping
+                      ? "Project is currently stopping"
+                      : undefined
               }
               variant="outline"
               isLoading={currentAction === "recreate" && isRecreating}

@@ -9,6 +9,7 @@ import CopiableField from "@/components/molecules/copiable-field";
 import { useAppSelector } from "@/hooks/useStore";
 import { useGetDeploymentCodeQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Theme } from "@/services/settingsSlice";
 
 const aiToolToLabel: Record<AITools, string> = {
   [AITools.VSCODE]: "VSCode",
@@ -24,7 +25,7 @@ const aiToolToFetchCommand: Record<AITools, string> = {
   [AITools.WINDSURF]: "@web",
 };
 
-const aiToolToLogo: Record<AITools, React.ReactNode> = {
+const getAiToolToLogo = (theme: Theme): Record<AITools, React.ReactNode> => ({
   [AITools.VSCODE]: (
     <img src="/vscode.png" alt="VSCode Logo" className="size-5 shrink-0" />
   ),
@@ -32,16 +33,18 @@ const aiToolToLogo: Record<AITools, React.ReactNode> = {
     <img src="/cursor.png" alt="Cursor Logo" className="size-5 shrink-0" />
   ),
   [AITools.ZED]: (
-    <img src="/zed.png" alt="Zed Logo" className="size-5 shrink-0" />
+    <div className={`${theme === Theme.LIGHT ? "bg-black rounded p-1" : ""}`}>
+      <img src="/zed.png" alt="Zed Logo" className="size-5 shrink-0" />
+    </div>
   ),
   [AITools.WINDSURF]: (
     <img
       src="/windsurf.png"
       alt="Windsurf Logo"
-      className="size-5 shrink-0 bg-foreground rounded-full"
+      className={`size-5 shrink-0 rounded-full ${theme === Theme.LIGHT ? "" : "bg-foreground"}`}
     />
   ),
-};
+});
 
 type AIToolCardProps = {
   label: React.ReactNode;
@@ -62,7 +65,7 @@ const AIToolCard: FC<AIToolCardProps> = ({
       "p-2 flex-1 justify-center md:p-8 flex flex-row items-center gap-2 text-typography/70",
       isActive
         ? "text-primary cursor-default"
-        : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow"
+        : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow",
     )}
   >
     <span className="text-md md:text-xl">{label}</span>
@@ -82,10 +85,13 @@ function AISourceForm() {
     data: deploymentCode,
     isFetching,
     isError,
+    refetch,
   } = useGetDeploymentCodeQuery();
   const code = deploymentCode?.deploy_code ?? "XXXXXX";
 
   const { backendUrl } = useAppSelector((state) => state.config);
+  const theme = useAppSelector((state) => state.settings.theme);
+  const aiToolToLogo = getAiToolToLogo(theme);
 
   return (
     <AnimatePresence>
@@ -171,7 +177,21 @@ function AISourceForm() {
                   ex: "Deploy to Haddock using code {code}"
                 </span>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="self-center"
+                type="button"
+                onClick={() => refetch()}
+              >
+                Generate new key
+              </Button>
             </div>
+            {watchTool && (
+              <Button type="submit" className="w-fit self-center mt-8">
+                Done
+              </Button>
+            )}
           </div>
         )}
       </div>

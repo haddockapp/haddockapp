@@ -32,7 +32,7 @@ export class DeployCodeService {
     return newCode;
   }
 
-  async validateAndRevoke(providedCode: string): Promise<void> {
+  async validate(providedCode: string): Promise<void> {
     const currentCode = await this.redis.get(this.GLOBAL_CODE_KEY);
 
     if (!currentCode || currentCode !== providedCode) {
@@ -40,7 +40,5 @@ export class DeployCodeService {
         'Invalid, expired, or already used deploy code',
       );
     }
-
-    await this.redis.del(this.GLOBAL_CODE_KEY);
   }
 }

@@ -31,7 +31,7 @@ function GithubSourceForm() {
   const canFetchReposAndBranches = useMemo(() => {
     if (!watchAuthorization) return false;
     const authorization = authorizations?.find(
-      (authorization) => authorization.id === watchAuthorization
+      (authorization) => authorization.id === watchAuthorization,
     );
     if (!authorization) return false;
     return authorization?.type !== AuthorizationEnum.DEPLOY_KEY;
@@ -40,12 +40,12 @@ function GithubSourceForm() {
   const { currentData: repositories, isFetching: isFetchingRepositories } =
     useGetAllRepositoriesQuery(
       { authorization: watchAuthorization! },
-      { skip: !watchAuthorization || !canFetchReposAndBranches }
+      { skip: !watchAuthorization || !canFetchReposAndBranches },
     );
   const { currentData: branches, isFetching: isFetchingBranches } =
     useGetAllBranchesByRepositoryQuery(
       { repository: watchRepository, authorization: watchAuthorization! },
-      { skip: !watchRepository || !canFetchReposAndBranches }
+      { skip: !watchRepository || !canFetchReposAndBranches },
     );
 
   const authorizationsOptions = useMemo(
@@ -54,7 +54,7 @@ function GithubSourceForm() {
         label: `${authorization.name} (${authorization.type})`,
         value: authorization.id,
       })) ?? [],
-    [authorizations]
+    [authorizations],
   );
 
   const repositoriesOptions = useMemo(
@@ -63,7 +63,7 @@ function GithubSourceForm() {
         label: repository.full_name,
         value: repository.full_name,
       })) ?? [],
-    [repositories]
+    [repositories],
   );
 
   const branchesOptions = useMemo(
@@ -72,16 +72,16 @@ function GithubSourceForm() {
         label: branch,
         value: branch,
       })) ?? [],
-    [branches]
+    [branches],
   );
 
   return (
-    <div className="flex flex-col justify-between space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <FormField
         control={control}
         name="authorization"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-full">
             <Label>Authorization</Label>
             <FormControl>
               <Select
@@ -141,10 +141,10 @@ function GithubSourceForm() {
         name="composePath"
         rules={{ required: true }}
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-full">
             <Label>Compose path</Label>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} placeholder="e.g., docker-compose.yml" />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -1,4 +1,4 @@
-Haddock is a self-hosted Platform-as-a-Service (PaaS) designed to deploy containerized applications automatically without manual infrastructure configuration. Its goal is to take an existing container-based project (Dockerfile or Docker Compose), validate that it is production-ready, package it, and deploy it in an isolated runtime with defined resources and routing. This file (llm.txt) exists to instruct autonomous AI agents on how to safely, deterministically, and correctly prepare a project and interact with Haddock’s public deployment API. The agent must use this document as an executable contract: analyze the project, validate production readiness, package the code, collect missing information from the user, and only then trigger deployment via the unified-deploy endpoint.
+Haddock is a self-hosted Platform-as-a-Service (PaaS) designed to deploy containerized applications automatically without manual infrastructure configuration. Its goal is to take an existing container-based project (Dockerfile or Docker Compose), validate that it is production-ready, package it, and deploy it in an isolated runtime with defined resources and routing. This file (llms.txt) exists to instruct autonomous AI agents on how to safely, deterministically, and correctly prepare a project and interact with Haddock’s public deployment API. The agent must use this document as an executable contract: analyze the project, validate production readiness, package the code, collect missing information from the user, and only then trigger deployment via the unified-deploy endpoint.
 
 ## 0. Activation Phrase (MANDATORY)
 
@@ -180,7 +180,7 @@ multipart/form-data
         "prefix": "string (optional)"
       }
     },
-    "example": "[{\"port\": 3000, \"domain\": \"example.com\", \"prefix\": \"/api\"}]"
+    "example": "[{\"port\": 3000, \"domain\": \"example.com\", \"prefix\": \"api\"}]" // Example for port 3000 on api.example.com
   },
   {
     "name": "env",
