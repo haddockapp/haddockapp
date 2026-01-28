@@ -49,7 +49,7 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
     Record<string, Partial<EnvironmentVariableDto>>
   >({});
 
-  // Bulk edit mode state
+  // Bulk edit mode statehead
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
   const [bulkEditValue, setBulkEditValue] = useState("");
   const [isBulkSaving, setIsBulkSaving] = useState(false);

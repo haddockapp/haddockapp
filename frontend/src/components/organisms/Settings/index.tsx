@@ -19,6 +19,7 @@ import SSO from "./SSO";
 import { useGetSelfQuery, UserRole } from "@/services/backendApi/users";
 import Kbd from "@/components/atoms/kbd";
 import { useSidebar } from "@/components/ui/sidebar";
+import { formatShortcut } from "@/lib/utils";
 
 const settings: {
   key: string;
@@ -28,43 +29,43 @@ const settings: {
   isAuthRequired: boolean;
   isAdminRequired?: boolean;
 }[] = [
-  {
-    key: "users",
-    name: "Users",
-    command: "U",
-    Component: UsersSettings,
-    isAuthRequired: true,
-  },
-  {
-    key: "github-application",
-    name: "GitHub Application",
-    command: "G",
-    Component: ChangeGithubApplication,
-    isAuthRequired: false,
-  },
-  {
-    key: "authorizations",
-    name: "Authorizations",
-    command: "A",
-    Component: Authorizations,
-    isAuthRequired: true,
-  },
-  {
-    key: "sso",
-    name: "SSO Configuration",
-    Component: SSO,
-    command: "L",
-    isAuthRequired: true,
-    isAdminRequired: true,
-  },
-  {
-    key: "about",
-    name: "About",
-    command: "Z",
-    Component: About,
-    isAuthRequired: false,
-  },
-];
+    {
+      key: "users",
+      name: "Users",
+      command: "U",
+      Component: UsersSettings,
+      isAuthRequired: true,
+    },
+    {
+      key: "github-application",
+      name: "GitHub Application",
+      command: "G",
+      Component: ChangeGithubApplication,
+      isAuthRequired: false,
+    },
+    {
+      key: "authorizations",
+      name: "Authorizations",
+      command: "A",
+      Component: Authorizations,
+      isAuthRequired: true,
+    },
+    {
+      key: "sso",
+      name: "SSO Configuration",
+      Component: SSO,
+      command: "L",
+      isAuthRequired: true,
+      isAdminRequired: true,
+    },
+    {
+      key: "about",
+      name: "About",
+      command: "Z",
+      Component: About,
+      isAuthRequired: false,
+    },
+  ];
 
 const keyToMenu: Record<string, string> = {
   U: "users",
@@ -121,7 +122,7 @@ const Settings: FC<{ onClose: () => void }> = ({ onClose }) => {
               className="text-xl"
             >
               <div className="flex flex-row gap-4">
-                <Kbd>⌘ + Shift + {command}</Kbd>
+                <Kbd>{formatShortcut(`⌘ + Shift + ${command}`)}</Kbd>
                 {name}
               </div>
             </AccordionTrigger>
