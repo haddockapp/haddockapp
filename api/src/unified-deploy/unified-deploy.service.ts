@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RedirectDto, UnifiedDeployDto } from './dto/unified-project.dto';
@@ -19,6 +20,8 @@ import { DeployCodeService } from './deploy-code/deploy-code.service';
 
 @Injectable()
 export class UnifiedDeployService {
+  private readonly logger = new Logger(UnifiedDeployService.name);
+
   constructor(
     private readonly projectService: ProjectService,
     private readonly domainService: DomainsService,
@@ -67,6 +70,20 @@ export class UnifiedDeployService {
     return dtos;
   }
 
+  private async networkHandling(
+    dto: UnifiedDeployDto,
+    project: Project,
+  ): Promise<void> {
+    if (dto.redirects && dto.redirects.length > 0) {
+      const networkConnectionDtos: CreateNetworkConnectionDto[] =
+        await this.resolveRedirectionsDomains(project, dto.redirects);
+
+      for (const netDto of networkConnectionDtos) {
+        await this.networkService.createNetworkConnection(netDto);
+      }
+    }
+  }
+
   async deploy(
     file: Express.Multer.File,
     dto: UnifiedDeployDto,
@@ -106,14 +123,16 @@ export class UnifiedDeployService {
     try {
       const project: PersistedProjectDto =
         await this.projectService.createProject(projectCreationData);
+      this.logger.log(`Created project with ID: ${project.id}`);
 
-      if (dto.redirects && dto.redirects.length > 0) {
-        const networkConnectionDtos: CreateNetworkConnectionDto[] =
-          await this.resolveRedirectionsDomains(project, dto.redirects);
-
-        for (const netDto of networkConnectionDtos) {
-          await this.networkService.createNetworkConnection(netDto);
-        }
+      try {
+        await this.networkHandling(dto, project);
+      } catch (error) {
+        this.logger.error(
+          `Failed to create network connections: ${error.message}`,
+        );
+        await this.projectService.deleteProject(project.id);
+        throw error;
       }
 
       const finalZipPath = `../uploads/${project.id}.zip`;
@@ -136,6 +155,7 @@ export class UnifiedDeployService {
 
       return updatedProject;
     } catch (error) {
+      this.logger.error(`Failed to create project: ${error.message}`);
       fs.unlinkSync(file.path);
       throw error;
     }
