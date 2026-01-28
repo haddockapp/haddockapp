@@ -72,7 +72,7 @@ export class UnifiedDeployService {
     dto: UnifiedDeployDto,
   ): Promise<Project> {
     try {
-      await this.deployCodeService.validateAndRevoke(dto.deploy_code);
+      await this.deployCodeService.validate(dto.deploy_code);
     } catch (error) {
       if (file) {
         fs.unlinkSync(file.path);
