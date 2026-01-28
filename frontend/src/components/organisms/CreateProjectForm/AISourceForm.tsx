@@ -65,7 +65,7 @@ const AIToolCard: FC<AIToolCardProps> = ({
       "p-2 flex-1 justify-center md:p-8 flex flex-row items-center gap-2 text-typography/70",
       isActive
         ? "text-primary cursor-default"
-        : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow"
+        : "hover:text-primary cursor-pointer hover:shadow-md transition-shadow",
     )}
   >
     <span className="text-md md:text-xl">{label}</span>
@@ -85,6 +85,7 @@ function AISourceForm() {
     data: deploymentCode,
     isFetching,
     isError,
+    refetch,
   } = useGetDeploymentCodeQuery();
   const code = deploymentCode?.deploy_code ?? "XXXXXX";
 
@@ -176,6 +177,15 @@ function AISourceForm() {
                   ex: "Deploy to Haddock using code {code}"
                 </span>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="self-center"
+                type="button"
+                onClick={() => refetch()}
+              >
+                Generate new key
+              </Button>
             </div>
             {watchTool && (
               <Button type="submit" className="w-fit self-center mt-8">
