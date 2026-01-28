@@ -24,7 +24,7 @@ export class SecurityController {
   @Get('findings/:projectId')
   async getFindings(
     @Param('projectId') projectId: string,
-  ): Promise<{findings: SecurityFinding[]}> {
+  ): Promise<{ findings: SecurityFinding[] }> {
     const cacheKey = `security:findings:${projectId}`;
     let findings = await this.cache.get<SecurityFinding[]>(cacheKey);
     if (!findings) {

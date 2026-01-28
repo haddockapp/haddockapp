@@ -10,7 +10,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const message = exception.message.replace(/\n/g, '');
-    
+
     switch (exception.code) {
       case 'P2001':
       case 'P2025': {
@@ -21,9 +21,9 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
         });
         break;
       }
-      case 'P2000': 
-      case 'P2002': 
-      case 'P2003': 
+      case 'P2000':
+      case 'P2002':
+      case 'P2003':
       case 'P2004': {
         const status = HttpStatus.CONFLICT;
         response.status(status).json({

@@ -1,3 +1,3 @@
 export interface WebsocketConnectDto {
-    userId: string;
+  userId: string;
 }

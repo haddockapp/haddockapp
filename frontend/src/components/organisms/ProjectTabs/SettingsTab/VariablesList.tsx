@@ -111,6 +111,7 @@ const VariablesList: FC<VariablesListProps> = ({ projectId }) => {
         delete newState[original.key];
         return newState;
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast({
         title: "Error",

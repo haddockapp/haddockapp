@@ -5,7 +5,7 @@ import { CreateDomainDto } from './dto/create-domain.dto';
 
 @Injectable()
 export class DomainRepository {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createDomain(
     data: CreateDomainDto,
@@ -67,11 +67,13 @@ export class DomainRepository {
   }
 
   async hasMainDomain(): Promise<boolean> {
-    return this.prismaService.domain.count({
-      where: {
-        main: true,
-      },
-    }).then(count => count > 0);
+    return this.prismaService.domain
+      .count({
+        where: {
+          main: true,
+        },
+      })
+      .then((count) => count > 0);
   }
 
   async getMainDomain(): Promise<Domain | null> {

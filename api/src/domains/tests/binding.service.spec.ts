@@ -19,7 +19,9 @@ describe('BindingService', () => {
 
   describe('getServerIPv4', () => {
     it('should return the first external IPv4 address', () => {
-      jest.spyOn(os, 'networkInterfaces').mockReturnValue(mockNetworkInterfaces());
+      jest
+        .spyOn(os, 'networkInterfaces')
+        .mockReturnValue(mockNetworkInterfaces());
 
       const result = service.getServerIPv4();
 
@@ -83,7 +85,9 @@ describe('BindingService', () => {
 
       const result = service.createChallengeBinding(mockDomain);
 
-      expect(result).toBe(`${service.getChallengeRecordName(mockDomain)} IN TXT "${mockDomain.challenge}"`);
+      expect(result).toBe(
+        `${service.getChallengeRecordName(mockDomain)} IN TXT "${mockDomain.challenge}"`,
+      );
     });
   });
 });

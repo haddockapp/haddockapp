@@ -6,6 +6,6 @@ import { LlmService } from './llm.service';
 @Module({
   imports: [DomainsModule],
   controllers: [LlmController],
-  providers: [LlmService]
+  providers: [LlmService],
 })
 export class LlmModule {}

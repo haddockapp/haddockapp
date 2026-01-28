@@ -4,8 +4,13 @@ import { Queue } from 'bull';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SourceFactory } from '../source.factory';
 import { SourceService } from '../source.service';
-import { generateCreateSourceDto, generateSource, generateSourceDto, generateSourceFromDto } from './mocks/sources.mock';
-import { BullModule, getQueueToken } from '@nestjs/bull';
+import {
+  generateCreateSourceDto,
+  generateSource,
+  generateSourceDto,
+  generateSourceFromDto,
+} from './mocks/sources.mock';
+import { getQueueToken } from '@nestjs/bull';
 
 jest.mock('../source.factory');
 export const mockPrismaService = {
@@ -57,7 +62,9 @@ describe('SourceService', () => {
 
       expect(result).toEqual(createdSource);
       expect(sourceFactory.createSource).toHaveBeenCalledWith(createSourceDto);
-      expect(prismaService.source.create).toHaveBeenCalledWith({ data: sourceDto });
+      expect(prismaService.source.create).toHaveBeenCalledWith({
+        data: sourceDto,
+      });
     });
   });
 
@@ -79,7 +86,9 @@ describe('SourceService', () => {
     it('should throw a NotFoundException if the source does not exist', async () => {
       prismaService.source.findUnique.mockResolvedValue(null);
 
-      await expect(service.deploySource('non-existent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.deploySource('non-existent-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

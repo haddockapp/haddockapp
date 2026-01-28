@@ -13,10 +13,12 @@ import axios from 'axios';
 export class AuthorizationService {
   constructor(
     private readonly repository: AuthorizationRepository,
-    private readonly mapper: AuthorizationMapper
-  ) { }
+    private readonly mapper: AuthorizationMapper,
+  ) {}
 
-  public async getAuthorizationType(authorizationId: string): Promise<AuthorizationEnum> {
+  public async getAuthorizationType(
+    authorizationId: string,
+  ): Promise<AuthorizationEnum> {
     const authorization = await this.repository.findById(authorizationId);
     const object = this.mapper.toAuthorizationObject(authorization);
     return object.type;
@@ -49,7 +51,9 @@ export class AuthorizationService {
           Authorization: `token ${object.data.token}`,
         };
       case AuthorizationEnum.DEPLOY_KEY:
-        throw new BadRequestException('Deploy keys are not supported as Github authorization headers.');
+        throw new BadRequestException(
+          'Deploy keys are not supported as Github authorization headers.',
+        );
     }
   }
 
@@ -66,7 +70,6 @@ export class AuthorizationService {
           username: 'x-access-token',
           password: object.data.token,
         };
-
     }
   }
 
@@ -74,8 +77,13 @@ export class AuthorizationService {
     return this.repository.createAuthorization(authorization);
   }
 
-  private async readSource(authorizationId: string, organization: string, repo: string) {
-    const authorizationHeaders = await this.getHeadersForAuthorization(authorizationId);
+  private async readSource(
+    authorizationId: string,
+    organization: string,
+    repo: string,
+  ) {
+    const authorizationHeaders =
+      await this.getHeadersForAuthorization(authorizationId);
 
     try {
       await axios.get(`https://api.github.com/repos/${organization}/${repo}`, {
@@ -88,12 +96,17 @@ export class AuthorizationService {
   }
 
   private isPublicRepo(organization: string, repo: string) {
-    return axios.get(`https://api.github.com/repos/${organization}/${repo}`)
+    return axios
+      .get(`https://api.github.com/repos/${organization}/${repo}`)
       .then(() => true)
       .catch(() => false);
   }
 
-  public async canReadSource(authorizationId: string | null, organization: string, repo: string) {
+  public async canReadSource(
+    authorizationId: string | null,
+    organization: string,
+    repo: string,
+  ) {
     if (!authorizationId) {
       return this.isPublicRepo(organization, repo);
     }

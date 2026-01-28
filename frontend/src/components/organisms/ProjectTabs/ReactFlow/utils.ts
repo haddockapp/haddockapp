@@ -113,6 +113,7 @@ const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 export const getLayoutedElements = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nodes: any[],
   edges: Edge[],
   direction = "LR"

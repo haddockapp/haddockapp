@@ -17,6 +17,7 @@ export interface ServiceInformationDto {
   ports: string[];
   networks: string[];
   depends_on: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   environment: Record<string, any>;
   user: ServiceUser | null;
   deployment: ServiceDeployment | null;

@@ -50,7 +50,7 @@ const ReactflowTab: FC<ReactflowTabProps> = ({ projectId }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [showEdges, setShowEdges] = useState(true);
-  // @ts-expect-error not using
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNodesInitialized, setIsNodesInitialized] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
     null

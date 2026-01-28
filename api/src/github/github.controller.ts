@@ -1,4 +1,10 @@
-import { Controller, ForbiddenException, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { GithubService } from './github.service';
 import Repository from './model/Repository';
 

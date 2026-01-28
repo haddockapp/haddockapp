@@ -3,10 +3,9 @@ import { Public } from 'src/auth/auth.decorator';
 
 @Controller('health')
 export class HealthController {
-
-    @Public()
-    @Get()
-    async healthCheck() {
-        return 'ok';
-    }
+  @Public()
+  @Get()
+  async healthCheck() {
+    return 'ok';
+  }
 }

@@ -24,7 +24,9 @@ export class ConfigurationService {
   ) {}
 
   async checkGithubTokensConformity(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     clientId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     clientSecret: string,
   ): Promise<boolean> {
     // @TODO: Validate using RegExp
@@ -90,8 +92,11 @@ export class ConfigurationService {
   }
 
   async checkSamlConfigurationConformity(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     entryPoint: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     issuer: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cert: string,
   ): Promise<boolean> {
     // @TODO: Validate SAML configuration

@@ -8,7 +8,12 @@ import { NetworksRepository } from './networks.repository';
 import { DomainsModule } from '../domains/domains.module';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => VmModule), CaddyModule, DomainsModule],
+  imports: [
+    PrismaModule,
+    forwardRef(() => VmModule),
+    CaddyModule,
+    DomainsModule,
+  ],
   controllers: [NetworksController],
   providers: [NetworksService, NetworksRepository],
   exports: [NetworksService],

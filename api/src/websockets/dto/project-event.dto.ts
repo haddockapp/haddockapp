@@ -1,7 +1,7 @@
 export enum ServiceEnum {
-    METRICS = 'metrics',
-    LOGS = 'logs',
-    STATUS = 'status'
+  METRICS = 'metrics',
+  LOGS = 'logs',
+  STATUS = 'status',
 }
 
 export interface ProjectEventDto {

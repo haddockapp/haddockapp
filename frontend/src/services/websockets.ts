@@ -69,8 +69,10 @@ export function getSocket() {
   return socket;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function emit(socket: Socket, event: string, data: any) {
   return new Promise((resolve) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     socket.emit(event, data, (response: any) => {
       resolve(response);
     });

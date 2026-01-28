@@ -8,5 +8,5 @@ export enum VmState {
   Running = 'running',
   Stopped = 'stopped',
   Stopping = 'stopping',
-  Error = 'error'
+  Error = 'error',
 }

@@ -8,10 +8,7 @@ describe('TemplatesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TemplatesService,
-        { provide: TemplatesMapper, useValue: {} },
-      ],
+      providers: [TemplatesService, { provide: TemplatesMapper, useValue: {} }],
     }).compile();
 
     service = module.get<TemplatesService>(TemplatesService);
@@ -28,18 +25,22 @@ describe('TemplatesService', () => {
   it('buildTemplateEnvironment builds env with inputs and generated variables', async () => {
     const fakeVersion: Version = {
       id: 'v1',
-      label: "Version 1",
-      compose: "compose.yml",
-      path: "path/to/version",
+      label: 'Version 1',
+      compose: 'compose.yml',
+      path: 'path/to/version',
       env: [
         { key: 'FOO', label: 'Foo', type: 'plain', policy: 'input' },
         { key: 'BAR', label: 'Bar', type: 'plain', policy: 'generated' },
-      ]
+      ],
     };
 
-    jest.spyOn(service as any, 'getTemplateVersion').mockResolvedValue(fakeVersion);
+    jest
+      .spyOn(service as any, 'getTemplateVersion')
+      .mockResolvedValue(fakeVersion);
 
-    const result = await service.buildTemplateEnvironment('tpl', 'v1', { FOO: 'value' });
+    const result = await service.buildTemplateEnvironment('tpl', 'v1', {
+      FOO: 'value',
+    });
 
     expect(result).toEqual({
       FOO: 'value',
@@ -50,19 +51,25 @@ describe('TemplatesService', () => {
   it('buildTemplateEnvironment throws when required input missing', async () => {
     const fakeVersion: Version = {
       id: 'v1',
-      label: "Version 1",
-      compose: "compose.yml",
-      path: "path/to/version",
+      label: 'Version 1',
+      compose: 'compose.yml',
+      path: 'path/to/version',
       env: [
         { key: 'FOO', label: 'Foo', type: 'plain', policy: 'input' },
         { key: 'BAR', label: 'Bar', type: 'plain', policy: 'input' },
-      ]
+      ],
     };
 
-    jest.spyOn(service as any, 'getTemplateVersion').mockResolvedValue(fakeVersion);
+    jest
+      .spyOn(service as any, 'getTemplateVersion')
+      .mockResolvedValue(fakeVersion);
 
-    const result = service.buildTemplateEnvironment('tpl', 'v1', { FOO: 'value' });
+    const result = service.buildTemplateEnvironment('tpl', 'v1', {
+      FOO: 'value',
+    });
 
-    await expect(result).rejects.toThrow('Missing required environment variable: BAR');
+    await expect(result).rejects.toThrow(
+      'Missing required environment variable: BAR',
+    );
   });
 });

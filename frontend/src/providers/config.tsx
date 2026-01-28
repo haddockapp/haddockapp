@@ -12,6 +12,7 @@ export interface ConfigContextProps {
   config: Config;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ConfigContext = createContext<ConfigContextProps | undefined>(
   undefined
 );

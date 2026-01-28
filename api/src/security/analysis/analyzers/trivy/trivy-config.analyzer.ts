@@ -7,28 +7,29 @@ import { TrivyConfigFact, TrivyConfigOutput } from './types';
 
 @Injectable()
 export class TrivyConfigAnalyzer implements SecurityAnalyzer {
-    async analyze(context: AnalysisContext): Promise<SecurityFact[]> {
-        const { project } = context;
+  async analyze(context: AnalysisContext): Promise<SecurityFact[]> {
+    const { project } = context;
 
-        if (!project.path) return [];
+    if (!project.path) return [];
 
-        const { stdout } = await execCommand(`trivy config --format json ${project.path}`);
+    const { stdout } = await execCommand(
+      `trivy config --format json ${project.path}`,
+    );
 
-        const trivyOutput = JSON.parse(stdout) as TrivyConfigOutput;
+    const trivyOutput = JSON.parse(stdout) as TrivyConfigOutput;
 
-        const facts: TrivyConfigFact[] = [];
+    const facts: TrivyConfigFact[] = [];
 
-        for (const result of trivyOutput.Results) {
-            for (const misconfiguration of result.Misconfigurations) {
-                facts.push({
-                    type: 'trivy-config',
-                    source: 'trivy-config',
-                    target: result.Target,
-                    misconfiguration,
-                });
-            }
-
-        }
-        return facts;
+    for (const result of trivyOutput.Results) {
+      for (const misconfiguration of result.Misconfigurations) {
+        facts.push({
+          type: 'trivy-config',
+          source: 'trivy-config',
+          target: result.Target,
+          misconfiguration,
+        });
+      }
     }
+    return facts;
+  }
 }
