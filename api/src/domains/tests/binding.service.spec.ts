@@ -19,7 +19,9 @@ describe('BindingService', () => {
 
   describe('getServerIPv4', () => {
     it('should return the first external IPv4 address', () => {
-      jest.spyOn(os, 'networkInterfaces').mockReturnValue(mockNetworkInterfaces());
+      jest
+        .spyOn(os, 'networkInterfaces')
+        .mockReturnValue(mockNetworkInterfaces());
 
       const result = service.getServerIPv4();
 
@@ -83,7 +85,89 @@ describe('BindingService', () => {
 
       const result = service.createChallengeBinding(mockDomain);
 
-      expect(result).toBe(`${service.getChallengeRecordName(mockDomain)} IN TXT "${mockDomain.challenge}"`);
+      expect(result).toBe(
+        `${service.getChallengeRecordName(mockDomain)} IN TXT "${mockDomain.challenge}"`,
+      );
+    });
+
+    it('should include challenge value in binding', () => {
+      const mockDomain = generateMockDomain();
+      mockDomain.challenge = 'test-challenge-123';
+
+      const result = service.createChallengeBinding(mockDomain);
+
+      expect(result).toContain('test-challenge-123');
+    });
+
+    it('should format challenge binding correctly', () => {
+      const mockDomain = generateMockDomain();
+      mockDomain.domain = 'example.com';
+      mockDomain.challenge = 'abc123';
+
+      const result = service.createChallengeBinding(mockDomain);
+
+      expect(result).toContain('IN TXT');
+      expect(result).toContain('"abc123"');
+    });
+  });
+
+  describe('getServerIPv4', () => {
+    it('should skip internal interfaces', () => {
+      jest.spyOn(os, 'networkInterfaces').mockReturnValue({
+        lo0: [
+          {
+            family: 'IPv4',
+            address: '127.0.0.1',
+            internal: true,
+            netmask: '255.0.0.0',
+            mac: '00:00:00:00:00:00',
+            cidr: '127.0.0.1/8',
+          },
+        ],
+        eth0: [
+          {
+            family: 'IPv4',
+            address: '192.168.1.1',
+            internal: false,
+            netmask: '255.255.255.0',
+            mac: '00:1B:44:11:3A:B7',
+            cidr: '192.168.1.1/24',
+          },
+        ],
+      });
+
+      const result = service.getServerIPv4();
+
+      expect(result).toBe('192.168.1.1');
+    });
+
+    it('should handle multiple network interfaces', () => {
+      jest.spyOn(os, 'networkInterfaces').mockReturnValue({
+        eth0: [
+          {
+            family: 'IPv4',
+            address: '10.0.0.1',
+            internal: false,
+            netmask: '255.0.0.0',
+            mac: '00:1B:44:11:3A:B7',
+            cidr: '10.0.0.1/8',
+          },
+        ],
+        eth1: [
+          {
+            family: 'IPv4',
+            address: '192.168.1.1',
+            internal: false,
+            netmask: '255.255.255.0',
+            mac: '00:1B:44:11:3A:B8',
+            cidr: '192.168.1.1/24',
+          },
+        ],
+      });
+
+      const result = service.getServerIPv4();
+
+      expect(result).toBe('10.0.0.1');
     });
   });
 });

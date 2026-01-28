@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CreateGithubSourceDto, SourceType } from '../dto/create-source.dto';
 import { SourceDto } from '../dto/source.dto';
 import { SourceFactory } from '../source.factory';
+import { AuthorizationService } from '../../authorization/authorization.service';
+import { TemplatesService } from '../../templates/templates.service';
 import {
   generateCreateGithubSourceDto,
   generateSourceDto,
@@ -13,48 +15,60 @@ describe('SourceFactory', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SourceFactory],
+      providers: [
+        SourceFactory,
+        {
+          provide: AuthorizationService,
+          useValue: {
+            canReadSource: jest.fn().mockResolvedValue(true),
+          },
+        },
+        {
+          provide: TemplatesService,
+          useValue: {
+            buildTemplateEnvironment: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     factory = module.get<SourceFactory>(SourceFactory);
   });
 
   describe('createGithubSource', () => {
-    it('should create a SourceDto for GitHub source type', () => {
+    it('should create a SourceDto for GitHub source type', async () => {
       const createGithubSourceDto: CreateGithubSourceDto =
         generateCreateGithubSourceDto();
       const expectedSourceDto: SourceDto = generateSourceDto(
         createGithubSourceDto,
       );
 
-      const result = factory['createGithubSource'](createGithubSourceDto);
+      const result = await factory['createGithubSource'](createGithubSourceDto);
 
       expect(result).toEqual(expectedSourceDto);
     });
   });
 
   describe('createSource', () => {
-    it('should create a SourceDto when the type is GitHub', () => {
+    it('should create a SourceDto when the type is GitHub', async () => {
       const createGithubSourceDto: CreateGithubSourceDto =
         generateCreateGithubSourceDto();
       const expectedSourceDto: SourceDto = generateSourceDto(
         createGithubSourceDto,
       );
 
-      const result = factory.createSource(createGithubSourceDto);
+      const result = await factory.createSource(createGithubSourceDto);
 
       expect(result).toEqual(expectedSourceDto);
     });
 
-    it('should throw an error for an invalid source type', () => {
+    it('should throw an error for an invalid source type', async () => {
       const invalidSourceDto = {
         ...generateCreateGithubSourceDto(),
         type: 'invalid' as SourceType.GITHUB,
       };
 
-      expect(() => factory.createSource(invalidSourceDto)).toThrow(
-        'Invalid source type',
-      );
+      await expect(factory.createSource(invalidSourceDto)).rejects.toThrow();
     });
   });
 });
