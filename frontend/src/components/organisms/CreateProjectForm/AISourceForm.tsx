@@ -9,6 +9,7 @@ import CopiableField from "@/components/molecules/copiable-field";
 import { useAppSelector } from "@/hooks/useStore";
 import { useGetDeploymentCodeQuery } from "@/services/backendApi/projects";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Theme } from "@/services/settingsSlice";
 
 const aiToolToLabel: Record<AITools, string> = {
   [AITools.VSCODE]: "VSCode",
@@ -24,7 +25,7 @@ const aiToolToFetchCommand: Record<AITools, string> = {
   [AITools.WINDSURF]: "@web",
 };
 
-const aiToolToLogo: Record<AITools, React.ReactNode> = {
+const getAiToolToLogo = (theme: Theme): Record<AITools, React.ReactNode> => ({
   [AITools.VSCODE]: (
     <img src="/vscode.png" alt="VSCode Logo" className="size-5 shrink-0" />
   ),
@@ -32,16 +33,18 @@ const aiToolToLogo: Record<AITools, React.ReactNode> = {
     <img src="/cursor.png" alt="Cursor Logo" className="size-5 shrink-0" />
   ),
   [AITools.ZED]: (
-    <img src="/zed.png" alt="Zed Logo" className="size-5 shrink-0" />
+    <div className={`${theme === Theme.LIGHT ? "bg-black rounded p-1" : ""}`}>
+      <img src="/zed.png" alt="Zed Logo" className="size-5 shrink-0" />
+    </div>
   ),
   [AITools.WINDSURF]: (
     <img
       src="/windsurf.png"
       alt="Windsurf Logo"
-      className="size-5 shrink-0 bg-foreground rounded-full"
+      className={`size-5 shrink-0 rounded-full ${theme === Theme.LIGHT ? "" : "bg-foreground"}`}
     />
   ),
-};
+});
 
 type AIToolCardProps = {
   label: React.ReactNode;
@@ -86,6 +89,8 @@ function AISourceForm() {
   const code = deploymentCode?.deploy_code ?? "XXXXXX";
 
   const { backendUrl } = useAppSelector((state) => state.config);
+  const theme = useAppSelector((state) => state.settings.theme);
+  const aiToolToLogo = getAiToolToLogo(theme);
 
   return (
     <AnimatePresence>
