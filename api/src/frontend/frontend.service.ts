@@ -13,13 +13,18 @@ export class FrontendService {
     await fs.writeFile(process.env.FRONTEND_CONFIG, JSON.stringify(config));
   }
 
-  async setFrontendConfigValue(key: keyof FrontendConfig, value: FrontendConfig[keyof FrontendConfig]): Promise<void> {
+  async setFrontendConfigValue(
+    key: keyof FrontendConfig,
+    value: FrontendConfig[keyof FrontendConfig],
+  ): Promise<void> {
     const config = await this.getFrontendConfig();
     config[key] = value;
     await this.setFrontendConfig(config);
   }
 
-  async getFrontendConfigValue(key: keyof FrontendConfig): Promise<FrontendConfig[keyof FrontendConfig]> {
+  async getFrontendConfigValue(
+    key: keyof FrontendConfig,
+  ): Promise<FrontendConfig[keyof FrontendConfig]> {
     const config = await this.getFrontendConfig();
     return config[key];
   }

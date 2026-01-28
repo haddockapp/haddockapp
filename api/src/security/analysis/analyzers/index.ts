@@ -10,11 +10,11 @@ export const analyzerProviders: Provider[] = [
   TrivyConfigAnalyzer,
   {
     provide: SECURITY_ANALYZERS,
-    useFactory: (compose: ComposeAnalyzer, env: EnvFileAnalyzer, trivy: TrivyConfigAnalyzer) => [
-      compose,
-      env,
-      trivy,
-    ],
+    useFactory: (
+      compose: ComposeAnalyzer,
+      env: EnvFileAnalyzer,
+      trivy: TrivyConfigAnalyzer,
+    ) => [compose, env, trivy],
     inject: [ComposeAnalyzer, EnvFileAnalyzer, TrivyConfigAnalyzer],
   },
 ];

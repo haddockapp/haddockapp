@@ -1,4 +1,4 @@
 export interface ServiceUser {
-    uid: string;
-    gid: string;
+  uid: string;
+  gid: string;
 }

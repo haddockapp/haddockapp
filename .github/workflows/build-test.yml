@@ -70,3 +70,49 @@ jobs:
             echo "Frontend build failed - dist directory missing"
             exit 1
           fi
+
+  lint-backend:
+    needs: [test-backend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: './api/yarn.lock'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Lint backend
+        run: yarn lint
+
+  lint-frontend:
+    needs: [test-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: './frontend/yarn.lock'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Lint frontend
+        run: yarn lint

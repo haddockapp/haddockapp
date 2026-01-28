@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { AuthError } from '../auth/error/AuthError';
 import { GithubService } from '../github/github.service';
@@ -10,7 +10,12 @@ import { AuthorizationRepository } from './authorization.repository';
 import { AuthorizationService } from './authorization.service';
 import { AuthorizationDTO } from './dto/authorization.dto';
 import { AuthorizationResponse } from './dto/authorization.response';
-import { CreateAuthorizationDTO, DeployKeyData, OAuthData, PersonalAccessTokenData } from './dto/request/create-authorization.dto';
+import {
+  CreateAuthorizationDTO,
+  DeployKeyData,
+  OAuthData,
+  PersonalAccessTokenData,
+} from './dto/request/create-authorization.dto';
 import { AuthorizationEnum } from './types/authorization.enum';
 
 @Injectable()
@@ -20,7 +25,7 @@ export class AuthorizationEntityService {
     private readonly mapper: AuthorizationMapper,
     private readonly githubService: GithubService,
     private readonly service: AuthorizationService,
-  ) { }
+  ) {}
 
   private async getOAuthToken(code: string): Promise<string> {
     try {
@@ -34,15 +39,18 @@ export class AuthorizationEntityService {
     }
   }
 
-
-  private async requestToAuthorizationObject(authorization: CreateAuthorizationDTO): Promise<AuthorizationDTO> {
+  private async requestToAuthorizationObject(
+    authorization: CreateAuthorizationDTO,
+  ): Promise<AuthorizationDTO> {
     switch (authorization.type) {
       case AuthorizationEnum.OAUTH:
         return {
           name: authorization.name,
           type: AuthorizationEnum.OAUTH,
           data: {
-            token: await this.getOAuthToken((authorization.data as OAuthData).code),
+            token: await this.getOAuthToken(
+              (authorization.data as OAuthData).code,
+            ),
           },
         };
       case AuthorizationEnum.PERSONAL_ACCESS_TOKEN:
@@ -66,7 +74,9 @@ export class AuthorizationEntityService {
 
   public async findAll(): Promise<AuthorizationResponse[]> {
     const authorizations = await this.repository.findAll();
-    return authorizations.map((authorization) => this.mapper.toResponse(authorization));
+    return authorizations.map((authorization) =>
+      this.mapper.toResponse(authorization),
+    );
   }
 
   public async findById(id: string): Promise<AuthorizationResponse> {

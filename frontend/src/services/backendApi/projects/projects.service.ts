@@ -19,6 +19,7 @@ export const updateProjectStatus = ({
   projectId,
   newStatus,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dispatch: ThunkDispatch<any, any, UnknownAction>;
   onSubscribe: () => void;
   onUnsubscribe: () => void;
@@ -50,6 +51,7 @@ export const updateServiceStatus = ({
   serviceId,
   newStatus,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dispatch: ThunkDispatch<any, any, UnknownAction>;
   projectId: string;
   serviceId: string;

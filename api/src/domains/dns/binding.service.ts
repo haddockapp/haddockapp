@@ -4,7 +4,6 @@ import * as os from 'os';
 
 @Injectable()
 export class BindingService {
-
   getServerIPv4(): string {
     const networkInterfaces = os.networkInterfaces();
     for (const interfaceName in networkInterfaces) {

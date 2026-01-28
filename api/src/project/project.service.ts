@@ -266,7 +266,7 @@ export class ProjectService {
       .then((icon) => {
         result.icon = icon;
       })
-      .catch((e) => {});
+      .catch(() => {});
     return result;
   }
 

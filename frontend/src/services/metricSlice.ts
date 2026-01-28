@@ -51,6 +51,7 @@ const initializeMetrics = (
   state: Record<string, MetricsData>,
   projectId: string
 ) => {
+  // eslint-disable-next-line no-extra-boolean-cast
   if (!!state[projectId]) return;
 
   state[projectId] = {

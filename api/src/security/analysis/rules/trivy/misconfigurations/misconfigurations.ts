@@ -7,7 +7,6 @@ import { stringToSeverity } from '../severity.utils';
 
 @Injectable()
 export class MisconfigurationsRule implements SecurityRule<TrivyConfigFact> {
-
   supports(fact: SecurityFact): fact is TrivyConfigFact {
     return fact.type === 'trivy-config';
   }

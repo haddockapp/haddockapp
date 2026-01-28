@@ -39,8 +39,9 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     }
   }
 
+  /* eslint-disable @typescript-eslint/ban-types */
   async validate(req: Request, done: Function) {
-    // @ts-ignore
+    // @ts-expect-error req.body is not typed
     const { code } = req.body as ConnectGithubDto;
     const accessToken = await this.connectGithubViaCode(code);
 

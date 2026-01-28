@@ -1,5 +1,10 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
@@ -12,11 +17,15 @@ export class AutologinsService {
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly userRepository: UserRepository,
-  ) { }
+  ) {}
 
   async generateToken(userId: string): Promise<string> {
     const token = uuidv4();
-    await this.cacheManager.set(`autologin:${token}`, userId, 24 * 60 * 60 * 1000);
+    await this.cacheManager.set(
+      `autologin:${token}`,
+      userId,
+      24 * 60 * 60 * 1000,
+    );
     return token;
   }
 

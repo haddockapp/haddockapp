@@ -1,16 +1,16 @@
-import { IsBoolean, IsOptional, IsString, Matches } from "class-validator";
+import { IsBoolean, IsOptional, IsString, Matches } from 'class-validator';
 
 const DOMAIN_NAME_REGEX = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,8}$/;
 
 export class CreateDomainDto {
-    @IsString()
-    @Matches(DOMAIN_NAME_REGEX, { message: "Invalid domain name" })
-    domain: string;
+  @IsString()
+  @Matches(DOMAIN_NAME_REGEX, { message: 'Invalid domain name' })
+  domain: string;
 
-    @IsBoolean()
-    main: boolean;
+  @IsBoolean()
+  main: boolean;
 
-    @IsOptional()
-    @IsBoolean()
-    https?: boolean;
+  @IsOptional()
+  @IsBoolean()
+  https?: boolean;
 }

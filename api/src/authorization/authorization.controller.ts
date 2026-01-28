@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AuthorizationEntityService } from './authorization-entity.service';
 import { CreateAuthorizationDTO } from './dto/request/create-authorization.dto';
 import { AuthorizationValidator } from './authorization.validator';
@@ -23,23 +16,17 @@ export class AuthorizationController {
   }
 
   @Get(':id')
-  async findById(
-    @Param('id') id: string
-  ) {
+  async findById(@Param('id') id: string) {
     return await this.service.findById(id);
   }
 
   @Delete(':id')
-  async delete(
-    @Param('id') id: string
-  ) {
+  async delete(@Param('id') id: string) {
     return await this.service.delete(id);
   }
 
   @Post()
-  async create(
-    @Body() body: CreateAuthorizationDTO
-  ) {
+  async create(@Body() body: CreateAuthorizationDTO) {
     await this.validator.validate(body);
     return this.service.create(body);
   }

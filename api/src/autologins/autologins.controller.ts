@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AutologinsService } from './autologins.service';
 import { AutologinRequestDto } from './dto/autologin.request';
 import { Public } from 'src/auth/auth.decorator';

@@ -209,6 +209,7 @@ const useWebsockets = () => {
       socket.disconnect();
       socket.off("message");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, clientId, socketUrl, projectId]);
 
   useEffect(() => {
@@ -224,6 +225,7 @@ const useWebsockets = () => {
       socket.off(WebsocketService.LOGS);
       socket.off(WebsocketService.STATUS);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, clientId, projectId, oldProjectId]);
 };
 

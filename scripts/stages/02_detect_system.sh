@@ -22,7 +22,7 @@ output "✓ System: $OS $VER ($ARCH)"
 log_system_info
 
 section_progress "Checking system compatibility"
-if [ "$OS" = "ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24 ]; then
+if [ "$OS" = "ubuntu" ] && [ "$(lsb_release -r | awk '{print $2}' | cut -d. -f1)" -ge 24.04 ]; then
     output "${RED}✗ Unsupported Ubuntu version${NC}"
     exit 1
 fi

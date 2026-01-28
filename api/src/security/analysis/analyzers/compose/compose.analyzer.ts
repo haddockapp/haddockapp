@@ -12,7 +12,7 @@ export class ComposeAnalyzer implements SecurityAnalyzer {
   constructor(
     private readonly sourceService: SourceService,
     private readonly composeService: ComposeService,
-  ) { }
+  ) {}
 
   async analyze(context: AnalysisContext): Promise<SecurityFact[]> {
     const source = await this.sourceService.findSourceById(

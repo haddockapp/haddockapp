@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { SecurityFact } from 'src/security/types/facts';
-import { SecurityFinding, Severity, SeverityLevel } from 'src/security/types/findings';
+import { SecurityFinding } from 'src/security/types/findings';
 import { SecurityRule } from 'src/security/types/rule.interface';
 import { ImageFact } from '../../../analyzers/compose/types';
 import { execCommand } from '../../../../../utils/exec-utils';
-import { TrivyImageOutput, TrivySeverity } from './trivy-output.type';
+import { TrivyImageOutput } from './trivy-output.type';
 import { stringToSeverity } from '../severity.utils';
 
 @Injectable()
 export class DockerVulnerabilitiesRule implements SecurityRule<ImageFact> {
-
   supports(fact: SecurityFact): fact is ImageFact {
     return fact.type === 'docker-image';
   }
@@ -21,7 +20,10 @@ export class DockerVulnerabilitiesRule implements SecurityRule<ImageFact> {
       return results;
     }
 
-    const { stdout } = await execCommand(`trivy image ${fact.image} --quiet --format json`, { timeout: 30000 });
+    const { stdout } = await execCommand(
+      `trivy image ${fact.image} --quiet --format json`,
+      { timeout: 30000 },
+    );
     const trivyResult = JSON.parse(stdout) as TrivyImageOutput;
 
     for (const result of trivyResult.Results) {

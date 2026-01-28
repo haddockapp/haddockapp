@@ -23,7 +23,9 @@ export class NetworksController {
 
   @Get('project/:id')
   async getAllNetworkConnections(@Param('id') projectId: string) {
-    return await this.networksRepository.findNetworkConnectionsByProjectId(projectId);
+    return await this.networksRepository.findNetworkConnectionsByProjectId(
+      projectId,
+    );
   }
 
   @Post()
@@ -39,7 +41,9 @@ export class NetworksController {
     @Body() data: UpdateNetworkConnectionDto,
   ) {
     const network_connection =
-      await this.networksRepository.findNetworkConnectionById(networkConnectionId);
+      await this.networksRepository.findNetworkConnectionById(
+        networkConnectionId,
+      );
 
     if (!network_connection) {
       throw new NotFoundException('Netowrk connection not found.');

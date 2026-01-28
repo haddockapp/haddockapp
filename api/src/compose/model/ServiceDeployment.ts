@@ -1,4 +1,4 @@
 export interface ServiceDeployment {
-    cpus: number;
-    memory: number;
+  cpus: number;
+  memory: number;
 }

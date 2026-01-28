@@ -1,5 +1,4 @@
-
 export interface FrontendConfig {
-    backendUrl: string;
-    socketUrl: string;
+  backendUrl: string;
+  socketUrl: string;
 }

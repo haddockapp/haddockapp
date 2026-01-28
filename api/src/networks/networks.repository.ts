@@ -12,11 +12,13 @@ export class NetworksRepository {
     return this.prismaService.networkConnection.findMany();
   }
 
-  async findNetworkConnectionsByProjectId(projectId: string): Promise<NetworkConnection[]> {
+  async findNetworkConnectionsByProjectId(
+    projectId: string,
+  ): Promise<NetworkConnection[]> {
     return this.prismaService.networkConnection.findMany({
-        where: {
-            projectId,
-        },
+      where: {
+        projectId,
+      },
     });
   }
 
@@ -60,7 +62,7 @@ export class NetworksRepository {
         domain: `${data.prefix}.${domain}`,
         port: data.port,
         projectId: project.id,
-        https
+        https,
       },
     });
   }

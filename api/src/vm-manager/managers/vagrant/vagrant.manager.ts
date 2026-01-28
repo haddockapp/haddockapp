@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IVMManager, UpdatedVm } from '../../types/ivm.manager';
-import { Project, Source, Vm } from '@prisma/client';
+import { Project, Source } from '@prisma/client';
 import { execCommand, ExecResult } from 'src/utils/exec-utils';
 import { compile } from 'handlebars';
 import { readFileSync } from 'fs';
@@ -96,7 +96,9 @@ export class VagrantManager implements IVMManager {
         return res;
       }
       default:
-        this.logger.error(`Source type ${source.type} not supported for Vm ${project.vmId}`);
+        this.logger.error(
+          `Source type ${source.type} not supported for Vm ${project.vmId}`,
+        );
         throw new Error('Invalid source type');
     }
   }
