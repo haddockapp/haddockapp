@@ -221,28 +221,28 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
             source:
               data.source === SourceType.ZIP_UPLOAD
                 ? {
-                    type: SourceType.ZIP_UPLOAD,
-                    compose_path: data.composePath,
-                  }
+                  type: SourceType.ZIP_UPLOAD,
+                  compose_path: data.composePath,
+                }
                 : data.source === SourceType.TEMPLATE
                   ? {
-                      type: SourceType.TEMPLATE,
-                      templateId: data.templateId!.value,
-                      versionId: data.templateVersionId!.value,
-                      variables: data.variables!,
-                    }
+                    type: SourceType.TEMPLATE,
+                    templateId: data.templateId!.value,
+                    versionId: data.templateVersionId!.value,
+                    variables: data.variables!,
+                  }
                   : {
-                      type: SourceType.GITHUB,
-                      authorization_id: data.authorization
-                        ? data.authorization?.value.length > 0
-                          ? data.authorization?.value
-                          : undefined
-                        : undefined,
-                      branch: data.branch!.value,
-                      organization: data.repository!.value.split("/")[0],
-                      repository: data.repository!.value.split("/")[1],
-                      compose_path: data.composePath,
-                    },
+                    type: SourceType.GITHUB,
+                    authorization_id: data.authorization
+                      ? data.authorization?.value.length > 0
+                        ? data.authorization?.value
+                        : undefined
+                      : undefined,
+                    branch: data.branch!.value,
+                    organization: data.repository!.value.split("/")[0],
+                    repository: data.repository!.value.split("/")[1],
+                    compose_path: data.composePath,
+                  },
           })
             .unwrap()
             .then((res) => {
@@ -337,8 +337,8 @@ const CreateProjectForm: FC<CreateProjectFormProps> = ({ onClose }) => {
                           icon={
                             <SparklesIcon className="size-8 shrink-0 text-purple-500" />
                           }
-                          label="Generate with AI"
-                          description="Let AI build your project structure"
+                          label="Deploy with AI"
+                          description="Let AI deploy your project to Haddock"
                           value={SourceType.AI}
                           onChangeValue={() => {
                             field.onChange(SourceType.AI);
