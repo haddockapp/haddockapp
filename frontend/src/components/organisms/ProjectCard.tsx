@@ -3,6 +3,7 @@ import { FC } from "react";
 import { Package } from "lucide-react";
 import { ProjectDto } from "@/services/backendApi/projects";
 import ProjectStatusBadge from "./ProjectManagement/ProjectStatusBadge";
+import dayjs from "dayjs";
 
 interface ProjectCardProps {
   onClick?: () => void;
@@ -26,8 +27,16 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
                 {project.name}
               </p>
               <div className="flex-row gap-1">
-                <p className="text-typography/60">Last deployment date:</p>
-                <p className="text-typography/80 font-semibold">12/09/2024</p>
+                {project.lastDeployedAt && (
+                  <>
+                    <p className="text-typography/60">Last deployment date:</p>
+                    <p className="text-typography/80 font-semibold">
+                      {dayjs(project.lastDeployedAt).format(
+                        "MMM D, YYYY h:mm A",
+                      )}
+                    </p>
+                  </>
+                )}
               </div>
               <p className="text-typography/70 line-clamp-2">
                 {project.description ?? ""}

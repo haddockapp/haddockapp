@@ -28,6 +28,7 @@ export type ProjectDto = {
   name: string;
   authorizationId?: string;
   description?: string;
+  lastDeployedAt?: string;
   vmId: string;
   vm: VMInfos;
   source: Source;
