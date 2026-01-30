@@ -25,6 +25,7 @@ export const generateSourceDto = (
     organization: createSourceDto.organization,
     repository: createSourceDto.repository,
     branch: createSourceDto.branch,
+    composePath: createSourceDto.compose_path,
   },
   authorizationId: createSourceDto.authorization_id,
 });
