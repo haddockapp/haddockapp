@@ -48,6 +48,7 @@ model Project {
     name               String
     description        String?
     path               String?             @unique
+    lastDeployedAt     DateTime?
     source             Source              @relation(fields: [sourceId], references: [id])
     sourceId           String              @unique
     vm                 Vm                  @relation(fields: [vmId], references: [id])
@@ -115,9 +116,9 @@ model Service {
     id          String   @id @default(uuid())
     name        String
     image       String
-    ports       String[]
-    networks    String[]
-    depends_on  String[]
+    ports       Json
+    networks    Json
+    depends_on  Json
     environment String
     user        String
     deployment  String

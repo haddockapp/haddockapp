@@ -25,7 +25,30 @@ const useConfiguration = () => {
     }
   }, [configuration]);
 
-  return { githubConfig };
+  const ssoConfig = useMemo<{
+    entryPoint: string;
+    issuer: string;
+    callbackUrl: string;
+  } | null>(() => {
+    function getConfigurationValue(toFind: ConfigurationType) {
+      const value = configuration?.find(({ key }) => key === toFind)?.value;
+      if (!value) throw new Error(`Missing configuration value for ${toFind}`);
+
+      return value;
+    }
+
+    try {
+      return {
+        entryPoint: getConfigurationValue(ConfigurationType.SAML_ENTRY_POINT),
+        issuer: getConfigurationValue(ConfigurationType.SAML_ISSUER),
+        callbackUrl: getConfigurationValue(ConfigurationType.SAML_CALLBACK_URL),
+      };
+    } catch {
+      return null;
+    }
+  }, [configuration]);
+
+  return { githubConfig, ssoConfig };
 };
 
 export default useConfiguration;

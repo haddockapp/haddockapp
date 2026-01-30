@@ -1,3 +1,4 @@
+import SecurityTab from "@/components/organisms/ProjectTabs/SecurityTab";
 import MonitoringTab from "@/components/organisms/ProjectTabs/MonitoringTab";
 import ReactflowTab from "@/components/organisms/ProjectTabs/ReactFlow/ReactflowTab";
 import SettingsTab from "@/components/organisms/ProjectTabs/SettingsTab";
@@ -11,16 +12,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch } from "@/hooks/useStore";
 import { setAlert, setProjectId } from "@/services/metricSlice";
 import { ProjectTabsValue } from "./projectTabsType";
+import SimpleDialog from "@/components/organisms/SimpleDialog";
+import UploadZipDialog from "@/components/organisms/UploadZipDialog";
+import { SourceType } from "@/services/backendApi/projects/sources.dto";
 
 const ProjectDetails: FC = () => {
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
   const [selectedTab, setSelectedTab] = useState<ProjectTabsValue>(
-    ProjectTabsValue.Topology
+    ProjectTabsValue.Topology,
   );
 
   const { data: projects, isLoading } = useGetProjectsQuery();
   const currentProject = projects?.find((project) => project.id === projectId);
+  const shouldShowUploadDialog =
+    currentProject?.source.type === SourceType.ZIP_UPLOAD &&
+    "status" in currentProject.source.settings &&
+    currentProject.source.settings.status === "none";
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(shouldShowUploadDialog);
 
   useEffect(() => {
     if (projectId) dispatch(setProjectId(projectId));
@@ -34,6 +43,10 @@ const ProjectDetails: FC = () => {
     if (selectedTab === ProjectTabsValue.Monitoring && !!projectId)
       dispatch(setAlert({ projectId, isAlert: false }));
   }, [dispatch, projectId, selectedTab]);
+
+  useEffect(() => {
+    setIsUploadDialogOpen(shouldShowUploadDialog);
+  }, [shouldShowUploadDialog]);
 
   if (isLoading) {
     return (
@@ -50,6 +63,16 @@ const ProjectDetails: FC = () => {
 
   return (
     <>
+      {shouldShowUploadDialog && (
+        <SimpleDialog
+          isOpen={isUploadDialogOpen}
+          title="Upload a ZIP file"
+          description="Drag and drop or browse to upload a ZIP file containing your project."
+          Content={UploadZipDialog}
+          onClose={() => setIsUploadDialogOpen(false)}
+        />
+      )}
+
       <ProjectManagementPanel
         onChangeTab={setSelectedTab}
         project={currentProject}
@@ -61,6 +84,7 @@ const ProjectDetails: FC = () => {
             <TabsTrigger
               value={ProjectTabsValue.Topology}
               onClick={() => setSelectedTab(ProjectTabsValue.Topology)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
@@ -75,6 +99,7 @@ const ProjectDetails: FC = () => {
             <TabsTrigger
               value={ProjectTabsValue.Monitoring}
               onClick={() => setSelectedTab(ProjectTabsValue.Monitoring)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
@@ -87,8 +112,24 @@ const ProjectDetails: FC = () => {
               </span>
             </TabsTrigger>
             <TabsTrigger
+              value={ProjectTabsValue.Security}
+              onClick={() => setSelectedTab(ProjectTabsValue.Security)}
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <span
+                className={
+                  selectedTab === ProjectTabsValue.Security
+                    ? "text-primary"
+                    : ""
+                }
+              >
+                Security
+              </span>
+            </TabsTrigger>
+            <TabsTrigger
               value={ProjectTabsValue.Settings}
               onClick={() => setSelectedTab(ProjectTabsValue.Settings)}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <span
                 className={
@@ -109,6 +150,9 @@ const ProjectDetails: FC = () => {
         </TabsContent>
         <TabsContent value="monitoring">
           <MonitoringTab projectId={projectId ?? ""} />
+        </TabsContent>
+        <TabsContent value="security">
+          <SecurityTab projectId={projectId ?? ""} />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsTab />

@@ -1,5 +1,5 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
@@ -9,6 +9,7 @@ import { UserRepository } from '../user/user.repository';
 export class AutologinsService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly userRepository: UserRepository,
   ) { }

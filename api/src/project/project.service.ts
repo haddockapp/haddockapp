@@ -25,6 +25,10 @@ import { ServiceStatus } from 'src/types/service.enum';
 import { EventScope, EventType } from 'src/websockets/dto/websocket-event.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { CreateProjectDto } from './dto/CreateProject.dto';
+import { CreatedSource } from 'src/source/dto/source.dto';
+import { JsonValue } from '@prisma/client/runtime/library';
+import { PersistedProjectDto } from './dto/project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -40,6 +44,58 @@ export class ProjectService {
     private readonly dockerService: DockerService,
     @InjectQueue('deploys') private readonly deployQueue: Queue,
   ) {}
+
+  private envVarMerger(
+    existingVars: EnvironmentVar[],
+    newVars: EnvironmentVar[],
+  ): EnvironmentVar[] {
+    const map = new Map<string, EnvironmentVar>();
+
+    for (const env of existingVars) {
+      map.set(env.key, env);
+    }
+
+    for (const env of newVars) {
+      map.set(env.key, env);
+    }
+
+    return Array.from(map.values());
+  }
+
+  async createProject(data: CreateProjectDto): Promise<Project> {
+    const source: CreatedSource = await this.sourceService.registerSource(
+      data.source,
+    );
+    const project = await this.projectRepository.createProject(data, source.id);
+
+    const environmentVars: EnvironmentVar[] = data.source.environmentVars;
+
+    if (source.environmentVars) {
+      const mergedEnvVars = this.envVarMerger(
+        environmentVars,
+        source.environmentVars,
+      );
+
+      await this.projectRepository.updateEnvironmentVars(
+        project.id,
+        mergedEnvVars,
+      );
+    } else {
+      await this.projectRepository.updateEnvironmentVars(
+        project.id,
+        environmentVars,
+      );
+    }
+
+    const updatedProject: PersistedProjectDto =
+      await this.projectRepository.findProjectById(project.id);
+
+    if (updatedProject) {
+      return updatedProject;
+    } else {
+      throw new NotFoundException('Project not found after creation.');
+    }
+  }
 
   async updateProject(
     projectId: string,
@@ -84,7 +140,16 @@ export class ProjectService {
       if (e instanceof ExecutionError) {
         this.logger.error(`Failed to destroy vm: ${e.message}`);
       }
-      return;
+      throw e;
+    }
+
+    try {
+      await this.sourceService.deletePhysicalFiles(project.sourceId);
+    } catch (e) {
+      if (e instanceof ExecutionError) {
+        this.logger.error(`Failed to delete physical files: ${e.message}`);
+      }
+      throw e;
     }
 
     await this.projectRepository.deleteProject(projectId);
@@ -98,6 +163,12 @@ export class ProjectService {
     await execCommand(`rm -rf ${project.path}`);
 
     this.logger.log(`Project ${projectId} deleted`);
+  }
+
+  async findProjectById(
+    projectId: string,
+  ): Promise<PersistedProjectDto | null> {
+    return this.projectRepository.findProjectById(projectId);
   }
 
   async stopProject(projectId: string) {
@@ -119,17 +190,22 @@ export class ProjectService {
   async deployProject(projectId: string) {
     const project = await this.projectRepository.findProjectById(projectId);
 
+    if (!project) {
+      throw new NotFoundException('Project not found.');
+    }
+
     if (
-      project.vm.status === VmState.Running ||
-      project.vm.status === VmState.Starting ||
-      project.vm.status === VmState.Stopping
+      project.vm &&
+      (project.vm.status === VmState.Running ||
+        project.vm.status === VmState.Starting ||
+        project.vm.status === VmState.Stopping)
     ) {
       throw new BadRequestException('Project is already running');
     }
 
     this.logger.log(`Deploying project ${project.id}`);
 
-    await this.sourceService.deploySource(project.sourceId);
+    await this.sourceService.deploySource(project.sourceId, false);
   }
 
   async recreateProject(projectId: string) {
@@ -158,10 +234,22 @@ export class ProjectService {
     await this.sourceService.deploySource(project.sourceId);
   }
 
+  private asStringArray(value: JsonValue): string[] {
+    if (Array.isArray(value) && value.every((i) => typeof i === 'string')) {
+      return value;
+    }
+    return [];
+  }
+
   async serviceEntityToDto(service: Service): Promise<ProjectServiceDto> {
     const result: ProjectServiceDto = {
       icon: 'https://img.icons8.com/?size=48&id=cdYUlRaag9G9&format=png',
       ...service,
+      name: service.name,
+      image: service.image,
+      ports: this.asStringArray(service.ports),
+      networks: this.asStringArray(service.networks),
+      depends_on: this.asStringArray(service.depends_on),
       environment: JSON.parse(service.environment),
       user: JSON.parse(service.user),
       deployment: JSON.parse(service.deployment),

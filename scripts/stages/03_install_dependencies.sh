@@ -116,6 +116,36 @@ else
     fi
 fi
 
+# Install Trivy
+if [ -x "$(command -v trivy)" ]; then
+    output "${GREEN}✓${NC} Trivy is already installed"
+else
+    output "Installing Trivy..."
+    if [ "$PM" = "apt" ]; then
+        # Install dependencies for Trivy repo
+        run_command "Installing Trivy dependencies..." "sudo apt install -y wget apt-transport-https gnupg lsb-release"
+        
+        # Add Trivy key and repository
+        run_command "Adding Trivy key..." "wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null"
+        run_command "Adding Trivy repository..." "echo 'deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main' | sudo tee /etc/apt/sources.list.d/trivy.list"
+        
+        run_command "Updating package lists..." "sudo apt update"
+        if run_command "Installing Trivy..." "sudo apt install -y trivy"; then
+            output "${GREEN}✓${NC} Trivy installed successfully"
+        else
+            output "${RED}✗${NC} Failed to install Trivy"
+            failed_installations+=("trivy")
+        fi
+    elif [ "$PM" = "brew" ]; then
+        if run_command "Installing Trivy..." "brew install trivy"; then
+            output "${GREEN}✓${NC} Trivy installed successfully"
+        else
+            output "${RED}✗${NC} Failed to install Trivy"
+            failed_installations+=("trivy")
+        fi
+    fi
+fi
+
 # Install Vagrant if user wants to
 if ask_yes_no "Do you want to install Vagrant?"; then
     output "Installing Vagrant..."

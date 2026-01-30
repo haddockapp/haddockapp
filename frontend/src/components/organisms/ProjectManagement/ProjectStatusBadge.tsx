@@ -33,40 +33,40 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
       case VmState.Running:
         return {
           label: "Running",
-          bgColor: "dark:bg-emerald-700 bg-emerald-100",
-          textColor: "dark:text-white text-emerald-700",
+          bgColor: "dark:bg-emerald-700/20 bg-emerald-100",
+          textColor: "dark:text-foreground/80 text-emerald-700",
           borderColor: "dark:border-emerald-900 border-emerald-200",
           icon: <CheckCircle className="h-4 w-4" />,
         };
       case VmState.Starting:
         return {
           label: "Starting",
-          bgColor: "dark:bg-amber-600 bg-amber-100",
-          textColor: "dark:text-white text-amber-700",
+          bgColor: "dark:bg-amber-600/20 bg-amber-100",
+          textColor: "dark:text-foreground/80 text-amber-700",
           borderColor: "dark:border-amber-900 border-amber-200",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopping:
         return {
           label: "Stopping",
-          bgColor: "dark:bg-amber-600 bg-amber-100",
-          textColor: "dark:text-white text-amber-700",
+          bgColor: "dark:bg-amber-600/20 bg-amber-100",
+          textColor: "dark:text-foreground/80 text-amber-700",
           borderColor: "dark:border-amber-900 border-amber-200",
           icon: <Loader2 className="h-4 w-4 animate-spin" />,
         };
       case VmState.Stopped:
         return {
           label: "Stopped",
-          bgColor: "dark:bg-slate-800 bg-slate-100",
-          textColor: "dark:text-white text-slate-700",
+          bgColor: "dark:bg-slate-800/20 bg-slate-100",
+          textColor: "dark:text-foreground/80 text-slate-700",
           borderColor: "dark:border-slate-900 border-slate-200",
           icon: <Clock className="h-4 w-4" />,
         };
       default:
         return {
           label: "Error",
-          bgColor: "dark:bg-red-800 bg-red-100",
-          textColor: "dark:text-white text-red-700",
+          bgColor: "dark:bg-red-800/20 bg-red-100",
+          textColor: "dark:text-foreground/80 text-red-700",
           borderColor: "dark:border-red-900 border-red-200",
           icon: <QuestionMarkCircledIcon className="h-4 w-4" />,
         };
@@ -88,6 +88,7 @@ const ProjectStatusBadge: FC<ProjectStatusBadgeProps> = ({
         <div
           className={cn(
             `inline-flex items-center gap-1.5 rounded-sm border font-medium cursor-pointer hover:brightness-95
+            shadow-sm hover:shadow-md transition-shadow
             ${isAlert ? "motion-safe:animate-scale-pulse transform-gpu" : ""}`,
             bgColor,
             textColor,

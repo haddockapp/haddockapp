@@ -1,46 +1,30 @@
-import useDisclosure from "@/hooks/use-disclosure";
 import { ArrowRight } from "lucide-react";
 import { FC } from "react";
 import Divider from "@/components/atoms/divider";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-  DrawerTitle,
-  DrawerHeader,
-} from "@/components/ui/drawer";
+import { Sidebar, SidebarContent, SidebarHeader } from "../ui/sidebar";
 
 interface SimpleDrawerProps {
   Trigger: FC<{ onOpen: () => void }>;
   Content: FC<{ onClose: () => void }>;
   title: string;
 }
-const SimpleDrawer: FC<SimpleDrawerProps> = ({ Content, Trigger, title }) => {
-  const { isOpen, onToggle, onOpen, onClose } = useDisclosure();
-
+const SimpleDrawer: FC<SimpleDrawerProps> = ({ Content, title }) => {
   return (
-    <Drawer
-      onOpenChange={(open) => (open ? onOpen() : onClose())}
-      open={isOpen}
-      direction="right"
-    >
-      <DrawerTrigger asChild>
-        <Trigger onOpen={onOpen} />
-      </DrawerTrigger>
-      <DrawerContent className="flex flex-col">
-        <DrawerHeader>
-          <DrawerTitle className="flex flex-row items-center space-x-1">
-            <Button onClick={onToggle} variant="ghost" className="group p-2">
-              <ArrowRight className="text-primary/70 group-hover:text-primary duration-500" />
-            </Button>
-            <span>{title}</span>
-          </DrawerTitle>
-        </DrawerHeader>
+    <Sidebar>
+      <SidebarHeader>
+        <div className="flex flex-row items-center space-x-1">
+          <Button onClick={() => {}} variant="ghost" className="group p-2">
+            <ArrowRight className="text-primary/70 group-hover:text-primary duration-500" />
+          </Button>
+          <span>{title}</span>
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="flex flex-col">
         <Divider />
-        <Content onClose={onClose} />
-      </DrawerContent>
-    </Drawer>
+        <Content onClose={() => {}} />
+      </SidebarContent>
+    </Sidebar>
   );
 };
 

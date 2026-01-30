@@ -19,6 +19,8 @@ export enum QueryKeys {
   Authorizations = "Authorizations",
   Users = "Users",
   EnvironmentVariables = "EnvironmentVariables",
+  Templates = "Templates",
+  Security = "Security",
 }
 
 export const backendApi = createApi({
@@ -28,7 +30,7 @@ export const backendApi = createApi({
     const result = await baseQuery(
       { ...args, url: `${baseUrl}${args.url}` },
       api,
-      extraOptions
+      extraOptions,
     );
     if (result.error?.status === "FETCH_ERROR") api.dispatch(logout());
     if (result.error?.status === 401) api.dispatch(logout());

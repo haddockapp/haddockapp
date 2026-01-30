@@ -14,7 +14,11 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigurationModule } from '../configuration/configuration.module';
 import { LocalStrategy } from './strategy/local.strategy';
 import { InvitationModule } from 'src/invitation/invitation.module';
+import { AutologinsModule } from '../autologins/autologins.module';
 import { AccessGuard } from './guard/access.guard';
+import { SamlStrategy } from './strategy/saml.strategy';
+import { SamlAuthGuard } from './guard/saml.guard';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -31,12 +35,15 @@ import { AccessGuard } from './guard/access.guard';
     ConfigurationModule,
     UserModule,
     InvitationModule,
+    forwardRef(() => AutologinsModule),
   ],
   providers: [
     AuthService,
     JwtStrategy,
     GithubStrategy,
     LocalStrategy,
+    SamlStrategy,
+    SamlAuthGuard,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],

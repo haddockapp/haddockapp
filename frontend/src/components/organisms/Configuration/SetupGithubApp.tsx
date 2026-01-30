@@ -112,7 +112,7 @@ const Configuration: FC<ConfigurationProps> = ({ onClose }) => {
             )}
           />
         </div>
-        <Button type="submit">
+        <Button variant="shine" type="submit">
           {!isGithubAppConfirmed ? "Update" : "Submit"}
         </Button>
       </form>

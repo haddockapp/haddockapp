@@ -195,6 +195,25 @@ const projectsApi = backendApi.injectEndpoints({
       }),
       invalidatesTags: [QueryKeys.Projects],
     }),
+    uploadProjectZip: builder.mutation<void, { projectId: string; file: File }>(
+      {
+        query: ({ projectId, file }) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          return {
+            url: `/project/zip_upload/${projectId}`,
+            method: "POST",
+            body: formData,
+          };
+        },
+        invalidatesTags: [QueryKeys.Projects],
+      }
+    ),
+    getDeploymentCode: builder.query<{ deploy_code: string }, void>({
+      query: () => ({
+        url: "/unified-deploy/code",
+      }),
+    }),
   }),
 });
 
@@ -212,4 +231,6 @@ export const {
   useStopProjectMutation,
   usePullProjectMutation,
   useRecreateProjectMutation,
+  useUploadProjectZipMutation,
+  useGetDeploymentCodeQuery,
 } = projectsApi;

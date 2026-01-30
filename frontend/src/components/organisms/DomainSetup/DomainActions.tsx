@@ -15,7 +15,7 @@ const DomainActions: FC<DomainActionsProps> = ({ id, onSave }) => {
       <Button
         disabled={isFetching}
         onClick={onRefetch}
-        className="space-x-2"
+        className="space-x-2 shadow-lg hover:shadow-xl transition-shadow"
         variant="secondary"
       >
         <RefreshCw size="16px" />

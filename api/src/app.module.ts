@@ -20,6 +20,10 @@ import { InvitationModule } from './invitation/invitation.module';
 import { AutologinsModule } from './autologins/autologins.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { WorkspacesModule } from 'src/workspaces/workspaces.module';
+import { TemplatesModule } from './templates/templates.module';
+import { SecurityModule } from './security/security.module';
+import { UnifiedDeployModule } from './unified-deploy/unified-deploy.module';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
@@ -47,6 +51,10 @@ import { WorkspacesModule } from 'src/workspaces/workspaces.module';
     InvitationModule,
     AutologinsModule,
     WorkspacesModule,
+    TemplatesModule,
+    SecurityModule,
+    UnifiedDeployModule,
+    LlmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

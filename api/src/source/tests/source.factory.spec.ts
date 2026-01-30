@@ -1,9 +1,12 @@
 // sourceFactory.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateGithubSourceDto } from '../dto/create-source.dto';
+import { CreateGithubSourceDto, SourceType } from '../dto/create-source.dto';
 import { SourceDto } from '../dto/source.dto';
 import { SourceFactory } from '../source.factory';
-import { generateCreateGithubSourceDto, generateSourceDto } from './mocks/sources.mock';
+import {
+  generateCreateGithubSourceDto,
+  generateSourceDto,
+} from './mocks/sources.mock';
 
 describe('SourceFactory', () => {
   let factory: SourceFactory;
@@ -18,8 +21,11 @@ describe('SourceFactory', () => {
 
   describe('createGithubSource', () => {
     it('should create a SourceDto for GitHub source type', () => {
-      const createGithubSourceDto: CreateGithubSourceDto = generateCreateGithubSourceDto();
-      const expectedSourceDto: SourceDto = generateSourceDto(createGithubSourceDto);
+      const createGithubSourceDto: CreateGithubSourceDto =
+        generateCreateGithubSourceDto();
+      const expectedSourceDto: SourceDto = generateSourceDto(
+        createGithubSourceDto,
+      );
 
       const result = factory['createGithubSource'](createGithubSourceDto);
 
@@ -29,8 +35,11 @@ describe('SourceFactory', () => {
 
   describe('createSource', () => {
     it('should create a SourceDto when the type is GitHub', () => {
-      const createGithubSourceDto: CreateGithubSourceDto = generateCreateGithubSourceDto();
-      const expectedSourceDto: SourceDto = generateSourceDto(createGithubSourceDto);
+      const createGithubSourceDto: CreateGithubSourceDto =
+        generateCreateGithubSourceDto();
+      const expectedSourceDto: SourceDto = generateSourceDto(
+        createGithubSourceDto,
+      );
 
       const result = factory.createSource(createGithubSourceDto);
 
@@ -38,9 +47,14 @@ describe('SourceFactory', () => {
     });
 
     it('should throw an error for an invalid source type', () => {
-      const invalidSourceDto = { ...generateCreateGithubSourceDto(), type: 'invalid' as 'github' };
+      const invalidSourceDto = {
+        ...generateCreateGithubSourceDto(),
+        type: 'invalid' as SourceType.GITHUB,
+      };
 
-      expect(() => factory.createSource(invalidSourceDto)).toThrow('Invalid source type');
+      expect(() => factory.createSource(invalidSourceDto)).toThrow(
+        'Invalid source type',
+      );
     });
   });
 });

@@ -19,6 +19,11 @@ run_command "Enabling PM2 startup..." "pm2 startup"
 run_command "Saving PM2 configuration..." "pm2 save"
 run_command "Enabling PM2 service..." "sudo systemctl enable pm2-$USER"
 
+# Install haddockctl to system PATH
+output "Installing haddockctl management CLI..."
+run_command "Making haddockctl executable..." "chmod +x /opt/haddock/haddockctl"
+run_command "Installing haddockctl to PATH..." "sudo ln -sf /opt/haddock/haddockctl /usr/local/bin/haddockctl"
+
 validate_installation() {
     local component=$1
     log_info "Validating component: $component"
@@ -106,7 +111,8 @@ if [ ${#failed_installations[@]} -eq 0 ] && [ "$VALIDATION_FAILED" = false ]; th
     printf "${BOLD}Next steps:${NC}\n"
     printf "1. Access Haddock at ${BLUE}http://%s${NC}\n" "$IP"
     printf "2. Configure your first project\n"
-    printf "3. Read the docs at ${BLUE}https://docs.haddock.ovh${NC}\n"
+    printf "3. Manage your installation with ${BLUE}sudo haddockctl${NC}\n"
+    printf "4. Read the docs at ${BLUE}https://docs.haddock.ovh${NC}\n"
 
     # Create backup quietly
     mkdir -p "$BACKUP_DIR" 2>/dev/null
